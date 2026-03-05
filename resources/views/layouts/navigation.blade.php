@@ -14,12 +14,12 @@
                 <i class="bi bi-people-fill text-lg"></i> Dashboard
             </a>
         </li>
-       {{--  <li>
-            <a href="{{ route('cars') }}" 
-               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('cars') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="bi bi-truck text-lg"></i> Vehículos
+        <li>
+            <a href="{{ route('products.index') }}" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.index') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="bi bi-truck text-lg"></i> Productos
             </a>
-        </li> --}}
+        </li>
         {{-- <li>
             <a href="{{ route('extras') }}" 
                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('extras') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}">
