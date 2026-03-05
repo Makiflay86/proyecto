@@ -6,7 +6,8 @@
     </x-slot>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-3">
                 <div class="p-6 text-gray-900">
                     <h1>¡Bienvenido <strong>{{ Auth::user()->name }}</strong>!</h1>
                     <p class="text-sm">
@@ -14,6 +15,17 @@
                     </p>
                 </div>
             </div>
+
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-3">
+                <div class="p-6 text-gray-900">
+                    <p>
+                        <button id="a" type="button" class="flex w-full items-center justify-center gap-2 text-red-600 border border-red-200 rounded-full py-2.5 font-bold text-sm hover:bg-red-50 transition-all">
+                            Pulsa
+                        </button>
+                    </p>
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
