@@ -34,17 +34,17 @@
 
     <div class="user-footer mt-2">
         @auth
-            <div class="p-4 rounded-2xl mb-4 border border-gray-100 bg-gray-50">
+            <a href="{{ route('profile.edit') }}" class="block p-4 rounded-2xl mb-4 border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-all" wire:navigate.hover>
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                     <div class="overflow-hidden">
-                        <span class="block text-[10px] uppercase font-bold text-gray-400 tracking-wider">Usuario activo</span>
+                        <span class="block text-[10px] uppercase font-bold text-gray-400 tracking-wider">Editar perfil</span>
                         <span class="block text-sm font-bold text-gray-900 truncate">{{ Auth::user()->name }}</span>
                     </div>
                 </div>
-            </div>
+            </a>
             
             <form action="{{ route('logout') }}" method="post">
                 @csrf

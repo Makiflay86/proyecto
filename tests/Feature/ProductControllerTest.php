@@ -2,10 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Events\ProductCreated;
+use App\Mail\ProductCreatedMail;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -238,6 +242,90 @@ class ProductControllerTest extends TestCase
             ->assertSessionHasErrors('images.0');
 
         $this->assertDatabaseMissing('products', ['nombre' => 'Laptop Gaming']);
+    }
+
+    // ─── store - Evento y Email ───────────────────────────────────────────
+
+    public function test_store_dispara_el_evento_product_created(): void
+    {
+        // Event::fake() intercepta todos los eventos para poder inspeccionarlos
+        // sin ejecutar sus listeners reales (no envía emails de verdad)
+        Event::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', $this->datosValidos());
+
+        // Comprueba que el evento se disparó exactamente una vez
+        Event::assertDispatched(ProductCreated::class, function ($event) use ($user) {
+            return $event->product->nombre === 'Laptop Gaming'
+                && $event->user->id === $user->id;
+        });
+    }
+
+    public function test_store_no_dispara_el_evento_si_la_validacion_falla(): void
+    {
+        Event::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', ['nombre' => '']);
+
+        // Si la validación falla, nunca se llega a crear el producto ni a disparar el evento
+        Event::assertNotDispatched(ProductCreated::class);
+    }
+
+    public function test_store_envia_email_al_crear_producto(): void
+    {
+        // Mail::fake() intercepta todos los emails para poder inspeccionarlos
+        // sin enviarlos de verdad (no llega nada a Mailpit)
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', $this->datosValidos());
+
+        // Comprueba que se envió exactamente 1 email del tipo ProductCreatedMail
+        Mail::assertSent(ProductCreatedMail::class, 1);
+    }
+
+    public function test_store_envia_email_al_correo_del_usuario(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', $this->datosValidos());
+
+        // Comprueba que el email fue enviado al email correcto
+        Mail::assertSent(ProductCreatedMail::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email);
+        });
+    }
+
+    public function test_store_email_contiene_el_nombre_del_producto(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', $this->datosValidos());
+
+        // Comprueba que el Mailable lleva el producto correcto
+        Mail::assertSent(ProductCreatedMail::class, function ($mail) {
+            return $mail->product->nombre === 'Laptop Gaming';
+        });
+    }
+
+    public function test_store_no_envia_email_si_la_validacion_falla(): void
+    {
+        Mail::fake();
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/products', ['nombre' => '']);
+
+        Mail::assertNothingSent();
     }
 
     // ─── Helper ───────────────────────────────────────────────────────────

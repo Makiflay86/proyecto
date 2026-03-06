@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProductCreated;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,9 +60,11 @@ class ProductController extends Controller
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048', // max 2MB por imagen
         ]);
 
-        // Transacción: si falla al guardar alguna imagen, el producto también se revierte
-        // Así nunca queda un producto sin imágenes por un error a mitad del proceso
-        DB::transaction(function () use ($request, $validatedData) {
+        $user = $request->user();
+
+        // Transacción: si falla al guardar alguna imagen, el producto también se revierte.
+        // La transacción devuelve el producto para usarlo fuera.
+        $product = DB::transaction(function () use ($request, $validatedData) {
 
             $product = Product::create($validatedData);
 
@@ -74,7 +77,13 @@ class ProductController extends Controller
                     $product->images()->create(['path' => $path]);
                 }
             }
+
+            return $product;
         });
+
+        // El evento se dispara FUERA de la transacción para que un fallo en el email
+        // no revierta la creación del producto. El producto ya está guardado aquí.
+        ProductCreated::dispatch($product, $user);
 
         return redirect()->route('products.index')
             ->with('success', 'Producto creado correctamente.');
