@@ -34,7 +34,8 @@ class ProductController extends Controller
             }
         });
 
-        return back()->with('success', 'Producto creado correctamente.');
+        return redirect()->route('products.index')
+                 ->with('success', 'Producto creado correctamente.');
     }
 
     public function index()

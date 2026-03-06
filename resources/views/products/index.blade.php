@@ -9,6 +9,12 @@
                 </a>
             </div>
 
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-full relative mb-4 alert-fade">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -26,7 +32,7 @@
                             <p class="text-gray-500 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
                             
                             <div class="mt-4 flex items-center justify-between">
-                                <span class="text-lg font-bold text-gray-800">${{ number_format($product->precio, 2) }}</span>
+                                <span class="text-lg font-bold text-gray-800">{{ number_format($product->precio, 2, ",", ".") }}€</span>
                                 <button class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Ver detalles →</button>
                             </div>
                         </div>

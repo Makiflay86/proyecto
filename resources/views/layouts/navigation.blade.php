@@ -1,7 +1,7 @@
 <nav id="sidebar" class="bg-white shadow-xl flex flex-col p-4 sticky top-0 h-screen" style="width: 300px;">
     
     <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-decoration-none">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-decoration-none" wire:navigate.hover>
             <i class="bi bi-car-front-fill text-2xl text-red-600"></i>
             <span class="text-2xl font-bold text-gray-900 tracking-tighter">mi-app</span>
         </a>
@@ -10,13 +10,15 @@
     <ul class="flex flex-col gap-2 mb-auto">
         <li>
             <a href="{{ route('dashboard') }}" 
-               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}">
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}"
+                wire:navigate.hover>
                 <i class="bi bi-people-fill text-lg"></i> Dashboard
             </a>
         </li>
         <li>
             <a href="{{ route('products.index') }}" 
-               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.index') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}">
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.index') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100' }}"
+                wire:navigate.hover>
                 <i class="bi bi-truck text-lg"></i> Productos
             </a>
         </li>

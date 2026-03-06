@@ -1,0 +1,2 @@
+@keyframes fadeOutAndCollapse{0%,80%{opacity:1}100%{opacity:0;pointer-events:none;display:none}}.alert-fade{animation:fadeOutAndCollapse 4s forwards}
+/*# sourceMappingURL=success-message.min.css.map */
