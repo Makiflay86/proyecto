@@ -30,6 +30,10 @@
         </li> --}}
     </ul>
 
+    <div class="my-4">
+        <livewire:product-search />
+    </div>
+
     <hr class="border-gray-200 my-4">
 
     <div class="user-footer mt-2">

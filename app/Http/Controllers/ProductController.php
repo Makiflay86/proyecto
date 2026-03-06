@@ -26,6 +26,18 @@ class ProductController extends Controller
     }
 
     /**
+     * Muestra el detalle de un producto concreto.
+     * Laravel resuelve automáticamente el Product por el {product} de la URL.
+     * Vista: resources/views/products/show.blade.php
+     */
+    public function show(Product $product)
+    {
+        $product->load('images');
+
+        return view('products.show', compact('product'));
+    }
+
+    /**
      * Lista todos los productos con sus imágenes.
      * Usa eager loading (with) para cargar las imágenes en una sola consulta
      * y evitar el problema N+1 (una consulta extra por cada producto).
