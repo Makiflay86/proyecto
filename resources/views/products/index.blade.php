@@ -19,6 +19,30 @@
                 </div>
             @endif
 
+            @if($products->isEmpty())
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-16 text-center transition-colors duration-300">
+                    <div class="flex justify-center mb-6">
+                        <div class="bg-indigo-100 dark:bg-indigo-900 rounded-full p-6">
+                            <svg class="w-12 h-12 text-indigo-400 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Sin productos todavía</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">
+                        Aún no has añadido ningún producto. ¡Crea el primero ahora!
+                    </p>
+                    <a href="{{ route('products.create') }}"
+                       class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium"
+                       wire:navigate.hover>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Crear primer producto
+                    </a>
+                </div>
+            @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300">
@@ -43,6 +67,7 @@
                     </div>
                 @endforeach
             </div>
+            @endif
 
         </div>
     </div>

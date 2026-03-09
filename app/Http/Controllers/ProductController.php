@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\ProductCreated;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,9 +11,13 @@ use Illuminate\Support\Facades\DB;
 /**
  * Controlador que gestiona las operaciones sobre productos.
  * Rutas asociadas (todas requieren auth + verified):
- *   GET  /products         → index()
- *   GET  /products/create  → create()
- *   POST /products         → store()
+ *   GET    /products                → index()
+ *   GET    /products/create         → create()
+ *   POST   /products                → store()
+ *   GET    /products/{product}      → show()
+ *   GET    /products/{product}/edit → edit()
+ *   PUT    /products/{product}      → update()
+ *   DELETE /products/{product}      → destroy()
  */
 class ProductController extends Controller
 {
@@ -22,7 +27,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('products.create');
+        $categories = Category::orderBy('name')->pluck('name');
+
+        return view('products.create', compact('categories'));
     }
 
     /**
@@ -99,5 +106,63 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Producto creado correctamente.');
+    }
+
+    /** Muestra el formulario para editar un producto existente. */
+    public function edit(Product $product)
+    {
+        $product->load('images');
+        $categories = Category::orderBy('name')->pluck('name');
+
+        return view('products.edit', compact('product', 'categories'));
+    }
+
+    /** Valida y actualiza un producto. Las imágenes nuevas se añaden a las existentes. */
+    public function update(Request $request, Product $product)
+    {
+        $request->validate([
+            'nombre'      => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'precio'      => 'required|numeric|min:0',
+            'categoria'   => 'required|string',
+            'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        DB::transaction(function () use ($request, $product) {
+            $product->update($request->only('nombre', 'descripcion', 'precio', 'categoria', 'estado'));
+
+            // Eliminar las imágenes marcadas con el botón X en el formulario
+            if ($request->filled('delete_images')) {
+                $toDelete = $product->images()->whereIn('id', $request->delete_images)->get();
+                foreach ($toDelete as $img) {
+                    \Storage::disk('public')->delete($img->path);
+                    $img->delete();
+                }
+            }
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('productos', 'public');
+                    $product->images()->create(['path' => $path]);
+                }
+            }
+        });
+
+        return redirect()->route('products.show', $product)
+            ->with('success', 'Producto actualizado correctamente.');
+    }
+
+    /** Elimina un producto y sus imágenes asociadas del storage. */
+    public function destroy(Product $product)
+    {
+        // Eliminar archivos físicos del storage antes de borrar el registro
+        foreach ($product->images as $image) {
+            \Storage::disk('public')->delete($image->path);
+        }
+
+        $product->delete();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Producto eliminado correctamente.');
     }
 }
