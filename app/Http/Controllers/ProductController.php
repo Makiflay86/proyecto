@@ -31,9 +31,9 @@ class ProductController extends Controller
     /** Muestra el formulario para crear un nuevo producto. */
     public function create()
     {
-        $categories = Category::orderBy('name')->get(['id', 'name']);
+        $categoryOptions = Category::flatOptions();
 
-        return view('products.create', compact('categories'));
+        return view('products.create', compact('categoryOptions'));
     }
 
     /** Valida y guarda un nuevo producto junto con sus imágenes. */
@@ -71,7 +71,7 @@ class ProductController extends Controller
     /** Muestra el detalle de un producto. */
     public function show(Product $product)
     {
-        $product->load(['images', 'category']);
+        $product->load(['images', 'category.parent.parent.parent.parent']);
 
         return view('products.show', compact('product'));
     }
@@ -80,9 +80,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $product->load('images');
-        $categories = Category::orderBy('name')->get(['id', 'name']);
+        $categoryOptions = Category::flatOptions();
 
-        return view('products.edit', compact('product', 'categories'));
+        return view('products.edit', compact('product', 'categoryOptions'));
     }
 
     /** Valida y actualiza un producto. Las imágenes nuevas se añaden a las existentes. */

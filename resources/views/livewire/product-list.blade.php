@@ -1,21 +1,38 @@
 <div>
-    {{-- Pills de filtro por categoría --}}
-    <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-        <button wire:click="setCategory(null)"
-                class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
-                    {{ $categoryFilter === null
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
-            Todas
-        </button>
-        @foreach($categories as $cat)
-            <button wire:click="setCategory({{ $cat->id }})"
-                    class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
-                        {{ $categoryFilter === $cat->id
-                            ? 'bg-indigo-600 text-white shadow-md'
-                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
-                {{ $cat->name }}
-            </button>
+    {{-- Drill-down category filter --}}
+    <div class="space-y-2 mb-6">
+        @foreach($categoryRows as $depth => $row)
+            <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {{-- "Todas" / "Todos" button --}}
+                @if($depth === 0)
+                    <button wire:click="clearFrom(0)"
+                            class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
+                                {{ empty($path)
+                                    ? 'bg-indigo-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                        Todas
+                    </button>
+                @else
+                    <button wire:click="clearFrom({{ $depth }})"
+                            class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
+                                {{ count($path) === $depth
+                                    ? 'bg-indigo-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                        Todos
+                    </button>
+                @endif
+
+                {{-- Category pills for this depth --}}
+                @foreach($row as $cat)
+                    <button wire:click="selectLevel({{ $depth }}, {{ $cat->id }})"
+                            class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
+                                {{ ($path[$depth] ?? null) === $cat->id
+                                    ? 'bg-indigo-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                        {{ $cat->name }}
+                    </button>
+                @endforeach
+            </div>
         @endforeach
     </div>
 
@@ -30,12 +47,12 @@
                     </svg>
                 </div>
             </div>
-            @if($categoryFilter)
+            @if(!empty($path))
                 <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Sin productos en esta categoría</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">
                     No hay productos en la categoría seleccionada.
                 </p>
-                <button wire:click="setCategory(null)"
+                <button wire:click="clearFrom(0)"
                         class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
                     Ver todos los productos
                 </button>
@@ -67,7 +84,7 @@
                     </div>
 
                     <div class="p-5">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->category?->name }}</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->category?->root->name }}</span>
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
                         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
 

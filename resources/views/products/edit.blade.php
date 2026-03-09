@@ -58,9 +58,9 @@
                             <select name="category_id"
                                     class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition" required>
                                 <option value="" disabled>Selecciona una categoría</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id) == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
+                                @foreach($categoryOptions as $opt)
+                                    <option value="{{ $opt['id'] }}" {{ old('category_id', $product->category_id) == $opt['id'] ? 'selected' : '' }}>
+                                        {{ $opt['label'] }}
                                     </option>
                                 @endforeach
                             </select>

@@ -32,7 +32,7 @@
                 <div class="p-8">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->category?->name }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->category?->breadcrumb }}</span>
                             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h1>
                         </div>
                         <span class="text-2xl font-bold text-gray-800 dark:text-gray-100 shrink-0">

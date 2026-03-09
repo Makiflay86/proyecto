@@ -28,6 +28,20 @@
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
 
+                    <div>
+                        <x-input-label for="parent_id" :value="__('Categoría padre')" />
+                        <select id="parent_id" name="parent_id"
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+                            <option value="">— Sin categoría padre (raíz) —</option>
+                            @foreach($categoryOptions as $opt)
+                                <option value="{{ $opt['id'] }}" {{ old('parent_id', $category->parent_id) == $opt['id'] ? 'selected' : '' }}>
+                                    {{ $opt['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('parent_id')" class="mt-2" />
+                    </div>
+
                     {{-- Imagen opcional con preview y opción de eliminar la actual --}}
                     <div x-data="{
                             preview: null,

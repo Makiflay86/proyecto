@@ -20,10 +20,10 @@ use Illuminate\Support\Facades\Storage;
  */
 class CategoryController extends Controller
 {
-    /** Lista todas las categorías ordenadas por nombre. */
+    /** Lista solo las categorías raíz (sin padre). */
     public function index()
     {
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
 
         return view('categories.index', compact('categories'));
     }
@@ -31,18 +31,24 @@ class CategoryController extends Controller
     /** Muestra el formulario para crear una nueva categoría. */
     public function create()
     {
-        return view('categories.create');
+        $categoryOptions = Category::flatOptions();
+
+        return view('categories.create', compact('categoryOptions'));
     }
 
     /** Valida y guarda una nueva categoría con imagen opcional. */
     public function store(Request $request)
     {
         $request->validate([
-            'name'  => 'required|string|max:255|unique:categories,name',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name'      => 'required|string|max:255|unique:categories,name',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        $data = ['name' => $request->name];
+        $data = [
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id ?: null,
+        ];
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categorias', 'public');
@@ -54,27 +60,35 @@ class CategoryController extends Controller
             ->with('success', 'Categoría creada correctamente.');
     }
 
-    /** Muestra el detalle de una categoría. */
+    /** Muestra el detalle de una categoría con sus subcategorías directas. */
     public function show(Category $category)
     {
+        $category->load(['parent', 'children']);
+
         return view('categories.show', compact('category'));
     }
 
     /** Muestra el formulario para editar una categoría. */
     public function edit(Category $category)
     {
-        return view('categories.edit', compact('category'));
+        $categoryOptions = Category::flatOptions($category->id);
+
+        return view('categories.edit', compact('category', 'categoryOptions'));
     }
 
     /** Valida y actualiza una categoría. Si se sube imagen nueva, borra la anterior. */
     public function update(Request $request, Category $category)
     {
         $request->validate([
-            'name'  => "required|string|max:255|unique:categories,name,{$category->id}",
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'name'      => "required|string|max:255|unique:categories,name,{$category->id}",
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'parent_id' => 'nullable|exists:categories,id',
         ]);
 
-        $data = ['name' => $request->name];
+        $data = [
+            'name'      => $request->name,
+            'parent_id' => $request->parent_id ?: null,
+        ];
 
         if ($request->hasFile('image')) {
             // Borrar imagen anterior del storage si existía
@@ -96,26 +110,37 @@ class CategoryController extends Controller
             ->with('success', 'Categoría actualizada correctamente.');
     }
 
-    /** Elimina una categoría, su imagen y todos los productos asociados con sus imágenes. */
+    /** Elimina una categoría, su imagen, todas las subcategorías y los productos asociados con sus imágenes. */
     public function destroy(Category $category)
     {
-        // Limpiar los archivos físicos de imágenes de los productos asociados
-        // (el CASCADE de la FK se encarga de borrar los registros de la BD)
-        $category->load('products.images');
-        foreach ($category->products as $product) {
+        $category->load('allChildren');
+        $allIds = array_merge([$category->id], $this->collectIds($category->allChildren));
+
+        // Delete product image files
+        Product::whereIn('category_id', $allIds)->with('images')->get()->each(function ($product) {
             foreach ($product->images as $image) {
                 Storage::disk('public')->delete($image->path);
             }
-        }
+        });
 
-        // Eliminar la imagen de la categoría si tiene
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
+        // Delete category image files
+        Category::whereIn('id', $allIds)->whereNotNull('image')->get()->each(function ($cat) {
+            Storage::disk('public')->delete($cat->image);
+        });
 
-        $category->delete();
+        $category->delete(); // DB cascade deletes subcategories + their products
 
         return redirect()->route('categories.index')
             ->with('success', 'Categoría eliminada correctamente.');
+    }
+
+    private function collectIds($children): array
+    {
+        $ids = [];
+        foreach ($children as $child) {
+            $ids[] = $child->id;
+            $ids = array_merge($ids, $this->collectIds($child->allChildren));
+        }
+        return $ids;
     }
 }

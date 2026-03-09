@@ -6,13 +6,22 @@
     </x-slot>
 
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            <a href="{{ route('categories.index') }}"
-               class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6 ps-4"
-               wire:navigate.hover>
-                ← Volver a categorías
-            </a>
+            {{-- Breadcrumb de navegación --}}
+            <nav class="flex items-center gap-1.5 text-sm mb-6 ps-4 flex-wrap">
+                <a href="{{ route('categories.index') }}"
+                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                   wire:navigate.hover>Categorías</a>
+                @if($category->parent)
+                    <span class="text-gray-400">›</span>
+                    <a href="{{ route('categories.show', $category->parent) }}"
+                       class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                       wire:navigate.hover>{{ $category->parent->name }}</a>
+                @endif
+                <span class="text-gray-400">›</span>
+                <span class="text-gray-600 dark:text-gray-400">{{ $category->name }}</span>
+            </nav>
 
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-colors duration-300">
 
@@ -127,6 +136,38 @@
                 </div>
 
             </div>
+            {{-- Subcategorías --}}
+            @if($category->children->isNotEmpty())
+                <div class="mt-8">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
+                        Subcategorías <span class="text-sm font-normal text-gray-400 dark:text-gray-500">({{ $category->children->count() }})</span>
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach($category->children as $child)
+                            <a href="{{ route('categories.show', $child) }}"
+                               class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 flex items-center gap-3 hover:shadow-xl dark:hover:shadow-indigo-900/50 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300"
+                               wire:navigate.hover>
+                                @if($child->image)
+                                    <img src="{{ asset('storage/' . $child->image) }}"
+                                         class="w-10 h-10 rounded-xl object-cover shrink-0 border border-gray-200 dark:border-gray-600">
+                                @else
+                                    <div class="bg-indigo-100 dark:bg-indigo-900 rounded-xl p-2.5 shrink-0">
+                                        <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                        </svg>
+                                    </div>
+                                @endif
+                                <span class="font-semibold text-gray-900 dark:text-white truncate">{{ $child->name }}</span>
+                                <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
         </div>
     </div>
 </x-app-layout>
