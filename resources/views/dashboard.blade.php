@@ -19,9 +19,11 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-3">
                 <div class="p-6 text-gray-900">
                     <p>
-                        <button id="a" type="button" class="flex w-full items-center justify-center gap-2 text-red-600 border border-red-200 rounded-full py-2.5 font-bold text-sm hover:bg-red-50 transition-all">
-                            Pulsa
-                        </button>
+                        @if($message)
+                            <div class="alert alert-info">
+                                {{ $message }}
+                            </div>
+                        @endif
                     </p>
                 </div>
             </div>

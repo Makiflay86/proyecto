@@ -9,7 +9,8 @@ use App\Http\Controllers\ProductController;
 }); */
 
 Route::get('/', function () {
-    return view('dashboard');
+    $dailyMessage = \App\Models\DailyMessage::whereDate('date', today())->first();
+    return view('dashboard', ['message' => $dailyMessage?->message]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
