@@ -1,21 +1,88 @@
 /**
  * dashboard.js
- * Inicialización de los gráficos Chart.js del dashboard.
+ * Inicialización y actualización de los gráficos Chart.js del dashboard.
  *
- * Los datos de PHP (categorías, conteos, activos/inactivos) se pasan sin código
- * inline usando data-attributes en el div#chart-data del blade. Esto mantiene
- * la vista limpia y desacopla PHP de JS.
- *
- * Se ejecuta tanto en la carga inicial como en cada navegación SPA de Livewire
- * (livewire:navigated), destruyendo las instancias anteriores para evitar
- * que Chart.js se queje de canvas ya en uso.
+ * Flujo general:
+ *  1. initDashboardCharts() crea los gráficos al cargar la página.
+ *  2. watchChartData() instala un MutationObserver sobre #chart-data.
+ *     Cuando el componente Livewire DashboardContent hace un poll (cada 30 s),
+ *     actualiza los data-attributes de ese div. El observer lo detecta y
+ *     llama a updateCharts() para reflejar los nuevos datos SIN destruir los
+ *     canvas (evita el parpadeo y el "Canvas already in use" de Chart.js).
+ *  3. Los contenedores de los canvas tienen wire:ignore en el blade, por lo
+ *     que Livewire nunca toca los elementos <canvas> directamente.
  *
  * Requiere: Chart.js cargado vía CDN en el <head> (pushado desde dashboard.blade.php)
  */
 
+// Paleta de colores para las barras — definida en el módulo para reutilizarla
+// tanto en la creación inicial como en actualizaciones por poll.
+const palette = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#14b8a6', '#a855f7', '#ec4899', '#0ea5e9'];
+
+// Helpers para adaptar colores al tema activo en cada render
+const isDark     = () => document.documentElement.classList.contains('dark');
+const gridColor  = () => isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+const labelColor = () => isDark() ? '#9ca3af' : '#6b7280';
+
+/**
+ * Lee los data-attributes de #chart-data y devuelve los valores ya parseados.
+ * Centraliza la lectura para no repetir JSON.parse en múltiples sitios.
+ */
+function readChartData() {
+    const el = document.getElementById('chart-data');
+    if (!el) return null;
+
+    return {
+        categoryLabels: JSON.parse(el.dataset.categories || '[]'),
+        categoryValues: JSON.parse(el.dataset.values     || '[]'),
+        activeCount:    parseInt(el.dataset.active        || '0', 10),
+        inactiveCount:  parseInt(el.dataset.inactive      || '0', 10),
+    };
+}
+
+/**
+ * Actualiza los datos de los gráficos existentes sin destruirlos.
+ * Llamada por el MutationObserver cuando Livewire hace un poll y cambia
+ * los data-attributes de #chart-data.
+ * Usa mode 'none' para que no haya animación en el refresco automático.
+ */
+function updateCharts() {
+    const data = readChartData();
+    if (!data || !window._barChart || !window._doughnutChart) return;
+
+    const { categoryLabels, categoryValues, activeCount, inactiveCount } = data;
+
+    // Actualizar gráfico de barras
+    window._barChart.data.labels                      = categoryLabels.length ? categoryLabels : ['Sin datos'];
+    window._barChart.data.datasets[0].data            = categoryValues.length ? categoryValues : [0];
+    window._barChart.data.datasets[0].backgroundColor = palette.slice(0, Math.max(categoryValues.length, 1));
+    window._barChart.update('none'); // sin animación para que el refresco sea silencioso
+
+    // Actualizar gráfico doughnut
+    window._doughnutChart.data.datasets[0].data = [activeCount, inactiveCount];
+    window._doughnutChart.update('none');
+}
+
+/**
+ * Instala un MutationObserver sobre #chart-data para detectar cuándo
+ * Livewire actualiza los data-attributes (en cada poll de 30 s) y
+ * refrescar los gráficos sin necesidad de recrearlos.
+ */
+function watchChartData() {
+    const el = document.getElementById('chart-data');
+    if (!el) return;
+
+    // Disconnectar el observer previo si existía (p. ej. al volver al dashboard)
+    if (window._chartDataObserver) window._chartDataObserver.disconnect();
+
+    window._chartDataObserver = new MutationObserver(updateCharts);
+    window._chartDataObserver.observe(el, { attributes: true });
+}
+
 /**
  * Crea (o recrea) los dos gráficos del dashboard.
  * Es seguro llamarla múltiples veces: destruye las instancias previas antes de crear.
+ * Se llama en la carga inicial y en cada navegación SPA (livewire:navigated).
  */
 function initDashboardCharts() {
     const barCanvas      = document.getElementById('barChart');
@@ -24,28 +91,16 @@ function initDashboardCharts() {
     // Si no estamos en el dashboard, salir sin error
     if (!barCanvas || !doughnutCanvas) return;
 
-    // Leer los datos pasados por PHP a través de data-attributes
-    const dataEl = document.getElementById('chart-data');
-    if (!dataEl) return;
+    const data = readChartData();
+    if (!data) return;
 
-    const categoryLabels = JSON.parse(dataEl.dataset.categories || '[]');
-    const categoryValues = JSON.parse(dataEl.dataset.values    || '[]');
-    const activeCount    = parseInt(dataEl.dataset.active      || '0', 10);
-    const inactiveCount  = parseInt(dataEl.dataset.inactive    || '0', 10);
-
-    // Paleta de colores para las barras por categoría
-    const palette = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#14b8a6', '#a855f7', '#ec4899', '#0ea5e9'];
-
-    // Helpers para adaptar colores al tema activo en cada render/update
-    const isDark     = () => document.documentElement.classList.contains('dark');
-    const gridColor  = () => isDark() ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-    const labelColor = () => isDark() ? '#9ca3af' : '#6b7280';
+    const { categoryLabels, categoryValues, activeCount, inactiveCount } = data;
 
     // Destruir instancias previas para evitar el error "Canvas already in use"
-    // cuando Livewire navega de vuelta al dashboard
-    if (window._barChart)      window._barChart.destroy();
-    if (window._doughnutChart) window._doughnutChart.destroy();
-    if (window._themeObserver) window._themeObserver.disconnect();
+    if (window._barChart)           window._barChart.destroy();
+    if (window._doughnutChart)      window._doughnutChart.destroy();
+    if (window._themeObserver)      window._themeObserver.disconnect();
+    if (window._chartDataObserver)  window._chartDataObserver.disconnect();
 
     // ── Gráfico de barras: productos por categoría ───────────────
     window._barChart = new Chart(barCanvas.getContext('2d'), {
@@ -94,12 +149,10 @@ function initDashboardCharts() {
     });
 
     // ── Observer para re-colorear los gráficos al cambiar el tema ─
-    // Observa cambios en el atributo class del <html> (donde vive la clase .dark)
     window._themeObserver = new MutationObserver(() => {
         [window._barChart, window._doughnutChart].forEach(chart => {
             if (!chart) return;
 
-            // Actualizar colores de ejes
             if (chart.options.scales) {
                 Object.values(chart.options.scales).forEach(axis => {
                     if (axis.grid)  axis.grid.color  = gridColor();
@@ -107,7 +160,6 @@ function initDashboardCharts() {
                 });
             }
 
-            // Actualizar color de la leyenda
             if (chart.options.plugins?.legend?.labels) {
                 chart.options.plugins.legend.labels.color = labelColor();
             }
@@ -118,12 +170,15 @@ function initDashboardCharts() {
 
     window._themeObserver.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ['class'], // solo reaccionar a cambios de clase, no otros atributos
+        attributeFilter: ['class'],
     });
+
+    // ── Observer para actualizar datos en los polls de Livewire ───
+    watchChartData();
 }
 
-// Carga inicial: los módulos ES ejecutan después de que el DOM está listo
+// Carga inicial
 initDashboardCharts();
 
-// Navegaciones SPA posteriores: Livewire reemplaza el body y dispara este evento
+// Navegaciones SPA: Livewire reemplaza el body y dispara este evento
 document.addEventListener('livewire:navigated', initDashboardCharts);

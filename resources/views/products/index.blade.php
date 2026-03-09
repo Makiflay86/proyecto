@@ -21,7 +21,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300">
                         <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
                             @if($product->images->isNotEmpty())
                                 <img src="{{ asset('storage/' . $product->images->first()->path) }}" class="w-full h-full object-cover">

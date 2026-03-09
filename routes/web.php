@@ -1,46 +1,19 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | Dashboard
 |--------------------------------------------------------------------------
-| Ruta raíz protegida por autenticación y verificación de email.
-| Prepara todos los datos necesarios para las estadísticas, gráficos y
-| la tabla de productos recientes del dashboard.
+| Toda la lógica de datos vive en DashboardController@index.
 */
-Route::get('/', function () {
-    // Mensaje del día: busca el registro de DailyMessage cuya fecha sea hoy
-    $dailyMessage = \App\Models\DailyMessage::whereDate('date', today())->first();
-
-    // Estadísticas generales de productos para las cards del dashboard
-    $totalProducts    = \App\Models\Product::count();
-    $activeProducts   = \App\Models\Product::where('estado', 'activo')->count();
-    $inactiveProducts = $totalProducts - $activeProducts;
-    $categoriesCount  = \App\Models\Product::distinct('categoria')->count('categoria');
-
-    // Últimos 5 productos creados para la tabla de recientes
-    $recentProducts = \App\Models\Product::latest()->take(5)->get();
-
-    // Agrupación por categoría para el gráfico de barras
-    // Resultado: Collection { 'electronica' => 3, 'hogar' => 5, ... }
-    $productsByCategory = \App\Models\Product::selectRaw('categoria, COUNT(*) as total')
-        ->groupBy('categoria')
-        ->pluck('total', 'categoria');
-
-    return view('dashboard', [
-        'message'            => $dailyMessage?->message,
-        'totalProducts'      => $totalProducts,
-        'activeProducts'     => $activeProducts,
-        'inactiveProducts'   => $inactiveProducts,
-        'categoriesCount'    => $categoriesCount,
-        'recentProducts'     => $recentProducts,
-        'productsByCategory' => $productsByCategory,
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------

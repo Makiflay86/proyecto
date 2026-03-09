@@ -1,3 +1,11 @@
 @import 'dist/navigation.min.css';
 @import 'dist/success-message.min.css';
 @import 'product-search';
+
+// Evita el flash blanco durante wire:navigate en dark mode.
+// El elemento <html> persiste entre navegaciones SPA, por lo que
+// fijarle el fondo oscuro garantiza que nunca se vea un destello blanco
+// mientras Livewire intercambia el <body>.
+html.dark {
+    background-color: rgb(17 24 39); // Tailwind gray-900
+}
