@@ -4,6 +4,7 @@
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución
 - Git instalado
+- Node.js instalado en el **host** (para compilar assets con Vite)
 
 ---
 
@@ -11,7 +12,6 @@
 
 ```bash
 git clone https://github.com/Makiflay86/proyecto.git
-
 cd proyecto
 ```
 
@@ -19,7 +19,7 @@ cd proyecto
 
 ## 2. Instalar dependencias de PHP
 
-Ejecuta este comando para crear la carpeta `vendor` (solo la primera vez):
+Genera la carpeta `vendor` sin necesidad de tener PHP instalado localmente:
 
 ```bash
 docker run --rm \
@@ -32,7 +32,7 @@ docker run --rm \
 
 ---
 
-## 3. Configurar el archivo de entorno
+## 3. Configurar el entorno
 
 ```bash
 cp .env.example .env
@@ -56,12 +56,12 @@ Para parar los contenedores:
 
 ---
 
-## 5. Generar clave y migrar la base de datos
+## 5. Generar clave, migrar y enlazar storage
 
 ```bash
 ./vendor/bin/sail artisan key:generate
-
 ./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan storage:link
 ```
 
 Si quieres poblar la base de datos con datos de prueba:
@@ -72,24 +72,38 @@ Si quieres poblar la base de datos con datos de prueba:
 
 ---
 
+## 6. Instalar dependencias de Node y compilar assets
+
+> ⚠️ Vite tiene un bug con rollup dentro del contenedor ARM. Ejecuta estos comandos en el **host** (fuera de Sail):
+
+```bash
+npm install
+npm run build
+```
+
+Para desarrollo con hot-reload:
+
+```bash
+npm run dev
+```
+
+---
+
 ## Servicios disponibles
 
-Una vez levantado Docker, tienes acceso a los siguientes servicios:
+Una vez levantado Docker:
 
-### Aplicación web
-- URL: [http://localhost](http://localhost)
+| Servicio | URL |
+|---|---|
+| Aplicación web | http://localhost |
+| phpMyAdmin | http://localhost:8080 |
+| Mailpit (correos de prueba) | http://localhost:8025 |
 
-### phpMyAdmin
-Interfaz gráfica para gestionar la base de datos MySQL.
-- URL: [http://localhost:8080](http://localhost:8080)
+**phpMyAdmin**
 - Usuario: el definido en `.env` (`DB_USERNAME`)
 - Contraseña: la definida en `.env` (`DB_PASSWORD`)
 
-### Mailpit (bandeja de entrada de prueba)
-Captura todos los correos enviados por la app en local para que no lleguen a nadie real.
-- URL: [http://localhost:8025](http://localhost:8025)
-
-Para que los mails se envíen a Mailpit, asegúrate de tener esto en `.env`:
+**Mailpit** — para que los mails se envíen aquí, asegúrate de tener en `.env`:
 
 ```env
 MAIL_MAILER=smtp
@@ -119,6 +133,8 @@ MAIL_PASSWORD=null
 # Limpiar caché
 ./vendor/bin/sail artisan cache:clear
 ./vendor/bin/sail artisan config:clear
+./vendor/bin/sail artisan view:clear
+
 ```
 
 ---
@@ -131,7 +147,7 @@ La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
 ./vendor/bin/sail artisan app:generate-daily-message
 ```
 
-Para que se ejecute automáticamente cada día, añade esta tarea al scheduler de Laravel (ya configurada en `app/Console/Kernel.php` si la tienes definida). En producción necesitarías un cron que ejecute:
+En producción, añade un cron para que se ejecute automáticamente:
 
 ```bash
 * * * * * cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
