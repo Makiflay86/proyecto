@@ -15,15 +15,27 @@
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/sass/app.scss'])
 
         @livewireStyles
+
+        {{-- Anti-flash: must be inline in <head> because app.js is deferred by Vite --}}
+        <script>
+            (function () {
+                var t = localStorage.getItem('theme');
+                if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+        </script>
+
+        @stack('head-scripts')
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 flex">
-            
+    <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex transition-colors duration-300">
+
             @include('layouts.navigation')
 
             <div class="flex-1 flex flex-col">
                 @isset($header)
-                    <header class="bg-white shadow">
+                    <header class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900 transition-colors duration-300">
                         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                             {{ $header }}
                         </div>
@@ -37,5 +49,7 @@
         </div>
 
         @livewireScripts
+
+        @stack('scripts')
     </body>
 </html>

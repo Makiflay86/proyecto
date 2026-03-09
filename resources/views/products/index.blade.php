@@ -1,13 +1,17 @@
 <x-app-layout>
-    <div class="py-12">
+    <x-slot name="header">
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
+                {{ __('Productos') }}
+            </h2>
+            <a href="{{ route('products.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200" wire:navigate.hover>
+                + Crear Producto
+            </a>
+        </div>
+    </x-slot>
+
+    <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-extrabold text-gray-800">Mis Productos</h2>
-                <a href="{{ route('products.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200" wire:navigate.hover>
-                    + Crear Producto
-                </a>
-            </div>
 
             @if (session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-full relative mb-4 alert-fade">
@@ -17,23 +21,23 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                        <div class="h-48 overflow-hidden bg-gray-100">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300">
+                        <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
                             @if($product->images->isNotEmpty())
                                 <img src="{{ asset('storage/' . $product->images->first()->path) }}" class="w-full h-full object-cover">
                             @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-400">Sin imagen</div>
+                                <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">Sin imagen</div>
                             @endif
                         </div>
-                        
+
                         <div class="p-5">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">{{ $product->categoria }}</span>
-                            <h3 class="text-xl font-bold text-gray-900 mt-1">{{ $product->nombre }}</h3>
-                            <p class="text-gray-500 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
-                            
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->categoria }}</span>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
+                            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
+
                             <div class="mt-4 flex items-center justify-between">
-                                <span class="text-lg font-bold text-gray-800">{{ number_format($product->precio, 2, ",", ".") }}€</span>
-                                <a href="{{ route('products.show', $product->id) }}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
+                                <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ",", ".") }}€</span>
+                                <a href="{{ route('products.show', $product->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
                             </div>
                         </div>
                     </div>
