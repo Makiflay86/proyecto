@@ -175,7 +175,7 @@
                                     </a>
                                 </td>
                                 <td class="px-6 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                                    {{ $product->categoria ?? '—' }}
+                                    {{ $product->category?->name ?? '—' }}
                                 </td>
                                 <td class="px-6 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
                                     ${{ number_format($product->precio, 2) }}

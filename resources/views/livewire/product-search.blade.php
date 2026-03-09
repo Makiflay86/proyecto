@@ -30,7 +30,7 @@
                     </div>
                     <div class="product-search__item-info">
                         <span class="product-search__item-name">{{ $product['nombre'] }}</span>
-                        <span class="product-search__item-meta">{{ ucfirst($product['categoria']) }}</span>
+                        <span class="product-search__item-meta">{{ $product['category']['name'] ?? '' }}</span>
                     </div>
                     <span class="product-search__item-price">
                         {{ number_format($product['precio'], 2, ',', '.') }}€

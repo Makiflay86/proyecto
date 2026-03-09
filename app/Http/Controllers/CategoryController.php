@@ -99,17 +99,14 @@ class CategoryController extends Controller
     /** Elimina una categoría, su imagen y todos los productos asociados con sus imágenes. */
     public function destroy(Category $category)
     {
-        // Eliminar todos los productos que pertenecen a esta categoría
-        // junto con sus archivos físicos de imágenes en storage
-        Product::where('categoria', $category->name)
-            ->with('images')
-            ->get()
-            ->each(function (Product $product) {
-                foreach ($product->images as $image) {
-                    Storage::disk('public')->delete($image->path);
-                }
-                $product->delete();
-            });
+        // Limpiar los archivos físicos de imágenes de los productos asociados
+        // (el CASCADE de la FK se encarga de borrar los registros de la BD)
+        $category->load('products.images');
+        foreach ($category->products as $product) {
+            foreach ($product->images as $image) {
+                Storage::disk('public')->delete($image->path);
+            }
+        }
 
         // Eliminar la imagen de la categoría si tiene
         if ($category->image) {

@@ -48,12 +48,12 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
-                            <select name="categoria"
+                            <select name="category_id"
                                     class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition" required>
                                 <option value="" disabled selected>Selecciona una categoría</option>
                                 @foreach($categories as $cat)
-                                    <option value="{{ $cat }}" {{ old('categoria') === $cat ? 'selected' : '' }}>
-                                        {{ $cat }}
+                                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
                                     </option>
                                 @endforeach
                             </select>

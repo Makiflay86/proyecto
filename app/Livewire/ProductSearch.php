@@ -33,12 +33,13 @@ class ProductSearch extends Component
             return;
         }
 
-        // Busca en nombre, descripción y categoría (LIKE insensible a mayúsculas)
-        $this->results = Product::where('nombre', 'like', "%{$this->query}%")
+        // Busca en nombre, descripción y nombre de categoría (LIKE insensible a mayúsculas)
+        $this->results = Product::with('category')
+            ->where('nombre', 'like', "%{$this->query}%")
             ->orWhere('descripcion', 'like', "%{$this->query}%")
-            ->orWhere('categoria', 'like', "%{$this->query}%")
+            ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%{$this->query}%"))
             ->limit(6)
-            ->get(['id', 'nombre', 'descripcion', 'categoria', 'precio'])
+            ->get(['id', 'nombre', 'category_id', 'precio'])
             ->toArray();
 
         $this->open = true;

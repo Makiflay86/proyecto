@@ -27,7 +27,7 @@ class DashboardContent extends Component
             SELECT
                 COUNT(*)                                             AS total,
                 SUM(CASE WHEN estado = ? THEN 1 ELSE 0 END)        AS active,
-                COUNT(DISTINCT categoria)                            AS categories
+                COUNT(DISTINCT category_id)                          AS categories
             FROM products
         ', ['activo']);
 
@@ -37,15 +37,18 @@ class DashboardContent extends Component
         $categoriesCount  = (int) $stats->categories;
 
         // ── Query 2: últimos 5 productos ──────────────────────────────────────
-        $recentProducts = Product::select('id', 'nombre', 'categoria', 'precio', 'estado', 'created_at')
+        $recentProducts = Product::with('category')
+            ->select('id', 'nombre', 'category_id', 'precio', 'estado', 'created_at')
             ->latest()
             ->take(5)
             ->get();
 
         // ── Query 3: agrupación por categoría (para los gráficos) ─────────────
-        $productsByCategory = Product::selectRaw('categoria, COUNT(*) as total')
-            ->groupBy('categoria')
-            ->pluck('total', 'categoria');
+        $productsByCategory = Product::selectRaw('category_id, COUNT(*) as total')
+            ->with('category')
+            ->groupBy('category_id')
+            ->get()
+            ->pluck('total', 'category.name');
 
         // ── Query 4: mensaje del día ───────────────────────────────────────────
         $dailyMessage = DailyMessage::whereDate('date', today())->first();

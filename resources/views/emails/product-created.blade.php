@@ -30,7 +30,7 @@
             <div class="product">
                 <h2>{{ $product->nombre }}</h2>
                 <p>{{ $product->descripcion }}</p>
-                <p><strong>Categoría:</strong> {{ $product->categoria }}</p>
+                <p><strong>Categoría:</strong> {{ $product->category?->name }}</p>
                 <p><strong>Estado:</strong> {{ $product->estado }}</p>
                 <p class="price">${{ number_format($product->precio, 2) }}</p>
             </div>
