@@ -33,7 +33,7 @@
                             
                             <div class="mt-4 flex items-center justify-between">
                                 <span class="text-lg font-bold text-gray-800">{{ number_format($product->precio, 2, ",", ".") }}€</span>
-                                <button class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">Ver detalles →</button>
+                                <a href="{{ route('products.show', $product->id) }}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
                             </div>
                         </div>
                     </div>

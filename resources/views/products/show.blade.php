@@ -3,8 +3,8 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
             {{-- Botón volver --}}
-            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 text-sm mb-6" wire:navigate.hover>
-                <i class="bi bi-arrow-left"></i> Volver a productos
+            <a href="{{ route('products.index') }}"  class="text-indigo-600 hover:text-indigo-800 font-medium text-sm mb-6" wire:navigate.hover>
+                ← Volver a productos
             </a>
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -19,7 +19,7 @@
                     </div>
                 @else
                     <div class="h-48 bg-gray-100 flex items-center justify-center text-gray-400">
-                        <i class="bi bi-image text-4xl"></i>
+                        Sin imagen
                     </div>
                 @endif
 
@@ -35,7 +35,7 @@
                         </span>
                     </div>
 
-                    <p class="mt-6 text-gray-600 leading-relaxed">{{ $product->descripcion }}</p>
+                    <p class="mt-6 text-gray-600 leading-relaxed whitespace-pre-line">{{ $product->descripcion }}</p>
 
                     <div class="mt-6 flex items-center gap-2">
                         <span class="text-sm text-gray-500">Estado:</span>
