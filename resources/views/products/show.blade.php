@@ -8,7 +8,7 @@
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            <a href="{{ route('products.index') }}" class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6" wire:navigate.hover>
+            <a href="{{ route('products.index') }}" class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6 ps-4" wire:navigate.hover>
                 ← Volver a productos
             </a>
 

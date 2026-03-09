@@ -41,7 +41,7 @@ class ProductSearch extends Component
             ->get(['id', 'nombre', 'descripcion', 'categoria', 'precio'])
             ->toArray();
 
-        $this->open = count($this->results) > 0;
+        $this->open = true;
     }
 
     /**
