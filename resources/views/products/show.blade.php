@@ -16,11 +16,79 @@
 
                 {{-- Imágenes --}}
                 @if($product->images->isNotEmpty())
-                    <div class="flex gap-2 p-4 bg-gray-50 dark:bg-gray-700 overflow-x-auto">
-                        @foreach($product->images as $image)
-                            <img src="{{ asset('storage/' . $image->path) }}"
-                                 class="h-56 w-auto rounded-xl object-cover shrink-0">
-                        @endforeach
+                    <div x-data="{
+                            open: false,
+                            current: 0,
+                            images: {{ Js::from($product->images->pluck('path')) }},
+                            show(index) { this.current = index; this.open = true; },
+                            prev() { this.current = (this.current - 1 + this.images.length) % this.images.length; },
+                            next() { this.current = (this.current + 1) % this.images.length; },
+                         }"
+                         @keydown.escape.window="open = false"
+                         @keydown.arrow-left.window="open && prev()"
+                         @keydown.arrow-right.window="open && next()">
+
+                        {{-- Miniaturas --}}
+                        <div class="flex gap-2 p-4 bg-gray-50 dark:bg-gray-700 overflow-x-auto">
+                            @foreach($product->images as $i => $image)
+                                <button type="button" @click="show({{ $i }})" class="shrink-0 group relative">
+                                    <img src="{{ asset('storage/' . $image->path) }}"
+                                         class="h-56 w-auto rounded-xl object-cover transition group-hover:brightness-90 cursor-zoom-in">
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-xl">
+                                        <svg class="w-7 h-7 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                                        </svg>
+                                    </div>
+                                </button>
+                            @endforeach
+                        </div>
+
+                        {{-- Modal --}}
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0"
+                             x-transition:enter-end="opacity-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100"
+                             x-transition:leave-end="opacity-0"
+                             @click="open = false"
+                             class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-gray-900/80 cursor-zoom-out">
+
+                            {{-- Imagen --}}
+                            <div @click.stop class="bg-gray-100 dark:bg-gray-700 rounded-2xl shadow-2xl p-4 cursor-default max-h-[80vh] flex items-center">
+                                <template x-for="(path, index) in images" :key="index">
+                                    <img x-show="current === index"
+                                         :src="'/storage/' + path"
+                                         class="max-h-[72vh] max-w-[80vw] object-contain rounded-xl">
+                                </template>
+                            </div>
+
+                            {{-- Flechas (solo si hay más de una imagen) --}}
+                            @if($product->images->count() > 1)
+                                <button @click.stop="prev()"
+                                        class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-3 transition backdrop-blur-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                </button>
+                                <button @click.stop="next()"
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white rounded-full p-3 transition backdrop-blur-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
+
+                                {{-- Indicador de posición --}}
+                                <div @click.stop class="absolute bottom-5 flex gap-2 cursor-default">
+                                    <template x-for="(_, index) in images" :key="index">
+                                        <button @click.stop="current = index"
+                                                :class="current === index ? 'bg-white w-5' : 'bg-white/50 w-2'"
+                                                class="h-2 rounded-full transition-all duration-300">
+                                        </button>
+                                    </template>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @else
                     <div class="h-48 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500">

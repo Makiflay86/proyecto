@@ -43,12 +43,24 @@ class DashboardContent extends Component
             ->take(5)
             ->get();
 
-        // ── Query 3: agrupación por categoría (para los gráficos) ─────────────
+        // ── Query 3: agrupación por categoría raíz (para los gráficos) ──────────
+        // Construimos un mapa category_id → nombre de raíz
+        $allCats = \App\Models\Category::all(['id', 'parent_id', 'name'])->keyBy('id');
+        $rootOf  = [];
+        foreach ($allCats as $cat) {
+            $current = $cat;
+            while ($current->parent_id !== null && isset($allCats[$current->parent_id])) {
+                $current = $allCats[$current->parent_id];
+            }
+            $rootOf[$cat->id] = $current->name;
+        }
+
         $productsByCategory = Product::selectRaw('category_id, COUNT(*) as total')
-            ->with('category')
             ->groupBy('category_id')
             ->get()
-            ->pluck('total', 'category.name');
+            ->groupBy(fn ($row) => $rootOf[$row->category_id] ?? '—')
+            ->map(fn ($group) => $group->sum('total'))
+            ->sortKeys();
 
         // ── Query 4: mensaje del día ───────────────────────────────────────────
         $dailyMessage = DailyMessage::whereDate('date', today())->first();
