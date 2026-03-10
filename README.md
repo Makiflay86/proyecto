@@ -70,6 +70,8 @@ Si quieres poblar la base de datos con datos de prueba:
 ./vendor/bin/sail artisan db:seed
 ```
 
+> ⚠️ `db:seed` añade categorías y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
+
 ---
 
 ## 6. Instalar dependencias de Node y compilar assets
@@ -103,7 +105,7 @@ Una vez levantado Docker:
 - Usuario: el definido en `.env` (`DB_USERNAME`)
 - Contraseña: la definida en `.env` (`DB_PASSWORD`)
 
-**Mailpit** — para que los mails se envíen aquí, asegúrate de tener en `.env`:
+**Mailpit** — captura todos los emails que envía la app para poder revisarlos sin enviarlos de verdad. Para que funcione, asegúrate de tener en `.env`:
 
 ```env
 MAIL_MAILER=smtp
@@ -112,6 +114,22 @@ MAIL_PORT=1025
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
 ```
+
+---
+
+## Backup de la base de datos
+
+El proyecto incluye un comando artisan para generar backups completos de la BD. Los archivos se guardan en `storage/backups/` con el nombre `backup_YYYYMMDD_HHMMSS.sql`.
+
+```bash
+./vendor/bin/sail artisan backup:database
+```
+
+**Recomendación:** haz un backup antes de cualquier cambio importante en la BD o antes de cambiar de equipo.
+
+El comando guarda automáticamente solo los **últimos 5 backups** — cuando se crea el sexto, elimina el más antiguo. Así no se acumula peso en el repositorio.
+
+El backup **no se ejecuta automáticamente** en desarrollo, ejecútalo manualmente cuando lo necesites.
 
 ---
 
@@ -130,14 +148,17 @@ MAIL_PASSWORD=null
 # Ejecutar tests
 ./vendor/bin/sail test
 
-# Limpiar caché
+# Limpiar caché (útil si algo no se actualiza visualmente)
 ./vendor/bin/sail artisan cache:clear
 ./vendor/bin/sail artisan config:clear
 ./vendor/bin/sail artisan view:clear
 
+# Backup de la BD
+./vendor/bin/sail artisan backup:database
 ```
 
 ---
+
 
 ## Mensaje diario automático
 
