@@ -81,7 +81,7 @@
                                     0 productos
                                 </span>
                             @endif
-                            @if($category->children->isNotEmpty() && $directProductCount !== $totalProductCount)
+                            @if($category->children->isNotEmpty() && $directProductCount > 0 && $directProductCount !== $totalProductCount)
                                 <span class="text-xs text-gray-400 dark:text-gray-500">
                                     ({{ $directProductCount }} directos)
                                 </span>
