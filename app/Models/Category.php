@@ -31,6 +31,17 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->orderBy('name');
     }
 
+    /** Returns IDs of this category and all its descendants. */
+    public function allDescendantIds(): array
+    {
+        $this->loadMissing('allChildren');
+        $ids = [$this->id];
+        foreach ($this->allChildren as $child) {
+            $ids = array_merge($ids, $child->allDescendantIds());
+        }
+        return $ids;
+    }
+
     /** Recursive: loads all descendants. */
     public function allChildren(): HasMany
     {

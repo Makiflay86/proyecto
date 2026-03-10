@@ -4,12 +4,20 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Product;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class ProductList extends Component
 {
     /** Drill-down path: array of category IDs from root to deepest selected. */
+    #[Url(as: 'path')]
     public array $path = [];
+
+    /** Cast path values to int when the component is initialized (URL params arrive as strings). */
+    public function mount(): void
+    {
+        $this->path = array_map('intval', $this->path);
+    }
 
     /** Select a category at the given depth, clearing deeper selections. */
     public function selectLevel(int $depth, int $id): void

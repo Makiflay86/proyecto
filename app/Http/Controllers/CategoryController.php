@@ -23,9 +23,14 @@ class CategoryController extends Controller
     /** Lista solo las categorías raíz (sin padre). */
     public function index()
     {
-        $categories = Category::whereNull('parent_id')->orderBy('name')->get();
+        $categories = Category::whereNull('parent_id')->with('allChildren')->orderBy('name')->get();
 
-        return view('categories.index', compact('categories'));
+        $productCounts = [];
+        foreach ($categories as $category) {
+            $productCounts[$category->id] = Product::whereIn('category_id', $category->allDescendantIds())->count();
+        }
+
+        return view('categories.index', compact('categories', 'productCounts'));
     }
 
     /** Muestra el formulario para crear una nueva categoría. */
@@ -63,9 +68,25 @@ class CategoryController extends Controller
     /** Muestra el detalle de una categoría con sus subcategorías directas. */
     public function show(Category $category)
     {
-        $category->load(['parent', 'children']);
+        $category->load(['parent', 'children.allChildren']);
 
-        return view('categories.show', compact('category'));
+        $totalProductCount  = Product::whereIn('category_id', $category->allDescendantIds())->count();
+        $directProductCount = $category->products()->count();
+
+        $childProductCounts = [];
+        foreach ($category->children as $child) {
+            $childProductCounts[$child->id] = Product::whereIn('category_id', $child->allDescendantIds())->count();
+        }
+
+        // Build ancestor path array (root → current) for the products filter URL
+        $categoryPath = [];
+        $cat = $category;
+        while ($cat) {
+            array_unshift($categoryPath, $cat->id);
+            $cat = $cat->parent;
+        }
+
+        return view('categories.show', compact('category', 'totalProductCount', 'directProductCount', 'childProductCounts', 'categoryPath'));
     }
 
     /** Muestra el formulario para editar una categoría. */
