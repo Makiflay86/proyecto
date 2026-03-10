@@ -8,7 +8,12 @@
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Breadcrumb de navegación --}}
+            {{--
+                BREADCRUMB DE NAVEGACIÓN
+                Muestra la ruta jerárquica: Categorías › MOTOR › COCHE
+                Si la categoría tiene padre, lo mostramos como enlace intermedio.
+                $category->parent viene cargado desde el controlador con ->load(['parent', ...])
+            --}}
             <nav class="flex items-center gap-1.5 text-sm mb-6 ps-4 flex-wrap">
                 <a href="{{ route('categories.index') }}"
                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
@@ -23,11 +28,24 @@
                 <span class="text-gray-600 dark:text-gray-400">{{ $category->name }}</span>
             </nav>
 
+            {{-- TARJETA PRINCIPAL DE LA CATEGORÍA --}}
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 transition-colors duration-300">
 
+                {{--
+                    CABECERA: imagen/icono + nombre + conteo de productos
+                    x-data="{ imgOpen: false }" inicializa un estado local de Alpine.js
+                    para controlar si el modal de imagen está abierto o cerrado.
+                --}}
                 <div class="flex items-center gap-4" x-data="{ imgOpen: false }">
-                    {{-- Imagen si existe, icono por defecto si no --}}
+
+                    {{-- IMAGEN DE LA CATEGORÍA --}}
                     @if($category->image)
+                        {{--
+                            Si tiene imagen, al hacer click abre un modal con la imagen grande.
+                            @click="imgOpen = true" es Alpine.js: cambia la variable local.
+                            group + group-hover permite aplicar estilos al hijo cuando se hace
+                            hover sobre el padre.
+                        --}}
                         <button type="button" @click="imgOpen = true" class="shrink-0 group relative">
                             <img src="{{ asset('storage/' . $category->image) }}"
                                  class="w-20 h-20 rounded-xl object-cover border border-gray-200 dark:border-gray-600 shadow-sm transition group-hover:brightness-90 cursor-zoom-in">
@@ -38,7 +56,14 @@
                             </div>
                         </button>
 
-                        {{-- Modal imagen grande --}}
+                        {{--
+                            MODAL DE IMAGEN AMPLIADA
+                            x-show controla la visibilidad con Alpine.js.
+                            x-transition añade animaciones de entrada/salida.
+                            @keydown.escape.window="imgOpen = false" permite cerrarlo con Escape.
+                            @click.stop en el contenedor interior evita que el click se propague
+                            al fondo (que cierra el modal).
+                        --}}
                         <div x-show="imgOpen"
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0"
@@ -55,6 +80,7 @@
                             </div>
                         </div>
                     @else
+                        {{-- Sin imagen: mostramos un icono genérico de etiqueta --}}
                         <div class="bg-indigo-100 dark:bg-indigo-900 rounded-xl p-4 shrink-0">
                             <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -62,9 +88,27 @@
                             </svg>
                         </div>
                     @endif
+
+                    {{-- NOMBRE + BADGE DE PRODUCTOS --}}
                     <div>
                         <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Categoría</p>
                         <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ $category->name }}</h1>
+
+                        {{--
+                            BADGE INTERACTIVO DE TOTAL DE PRODUCTOS
+                            $totalProductCount viene del controlador: suma productos de esta
+                            categoría y todos sus descendientes.
+
+                            Si hay productos → es un enlace que lleva a /products con el filtro
+                            pre-aplicado. La URL se construye así:
+                              route('products.index') → "/products"
+                              http_build_query(['path' => $categoryPath]) → "path[]=1&path[]=5"
+                              Resultado: "/products?path[]=1&path[]=5"
+                            El componente Livewire ProductList lee esos query params gracias
+                            al atributo #[Url] y activa el filtro automáticamente.
+
+                            Si no hay productos → badge gris sin link (no tiene sentido ir a ver 0 productos).
+                        --}}
                         <div class="flex items-center gap-4 mt-2">
                             @if($totalProductCount > 0)
                                 <a href="{{ route('products.index') . '?' . http_build_query(['path' => $categoryPath]) }}"
@@ -81,6 +125,14 @@
                                     0 productos
                                 </span>
                             @endif
+
+                            {{--
+                                Solo mostramos "(X directos)" cuando:
+                                1. La categoría tiene subcategorías (si no, total = directos siempre)
+                                2. Los directos son más de 0 (si son 0, no aporta información)
+                                3. Los directos son distintos al total (si son iguales, es redundante)
+                                Ejemplo útil: MOTOR tiene 12 total pero 3 son directos (los otros 9 son de subcategorías)
+                            --}}
                             @if($category->children->isNotEmpty() && $directProductCount > 0 && $directProductCount !== $totalProductCount)
                                 <span class="text-xs text-gray-400 dark:text-gray-500">
                                     ({{ $directProductCount }} directos)
@@ -94,11 +146,14 @@
                     Añadida el {{ $category->created_at->format('d/m/Y') }}
                 </p>
 
-                {{-- Botones de acción --}}
+                {{--
+                    BOTONES DE ACCIÓN (Editar / Eliminar)
+                    x-data="{ open: false }" inicia el estado del modal de confirmación de borrado.
+                --}}
                 <div class="mt-8 flex items-center gap-3 border-t border-gray-100 dark:border-gray-700 pt-6"
                      x-data="{ open: false }">
 
-                    {{-- Editar --}}
+                    {{-- Botón Editar: navega al formulario de edición --}}
                     <a href="{{ route('categories.edit', $category) }}"
                        class="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-xl"
                        wire:navigate.hover>
@@ -109,7 +164,7 @@
                         Editar
                     </a>
 
-                    {{-- Botón que abre el modal --}}
+                    {{-- Botón Eliminar: no elimina directamente, abre el modal de confirmación --}}
                     <button @click="open = true"
                             class="flex items-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-red-700 transition shadow-md hover:shadow-xl">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,7 +174,15 @@
                         Eliminar
                     </button>
 
-                    {{-- Modal de confirmación --}}
+                    {{--
+                        MODAL DE CONFIRMACIÓN DE BORRADO
+                        Se muestra sobre todo el contenido (fixed inset-0 z-50).
+                        El fondo semitransparente (bg-gray-900/60) bloquea visualmente el resto.
+                        @click.outside="open = false" cierra el modal al hacer click fuera del cuadro.
+                        La acción de borrado usa un formulario POST con @method('DELETE')
+                        porque los navegadores solo soportan GET y POST nativamente; Laravel
+                        detecta el campo _method y enruta al método destroy del controlador.
+                    --}}
                     <div x-show="open"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0"
@@ -140,7 +203,7 @@
                              @click.outside="open = false"
                              class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
 
-                            {{-- Icono --}}
+                            {{-- Icono de advertencia --}}
                             <div class="flex justify-center mb-5">
                                 <div class="bg-red-100 dark:bg-red-900/50 rounded-full p-4">
                                     <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,7 +213,7 @@
                                 </div>
                             </div>
 
-                            {{-- Texto --}}
+                            {{-- Texto explicativo del impacto del borrado --}}
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">
                                 ¿Eliminar categoría?
                             </h3>
@@ -160,15 +223,15 @@
                                 Esta acción no se puede deshacer.
                             </p>
 
-                            {{-- Acciones --}}
+                            {{-- Acciones: cancelar o confirmar el borrado --}}
                             <div class="mt-6 flex gap-3">
                                 <button @click="open = false"
                                         class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
                                     Cancelar
                                 </button>
                                 <form action="{{ route('categories.destroy', $category) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    @method('DELETE')
+                                    @csrf {{-- Token CSRF: protege contra ataques de falsificación de petición --}}
+                                    @method('DELETE') {{-- Laravel interpreta esto como método HTTP DELETE --}}
                                     <button type="submit"
                                             class="w-full px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium transition shadow-md">
                                         Sí, eliminar
@@ -182,7 +245,12 @@
                 </div>
 
             </div>
-            {{-- Subcategorías --}}
+
+            {{--
+                SECCIÓN DE SUBCATEGORÍAS
+                Solo se renderiza si esta categoría tiene hijos directos.
+                $category->children está cargado desde el controlador con ->load(['children.allChildren']).
+            --}}
             @if($category->children->isNotEmpty())
                 <div class="mt-8">
                     <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
@@ -190,9 +258,26 @@
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($category->children as $child)
+                            {{--
+                                Construimos el path de esta subcategoría extendiendo el path actual.
+                                Si $categoryPath = [1] (MOTOR) y $child->id = 5 (COCHE),
+                                entonces $childPath = [1, 5].
+                                Este array se convierte en query string para el enlace a productos.
+                                Se hace en @php para no repetir la lógica en la vista.
+                            --}}
                             @php $childPath = array_merge($categoryPath, [$child->id]); @endphp
+
+                            {{--
+                                TARJETA DE SUBCATEGORÍA
+                                Está dividida en dos zonas clicables con semántica diferente:
+                                1. Parte superior (link) → va al detalle de la subcategoría
+                                2. Franja inferior (link) → va a los productos con filtro aplicado
+                                No se puede usar <a> dentro de <a> (HTML inválido), por eso
+                                la tarjeta es un <div> y cada zona es un <a> independiente.
+                            --}}
                             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300">
-                                {{-- Link principal → detalle de la subcategoría --}}
+
+                                {{-- LINK PRINCIPAL → detalle de la subcategoría --}}
                                 <a href="{{ route('categories.show', $child) }}"
                                    class="p-5 flex items-center gap-3 group"
                                    wire:navigate.hover>
@@ -213,7 +298,18 @@
                                     </svg>
                                 </a>
 
-                                {{-- Link secundario → productos filtrados --}}
+                                {{--
+                                    FRANJA INFERIOR → link directo a productos con filtro
+                                    $childProductCounts[$child->id] viene del controlador.
+                                    Solo mostramos el link si tiene productos (si no, mostramos "Sin productos").
+
+                                    La URL generada es: /products?path[]=1&path[]=5
+                                    Que el componente Livewire ProductList interpreta como
+                                    "filtrar por MOTOR > COCHE".
+
+                                    Nota: usamos wire:navigate (sin .hover) porque queremos
+                                    que la navegación sea inmediata al hacer click, no al hover.
+                                --}}
                                 @if(($childProductCounts[$child->id] ?? 0) > 0)
                                     <a href="{{ route('products.index') . '?' . http_build_query(['path' => $childPath]) }}"
                                        class="flex items-center gap-1.5 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"

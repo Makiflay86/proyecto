@@ -1,9 +1,33 @@
 <div>
-    {{-- Drill-down category filter --}}
+    {{--
+        FILTRO DE CATEGORÍAS EN MODO DRILL-DOWN
+        =========================================
+        "Drill-down" significa que el usuario navega por niveles de categorías:
+        primero elige la raíz (MOTOR), luego aparece una fila con sus hijos (COCHE, MOTO),
+        al elegir uno aparece otra fila con sus hijos (SEDAN, SUV)... y así.
+
+        $categoryRows es un array de colecciones, una por nivel:
+          $categoryRows[0] → categorías raíz (MOTOR, ROPA, ELECTRÓNICA...)
+          $categoryRows[1] → hijos de la raíz seleccionada (COCHE, MOTO si eligió MOTOR)
+          $categoryRows[2] → hijos del nivel 1 seleccionado... y así
+
+        $path es el array de IDs seleccionados: [id_raiz, id_hijo, id_nieto...]
+        Se usa para saber qué botón debe aparecer resaltado en indigo.
+    --}}
     <div class="space-y-2 mb-6">
         @foreach($categoryRows as $depth => $row)
             <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {{-- "Todas" / "Todos" button --}}
+
+                {{--
+                    BOTÓN "TODAS/TODOS" DE CADA FILA
+                    Al hacer click llama al método clearFrom($depth) del componente PHP.
+                    - En depth 0: "Todas" → limpia todo el filtro (muestra todos los productos)
+                    - En depth 1+: "Todos" → quita la selección de este nivel hacia abajo
+
+                    Lógica de resaltado:
+                    - Fila 0: resaltado si $path está vacío (no hay nada seleccionado)
+                    - Fila N: resaltado si count($path) === N (el path termina antes de este nivel)
+                --}}
                 @if($depth === 0)
                     <button wire:click="clearFrom(0)"
                             class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
@@ -22,7 +46,19 @@
                     </button>
                 @endif
 
-                {{-- Category pills for this depth --}}
+                {{--
+                    BOTONES DE CATEGORÍA DE ESTE NIVEL
+                    wire:click="selectLevel($depth, $cat->id)" llama al método PHP del componente
+                    que actualiza $path y Livewire re-renderiza el componente automáticamente.
+
+                    Lógica de resaltado: ($path[$depth] ?? null) === $cat->id
+                    - $path[$depth] obtiene el ID seleccionado en este nivel
+                    - ?? null evita error si ese índice no existe
+                    - === compara de forma estricta (mismo valor Y mismo tipo)
+                    - IMPORTANTE: los valores del path son integers (gracias al cast en mount())
+                      y $cat->id también es integer, por eso === funciona correctamente.
+                      Sin ese cast, los valores de la URL llegarían como strings y === fallaría.
+                --}}
                 @foreach($row as $cat)
                     <button wire:click="selectLevel({{ $depth }}, {{ $cat->id }})"
                             class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
@@ -36,8 +72,14 @@
         @endforeach
     </div>
 
-    {{-- Grid de productos --}}
+    {{-- GRID DE PRODUCTOS --}}
     @if($products->isEmpty())
+        {{--
+            ESTADO VACÍO
+            Diferenciamos dos casos:
+            1. Hay filtro activo pero no hay productos → ofrecemos quitar el filtro
+            2. No hay filtro y no hay productos en absoluto → ofrecemos crear el primero
+        --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-16 text-center transition-colors duration-300">
             <div class="flex justify-center mb-6">
                 <div class="bg-indigo-100 dark:bg-indigo-900 rounded-full p-6">
@@ -52,6 +94,7 @@
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">
                     No hay productos en la categoría seleccionada.
                 </p>
+                {{-- wire:click llama al método PHP sin recargar la página --}}
                 <button wire:click="clearFrom(0)"
                         class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
                     Ver todos los productos
@@ -72,11 +115,15 @@
             @endif
         </div>
     @else
+        {{-- GRID DE TARJETAS DE PRODUCTOS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300">
+
+                    {{-- IMAGEN DEL PRODUCTO --}}
                     <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
                         @if($product->images->isNotEmpty())
+                            {{-- Mostramos la primera imagen de la colección --}}
                             <img src="{{ asset('storage/' . $product->images->first()->path) }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">Sin imagen</div>
@@ -84,6 +131,19 @@
                     </div>
 
                     <div class="p-5">
+                        {{--
+                            CABECERA: categoría raíz + badge de estado
+                            Se muestran en la misma línea con justify-between.
+
+                            $product->category->root sube por la cadena de padres hasta la raíz.
+                            El operador ?-> (null-safe) evita error si category es null.
+
+                            BADGE DE ESTADO:
+                            - 'activo'   → fondo verde, punto verde, texto "Activo"
+                            - cualquier otro valor → fondo gris, punto gris, texto "Inactivo"
+                            El punto de color (w-1.5 h-1.5 rounded-full) es un círculo pequeño
+                            que actúa como indicador visual rápido.
+                        --}}
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">{{ $product->category?->root->name }}</span>
                             @if($product->estado === 'activo')
@@ -98,10 +158,23 @@
                                 </span>
                             @endif
                         </div>
+
+                        {{-- Nombre del producto --}}
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
+
+                        {{--
+                            Descripción truncada a 2 líneas con line-clamp-2 (clase de Tailwind).
+                            Evita que las descripciones largas rompan el layout de la grid.
+                        --}}
                         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
 
+                        {{-- PRECIO + ENLACE AL DETALLE --}}
                         <div class="mt-4 flex items-center justify-between">
+                            {{--
+                                number_format formatea el precio con 2 decimales,
+                                coma como separador decimal y punto como separador de miles.
+                                Ejemplo: 1234.5 → "1.234,50€"
+                            --}}
                             <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ",", ".") }}€</span>
                             <a href="{{ route('products.show', $product->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
                         </div>
