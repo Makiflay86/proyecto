@@ -178,7 +178,7 @@
                                     {{ $product->category?->root->name ?? '—' }}
                                 </td>
                                 <td class="px-6 py-4 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                                    ${{ number_format($product->precio, 2) }}
+                                    {{ number_format($product->precio, 2) }}€
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if($product->estado === 'activo')
