@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * Modelo que representa una categoría.
@@ -23,6 +25,19 @@ class Category extends Model
 
     // Solo estos campos se pueden asignar de forma masiva (protección contra mass-assignment)
     protected $fillable = ['name', 'image', 'parent_id'];
+
+    /**
+     * Mutador: normaliza el nombre antes de guardarlo en la BD.
+     * Convierte la primera letra de cada palabra a mayúscula sin importar
+     * cómo lo escriba el usuario (todo mayús, todo minús, mezclado...).
+     * Ejemplos: "motor" → "Motor" | "COCHE DEPORTIVO" → "Coche Deportivo"
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => Str::title(mb_strtolower($value)),
+        );
+    }
 
     /**
      * Relación: esta categoría pertenece a otra categoría padre.

@@ -18,12 +18,13 @@
                 <a href="{{ route('categories.index') }}"
                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
                    wire:navigate.hover>Categorías</a>
-                @if($category->parent)
+                {{-- Recorremos todos los ancestros: Electrónica › Móvil › Apple --}}
+                @foreach($ancestors as $ancestor)
                     <span class="text-gray-400">›</span>
-                    <a href="{{ route('categories.show', $category->parent) }}"
+                    <a href="{{ route('categories.show', $ancestor) }}"
                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
-                       wire:navigate.hover>{{ $category->parent->name }}</a>
-                @endif
+                       wire:navigate.hover>{{ $ancestor->name }}</a>
+                @endforeach
                 <span class="text-gray-400">›</span>
                 <span class="text-gray-600 dark:text-gray-400">{{ $category->name }}</span>
             </nav>
@@ -258,14 +259,6 @@
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($category->children as $child)
-                            {{--
-                                Construimos el path de esta subcategoría extendiendo el path actual.
-                                Si $categoryPath = [1] (MOTOR) y $child->id = 5 (COCHE),
-                                entonces $childPath = [1, 5].
-                                Este array se convierte en query string para el enlace a productos.
-                                Se hace en @php para no repetir la lógica en la vista.
-                            --}}
-                            @php $childPath = array_merge($categoryPath, [$child->id]); @endphp
 
                             {{--
                                 TARJETA DE SUBCATEGORÍA
@@ -311,7 +304,7 @@
                                     que la navegación sea inmediata al hacer click, no al hover.
                                 --}}
                                 @if(($childProductCounts[$child->id] ?? 0) > 0)
-                                    <a href="{{ route('products.index') . '?' . http_build_query(['path' => $childPath]) }}"
+                                    <a href="{{ route('products.index') . '?' . http_build_query(['path' => $childPaths[$child->id]]) }}"
                                        class="flex items-center gap-1.5 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
                                        wire:navigate>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

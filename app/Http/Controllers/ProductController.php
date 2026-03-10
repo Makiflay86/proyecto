@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ProductCreated;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -47,8 +46,6 @@ class ProductController extends Controller
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $user = $request->user();
-
         $product = DB::transaction(function () use ($request, $validatedData) {
             $product = Product::create($validatedData);
 
@@ -61,8 +58,6 @@ class ProductController extends Controller
 
             return $product;
         });
-
-        ProductCreated::dispatch($product, $user);
 
         return redirect()->route('products.index')
             ->with('success', 'Producto creado correctamente.');

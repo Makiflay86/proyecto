@@ -24,8 +24,13 @@ class SendProductCreatedEmail
      */
     public function handle(ProductCreated $event): void
     {
-        // Envía el email al usuario que creó el producto
-        Mail::to($event->user->email)
-            ->send(new ProductCreatedMail($event->product, $event->user));
+        try {
+            Mail::to($event->user->email)
+                ->send(new ProductCreatedMail($event->product, $event->user));
+        } catch (\Throwable $e) {
+            // Si el email falla (servidor no configurado, timeout, etc.)
+            // simplemente lo ignoramos para no interrumpir la creación del producto
+            logger()->warning("No se pudo enviar el email de producto creado: " . $e->getMessage());
+        }
     }
 }

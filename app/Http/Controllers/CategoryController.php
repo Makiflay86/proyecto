@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 /**
  * Controlador que gestiona las operaciones CRUD sobre categorías.
@@ -73,8 +74,18 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $parentId = $request->parent_id ?: null;
+
         $request->validate([
-            'name'      => 'required|string|max:255|unique:categories,name',
+            'name' => [
+                'required', 'string', 'max:255',
+                // Único solo dentro del mismo padre: permite "Apple" bajo Móvil Y bajo Tablet
+                Rule::unique('categories', 'name')->where(function ($query) use ($parentId) {
+                    return $parentId
+                        ? $query->where('parent_id', $parentId)
+                        : $query->whereNull('parent_id');
+                }),
+            ],
             'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
@@ -115,7 +126,7 @@ class CategoryController extends Controller
     {
         // Cargamos: el padre (para el breadcrumb), los hijos directos y
         // los descendientes de los hijos (para calcular sus conteos de productos)
-        $category->load(['parent', 'children.allChildren']);
+        $category->load(['parent.parent.parent.parent.parent', 'children.allChildren']);
 
         // Total de productos incluyendo toda la jerarquía descendiente
         $totalProductCount  = Product::whereIn('category_id', $category->allDescendantIds())->count();
@@ -123,22 +134,28 @@ class CategoryController extends Controller
         // Solo los productos asignados directamente a esta categoría
         $directProductCount = $category->products()->count();
 
-        // Conteo de productos por cada subcategoría directa (también incluyendo sus descendientes)
-        $childProductCounts = [];
-        foreach ($category->children as $child) {
-            $childProductCounts[$child->id] = Product::whereIn('category_id', $child->allDescendantIds())->count();
-        }
-
         // Construimos el "path" de IDs desde la raíz hasta la categoría actual.
         // Subimos por la cadena de padres usando array_unshift para ir añadiendo al inicio.
         // Ejemplo: estando en COCHE (padre: MOTOR), el resultado es [id_MOTOR, id_COCHE].
         // Este array se convierte en query string: ?path[]=1&path[]=5
         // y el componente Livewire ProductList lo usa para pre-aplicar el filtro.
         $categoryPath = [];
+        $ancestors    = [];
         $cat = $category;
         while ($cat) {
-            array_unshift($categoryPath, $cat->id); // Añade al inicio del array
+            array_unshift($categoryPath, $cat->id);
+            if ($cat->id !== $category->id) {
+                array_unshift($ancestors, $cat); // Todos los padres ordenados raíz → padre inmediato
+            }
             $cat = $cat->parent;
+        }
+
+        // Conteo de productos y path por cada subcategoría directa
+        $childProductCounts = [];
+        $childPaths         = [];
+        foreach ($category->children as $child) {
+            $childProductCounts[$child->id] = Product::whereIn('category_id', $child->allDescendantIds())->count();
+            $childPaths[$child->id]         = array_merge($categoryPath, [$child->id]);
         }
 
         return view('categories.show', compact(
@@ -146,7 +163,9 @@ class CategoryController extends Controller
             'totalProductCount',
             'directProductCount',
             'childProductCounts',
-            'categoryPath'
+            'childPaths',
+            'categoryPath',
+            'ancestors'
         ));
     }
 
@@ -175,8 +194,19 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        $parentId = $request->parent_id ?: null;
+
         $request->validate([
-            'name'      => "required|string|max:255|unique:categories,name,{$category->id}",
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('categories', 'name')
+                    ->ignore($category->id)
+                    ->where(function ($query) use ($parentId) {
+                        return $parentId
+                            ? $query->where('parent_id', $parentId)
+                            : $query->whereNull('parent_id');
+                    }),
+            ],
             'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
