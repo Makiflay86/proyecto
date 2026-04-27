@@ -1,4 +1,8 @@
-# Venalia — Instrucciones de instalación con Docker
+<p align="center">
+  <img src="public/images/logo.svg" alt="Venalia" height="80">
+</p>
+
+# Instrucciones de instalación con Docker
 
 > **Este proyecto está pensado principalmente para Windows con WSL2.**
 > Todos los comandos de esta guía se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
