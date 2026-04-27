@@ -31,8 +31,7 @@
     {{-- Logo --}}
     <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate.hover>
-            <i class="bi bi-car-front-fill text-2xl text-red-600"></i>
-            <span class="text-2xl font-bold text-gray-900 dark:text-white tracking-tighter">mi-app</span>
+            <img src="{{ asset('images/logo.svg') }}" alt="Venalia" class="h-14 w-auto">
         </a>
     </div>
 
