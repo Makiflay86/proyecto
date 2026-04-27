@@ -128,6 +128,8 @@ Para desarrollo con hot-reload:
 npm run dev
 ```
 
+> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión) y `auth.js` (funciones compartidas de los formularios de autenticación como el toggle de contraseña y la limpieza de errores).
+
 ---
 
 ## Servicios disponibles
@@ -153,6 +155,44 @@ MAIL_PORT=1025
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
 ```
+
+---
+
+## Roles y administración
+
+El sistema distingue dos tipos de usuario: **visitantes/usuarios registrados** y **administradores**.
+
+### Campo `is_admin`
+
+La tabla `users` tiene una columna booleana `is_admin` (por defecto `false`). Solo los usuarios con `is_admin = true` pueden acceder al panel de gestión, productos y categorías.
+
+Los usuarios registrados desde el formulario de registro **nunca** obtienen acceso de administrador automáticamente.
+
+### Dar permisos de administrador a un usuario
+
+Desde Tinker:
+
+```bash
+./vendor/bin/sail artisan tinker
+```
+
+```php
+User::where('email', 'correo@ejemplo.com')->update(['is_admin' => true]);
+```
+
+O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
+
+### Qué ve cada usuario
+
+| Sección | Usuario normal | Administrador |
+|---|---|---|
+| Tienda pública | ✅ | ✅ |
+| Panel de gestión | ❌ | ✅ |
+| Productos (CRUD) | ❌ | ✅ |
+| Categorías (CRUD) | ❌ | ✅ |
+| Perfil propio | ✅ | ✅ |
+
+El enlace **"Panel de gestión"** en el menú de la tienda solo aparece si el usuario es administrador.
 
 ---
 

@@ -4,7 +4,16 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Tienda pública (sin autenticación)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [StoreController::class, 'index'])->name('store.index');
+Route::get('/producto/{product}', [StoreController::class, 'show'])->name('store.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -12,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Toda la lógica de datos vive en DashboardController@index.
 */
-Route::get('/', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'admin'])
     ->name('dashboard');
 
 /*
@@ -22,7 +31,7 @@ Route::get('/', [DashboardController::class, 'index'])
 |--------------------------------------------------------------------------
 | CRUD de productos. Todas las rutas requieren autenticación y email verificado.
 */
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/products',                  [ProductController::class, 'index'])->name('products.index');
     Route::post('/products',                 [ProductController::class, 'store'])->name('products.store');
     Route::get('/products/create',           [ProductController::class, 'create'])->name('products.create');

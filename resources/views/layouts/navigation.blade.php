@@ -29,8 +29,8 @@
     </button>
 
     {{-- Logo --}}
-    <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2" wire:navigate.hover>
+    <div class="flex items-center justify-center border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+        <a href="{{ route('dashboard') }}" wire:navigate.hover>
             <img src="{{ asset('images/logo.svg') }}" alt="Venalia" class="h-14 w-auto">
         </a>
     </div>
@@ -68,27 +68,27 @@
         <livewire:product-search />
     </div>
 
-    {{-- Toggle dark / light mode --}}
-    <div class="px-1 mb-3">
+    {{-- Ver tienda + Toggle dark / light mode --}}
+    <div class="px-1 mb-3 flex gap-2">
+        <a href="{{ route('store.index') }}"
+           wire:navigate
+           class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all text-gray-600 dark:text-gray-300 text-sm font-medium">
+            <i class="bi bi-shop text-lg"></i>
+            Ver tienda
+        </a>
         <button
             onclick="toggleTheme()"
             id="theme-toggle-btn"
-            class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all"
+            class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-all"
         >
-            <div class="flex items-center gap-3">
-                <svg class="w-4 h-4 text-yellow-500 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-                </svg>
-                <svg class="w-4 h-4 text-gray-500 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-                </svg>
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    <span class="block dark:hidden">Modo oscuro</span>
-                    <span class="hidden dark:block">Modo claro</span>
-                </span>
-            </div>
+            <svg class="w-4 h-4 text-yellow-500 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+            </svg>
+            <svg class="w-4 h-4 text-gray-500 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
             <div class="relative w-10 h-5 rounded-full bg-gray-300 dark:bg-indigo-600 transition-colors duration-300">
                 <div class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300 dark:translate-x-5"></div>
             </div>
