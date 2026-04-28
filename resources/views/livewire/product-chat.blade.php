@@ -3,28 +3,34 @@
 
     {{-- Cabecera: imagen del producto + nombre + contraparte --}}
     <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 shrink-0">
-        <div class="w-11 h-11 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-700 shrink-0">
-            @if($product->images->isNotEmpty())
-                <img src="{{ asset('storage/' . $product->images->first()->path) }}"
-                     class="w-full h-full object-cover"
-                     alt="{{ $product->nombre }}">
-            @else
-                <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                </div>
-            @endif
-        </div>
-        <div class="min-w-0">
-            <h3 class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ $product->nombre }}</h3>
-            @if(Auth::user()->is_admin)
-                <p class="text-xs text-gray-500 dark:text-gray-400">Conversación con <span class="font-medium">{{ $threadUser->name }}</span></p>
-            @else
-                <p class="text-xs text-gray-500 dark:text-gray-400">Vendedor · Venalia</p>
-            @endif
-        </div>
+        <a href="{{ route('store.show', $product) }}"
+           class="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition">
+            <div class="rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-600 shrink-0"
+                 style="width:2.75rem;height:2.75rem;min-width:2.75rem;min-height:2.75rem">
+                @if($product->images->isNotEmpty())
+                    <img src="{{ asset('storage/' . $product->images->first()->path) }}"
+                         class="w-full h-full object-cover block"
+                         alt="{{ $product->nombre }}">
+                @else
+                    <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                @endif
+            </div>
+            <div class="min-w-0">
+                <h3 class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ $product->nombre }}</h3>
+                @if(Auth::user()->is_admin)
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Conversación con <span class="font-medium">{{ $threadUser->name }}</span></p>
+                @else
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Vendedor · <span class="font-medium">{{ $product->user?->name ?? 'Venalia' }}</span>
+                    </p>
+                @endif
+            </div>
+        </a>
     </div>
 
     {{-- Área de mensajes con auto-scroll y polling cada 3s --}}

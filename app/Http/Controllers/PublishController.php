@@ -40,4 +40,22 @@ class PublishController extends Controller
 
         return redirect()->route('profile.store')->with('success', '¡Producto publicado correctamente!');
     }
+
+    public function markAsSold(Product $product)
+    {
+        abort_if($product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => 'vendido']);
+
+        return back()->with('success', '¡Producto marcado como vendido!');
+    }
+
+    public function reactivate(Product $product)
+    {
+        abort_if($product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => 'activo']);
+
+        return back()->with('success', '¡Producto reactivado correctamente!');
+    }
 }

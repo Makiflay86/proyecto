@@ -11,10 +11,23 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 ## Funcionalidades principales
 
 ### Tienda pública
-- Catálogo de productos con filtrado por categoría (árbol jerárquico) y búsqueda por nombre/descripción
-- Ordenación por precio (asc/desc) o por más recientes
+- Catálogo de productos con filtrado por categoría en modo **drill-down** reactivo (Livewire): seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente
+- Búsqueda por nombre/descripción desde la barra de navegación
+- Ordenación por precio (asc/desc) o por más recientes, reactiva sin recargar la página
 - Galería de imágenes con lightbox y navegación por teclado en el detalle del producto
-- Nombre del autor visible en cada tarjeta y en el detalle
+- Nombre del autor visible en cada tarjeta y en el detalle, **clickable** — lleva al perfil público del vendedor
+
+### Perfiles públicos de usuario
+- Cualquier visitante puede ver el perfil de un vendedor en `/usuarios/{user}`
+- Muestra foto/inicial, nombre, fecha de registro, número de productos en venta y la grid de productos
+- Si es tu propio perfil, aparece un botón "Editar perfil"
+
+### Sistema de ventas (marcar como vendido)
+- El dueño de un producto puede marcarlo como **vendido** desde la página del producto
+- Los productos vendidos desaparecen de la tienda pero su página sigue accesible con un badge rojo "Vendido"
+- En "Mis productos" los vendidos aparecen con badge rojo y la imagen a media opacidad
+- El dueño puede volver a poner el producto en venta en cualquier momento
+- La venta es siempre en persona; la plataforma solo gestiona la comunicación
 
 ### Sistema de likes (favoritos)
 - Botón de corazón en cada producto (tienda y detalle)
@@ -23,10 +36,12 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Chat entre comprador y vendedor
 - Desde el detalle de un producto, el botón "Contactar con el vendedor" abre un chat privado
+- La cabecera del chat muestra la imagen y nombre del producto, **clickable** al detalle del producto, y el nombre real del vendedor
 - Las conversaciones se identifican por producto + comprador, de modo que el vendedor puede tener hilos separados con cada interesado
 - Actualizacion automatica cada 3 segundos (Livewire polling)
 - Auto-scroll al mensaje mas reciente
 - "Mis mensajes" muestra todos los hilos activos con indicador de mensajes no leidos
+- Badge en el menú de usuario con el número de conversaciones con mensajes sin leer
 
 ### Publicar productos (todos los usuarios)
 - Cualquier usuario registrado puede publicar productos desde el menu de usuario ("Publicar producto") o desde su perfil ("Anadir producto")
@@ -35,12 +50,12 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Perfil de usuario
 - Pagina `/mi-perfil` con edicion de nombre, email y contrasena
-- Seccion "Mis productos" con las publicaciones propias y acceso rapido a cada una
+- Seccion "Mis productos" con las publicaciones propias, incluyendo badge de vendido en los ya cerrados
 
 ### Panel de administracion
 - Solo accesible para usuarios con `is_admin = true`
-- CRUD completo de productos y categorias (con jerarquia padre-hijo)
-- Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos y conversaciones
+- CRUD completo de productos y categorias (con jerarquia padre-hijo y filtro drill-down)
+- Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos
 - Los hilos de chat de todos los usuarios son visibles para el administrador
 
 ---
@@ -233,37 +248,40 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 
 ### Que ve cada usuario
 
-| Seccion                          | Usuario normal | Administrador |
-|----------------------------------|:--------------:|:-------------:|
-| Tienda publica                   | Si             | Si            |
-| Busqueda y filtros               | Si             | Si            |
-| Dar like a productos             | Si (con login) | Si            |
-| Mis favoritos                    | Si             | Si            |
-| Chat con el vendedor             | Si             | Si            |
-| Mis mensajes                     | Si             | Si (todos)    |
-| Publicar productos               | Si             | Si            |
-| Mi perfil (editar datos)         | Si             | Si            |
-| Ver perfil de cualquier usuario  | No             | Si            |
-| Panel de gestion                 | No             | Si            |
-| CRUD productos y categorias      | No             | Si            |
+| Seccion                              | Visitante | Usuario normal | Administrador |
+|--------------------------------------|:---------:|:--------------:|:-------------:|
+| Tienda publica                       | Si        | Si             | Si            |
+| Busqueda y filtros drill-down        | Si        | Si             | Si            |
+| Ver perfil publico de un usuario     | Si        | Si             | Si            |
+| Dar like a productos                 | No        | Si             | Si            |
+| Mis favoritos                        | No        | Si             | Si            |
+| Chat con el vendedor                 | No        | Si             | Si            |
+| Mis mensajes (badge no leidos)       | No        | Si             | Si (todos)    |
+| Publicar productos                   | No        | Si             | Si            |
+| Marcar producto como vendido         | No        | Si (propio)    | Si            |
+| Mi perfil (editar datos)             | No        | Si             | Si            |
+| Panel de gestion                     | No        | No             | Si            |
+| CRUD productos y categorias          | No        | No             | Si            |
 
 ---
 
 ## Rutas principales
 
-| Metodo | Ruta                      | Descripcion                                  |
-|--------|---------------------------|----------------------------------------------|
-| GET    | `/`                       | Catalogo de productos                        |
-| GET    | `/producto/{product}`     | Detalle del producto                         |
-| GET    | `/mis-favoritos`          | Productos marcados con like                  |
-| GET    | `/publicar`               | Formulario para publicar un nuevo producto   |
-| POST   | `/publicar`               | Guardar nuevo producto                       |
-| GET    | `/mis-mensajes`           | Lista de conversaciones                      |
-| GET    | `/chat/{product}`         | Chat del comprador con el vendedor           |
-| GET    | `/chat/{product}/{user}`  | Hilo especifico (solo admin)                 |
-| GET    | `/mi-perfil`              | Perfil propio (editar datos + mis productos) |
-| GET    | `/usuarios/{user}`        | Perfil de otro usuario (solo admin)          |
-| GET    | `/dashboard`              | Panel de gestion (solo admin)                |
+| Metodo | Ruta                               | Descripcion                                  |
+|--------|------------------------------------|----------------------------------------------|
+| GET    | `/`                                | Catalogo de productos                        |
+| GET    | `/producto/{product}`              | Detalle del producto                         |
+| PATCH  | `/producto/{product}/vendido`      | Marcar producto como vendido (dueño)         |
+| PATCH  | `/producto/{product}/reactivar`    | Volver a poner en venta (dueño)              |
+| GET    | `/mis-favoritos`                   | Productos marcados con like                  |
+| GET    | `/publicar`                        | Formulario para publicar un nuevo producto   |
+| POST   | `/publicar`                        | Guardar nuevo producto                       |
+| GET    | `/mis-mensajes`                    | Lista de conversaciones                      |
+| GET    | `/chat/{product}`                  | Chat del comprador con el vendedor           |
+| GET    | `/chat/{product}/{user}`           | Hilo especifico (solo admin)                 |
+| GET    | `/mi-perfil`                       | Perfil propio (editar datos + mis productos) |
+| GET    | `/usuarios/{user}`                 | Perfil publico de cualquier usuario          |
+| GET    | `/dashboard`                       | Panel de gestion (solo admin)                |
 
 ---
 

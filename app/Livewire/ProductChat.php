@@ -65,7 +65,7 @@ class ProductChat extends Component
             ->orderBy('created_at')
             ->get();
 
-        $product    = Product::with('images')->find($this->productId);
+        $product    = Product::with(['images', 'user'])->find($this->productId);
         $threadUser = User::find($this->threadUserId);
 
         return view('livewire.product-chat', compact('messages', 'product', 'threadUser'));

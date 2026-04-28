@@ -20,6 +20,8 @@ Route::get('/producto/{product}', [StoreController::class, 'show'])->name('store
 Route::get('/mis-favoritos', [StoreController::class, 'favorites'])->middleware('auth')->name('store.favorites');
 Route::get('/publicar',  [PublishController::class, 'create'])->middleware('auth')->name('publish.create');
 Route::post('/publicar', [PublishController::class, 'store'])->middleware('auth')->name('publish.store');
+Route::patch('/producto/{product}/vendido',   [PublishController::class, 'markAsSold'])->middleware('auth')->name('publish.sold');
+Route::patch('/producto/{product}/reactivar', [PublishController::class, 'reactivate'])->middleware('auth')->name('publish.reactivate');
 
 /*
 |--------------------------------------------------------------------------
@@ -79,9 +81,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/mi-perfil',        [ProfileController::class, 'storeEdit'])->name('profile.store');
-    Route::get('/usuarios/{user}',  [UserProfileController::class, 'show'])->name('users.profile');
+    Route::get('/mi-perfil', [ProfileController::class, 'storeEdit'])->name('profile.store');
 });
+
+Route::get('/usuarios/{user}', [UserProfileController::class, 'show'])->name('users.profile');
 
 // Rutas de autenticación generadas por Laravel Breeze (login, registro, etc.)
 require __DIR__.'/auth.php';

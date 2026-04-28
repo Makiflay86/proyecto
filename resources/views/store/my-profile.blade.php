@@ -145,9 +145,16 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($products as $product)
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
 
-                                <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600">
+                                {{-- Badge vendido --}}
+                                @if($product->estado === 'vendido')
+                                    <div class="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+                                        Vendido
+                                    </div>
+                                @endif
+
+                                <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600 {{ $product->estado === 'vendido' ? 'opacity-50' : '' }}">
                                     @if($product->images->isNotEmpty())
                                         <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                              alt="{{ $product->nombre }}"
