@@ -130,10 +130,16 @@
                                         <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">
                                             {{ $product->category?->root->name }}
                                         </span>
+                                        @livewire('toggle-like', ['productId' => $product->id], key('store-'.$product->id))
                                     </div>
 
                                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
                                     <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
+                                    @if($product->user)
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                            Por <span class="font-medium text-gray-600 dark:text-gray-400">{{ $product->user->name }}</span>
+                                        </p>
+                                    @endif
 
                                     <div class="mt-4 flex items-center justify-between">
                                         <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ',', '.') }} €</span>

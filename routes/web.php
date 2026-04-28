@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PublishController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,6 +17,20 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', [StoreController::class, 'index'])->name('store.index');
 Route::get('/producto/{product}', [StoreController::class, 'show'])->name('store.show');
+Route::get('/mis-favoritos', [StoreController::class, 'favorites'])->middleware('auth')->name('store.favorites');
+Route::get('/publicar',  [PublishController::class, 'create'])->middleware('auth')->name('publish.create');
+Route::post('/publicar', [PublishController::class, 'store'])->middleware('auth')->name('publish.store');
+
+/*
+|--------------------------------------------------------------------------
+| Chat
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/mis-mensajes',                      [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{product}',                    [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/{product}/{user}',             [ChatController::class, 'showThread'])->name('chat.thread');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +46,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 |--------------------------------------------------------------------------
 | Productos
 |--------------------------------------------------------------------------
-| CRUD de productos. Todas las rutas requieren autenticación y email verificado.
+| Crear/editar/borrar los propios: cualquier usuario autenticado.
+| Listar todos y gestionar categorías: solo admin.
 */
+
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/products',                  [ProductController::class, 'index'])->name('products.index');
     Route::post('/products',                 [ProductController::class, 'store'])->name('products.store');
@@ -59,6 +78,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/mi-perfil',        [ProfileController::class, 'storeEdit'])->name('profile.store');
+    Route::get('/usuarios/{user}',  [UserProfileController::class, 'show'])->name('users.profile');
 });
 
 // Rutas de autenticación generadas por Laravel Breeze (login, registro, etc.)

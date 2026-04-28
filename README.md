@@ -2,10 +2,53 @@
   <img src="public/images/logo.svg" alt="Venalia" height="80">
 </p>
 
-# Instrucciones de instalación con Docker
+# Venalia — Plataforma de compra y venta
 
-> **Este proyecto está pensado principalmente para Windows con WSL2.**
-> Todos los comandos de esta guía se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
+Venalia es una aplicación web de compra-venta donde cualquier usuario registrado puede publicar productos, contactar con vendedores mediante chat en tiempo real y guardar sus favoritos.
+
+---
+
+## Funcionalidades principales
+
+### Tienda pública
+- Catálogo de productos con filtrado por categoría (árbol jerárquico) y búsqueda por nombre/descripción
+- Ordenación por precio (asc/desc) o por más recientes
+- Galería de imágenes con lightbox y navegación por teclado en el detalle del producto
+- Nombre del autor visible en cada tarjeta y en el detalle
+
+### Sistema de likes (favoritos)
+- Botón de corazón en cada producto (tienda y detalle)
+- Los productos marcados se guardan en "Mis favoritos", accesible desde el menú de usuario
+- Si el usuario no está autenticado, el botón redirige al login
+
+### Chat entre comprador y vendedor
+- Desde el detalle de un producto, el botón "Contactar con el vendedor" abre un chat privado
+- Las conversaciones se identifican por producto + comprador, de modo que el vendedor puede tener hilos separados con cada interesado
+- Actualizacion automatica cada 3 segundos (Livewire polling)
+- Auto-scroll al mensaje mas reciente
+- "Mis mensajes" muestra todos los hilos activos con indicador de mensajes no leidos
+
+### Publicar productos (todos los usuarios)
+- Cualquier usuario registrado puede publicar productos desde el menu de usuario ("Publicar producto") o desde su perfil ("Anadir producto")
+- Formulario con subida de multiples imagenes, categoria, precio, descripcion y estado
+- Los productos publicados aparecen en la tienda publica
+
+### Perfil de usuario
+- Pagina `/mi-perfil` con edicion de nombre, email y contrasena
+- Seccion "Mis productos" con las publicaciones propias y acceso rapido a cada una
+
+### Panel de administracion
+- Solo accesible para usuarios con `is_admin = true`
+- CRUD completo de productos y categorias (con jerarquia padre-hijo)
+- Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos y conversaciones
+- Los hilos de chat de todos los usuarios son visibles para el administrador
+
+---
+
+## Instrucciones de instalacion con Docker
+
+> **Este proyecto esta pensado principalmente para Windows con WSL2.**
+> Todos los comandos de esta guia se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
 
 ---
 
@@ -13,7 +56,7 @@
 
 ### Windows (recomendado)
 
-1. **WSL2** instalado y configurado — [Guía oficial de Microsoft](https://learn.microsoft.com/es-es/windows/wsl/install)
+1. **WSL2** instalado y configurado — [Guia oficial de Microsoft](https://learn.microsoft.com/es-es/windows/wsl/install)
    - Abre PowerShell como administrador y ejecuta:
      ```powershell
      wsl --install
@@ -21,25 +64,25 @@
    - Reinicia el equipo. Por defecto instala Ubuntu.
 
 2. **Docker Desktop** — [Descargar](https://www.docker.com/products/docker-desktop/)
-   - Durante la instalación, activa la opción **"Use the WSL 2 based engine"**
+   - Durante la instalacion, activa la opcion **"Use the WSL 2 based engine"**
    - En Docker Desktop > Settings > Resources > WSL Integration: activa tu distro de Ubuntu
 
-3. **Git** — instálalo dentro de WSL2:
+3. **Git** — instalalo dentro de WSL2:
    ```bash
    sudo apt update && sudo apt install git -y
    ```
 
-4. **Node.js** — instálalo dentro de WSL2 (para compilar assets con Vite):
+4. **Node.js** — instalalo dentro de WSL2 (para compilar assets con Vite):
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
    sudo apt install -y nodejs
    ```
 
-> A partir de aquí, **todos los comandos se ejecutan en la terminal de WSL2** (busca "Ubuntu" en el menú inicio).
+> A partir de aqui, **todos los comandos se ejecutan en la terminal de WSL2** (busca "Ubuntu" en el menu inicio).
 
 ### macOS / Linux
 
-- Docker Desktop instalado y en ejecución
+- Docker Desktop instalado y en ejecucion
 - Git y Node.js instalados
 
 ---
@@ -55,7 +98,7 @@ cd proyecto
 
 > **Windows:** clona el proyecto dentro del sistema de archivos de WSL2, no en `/mnt/c/...`.
 > La ruta recomendada es tu home de Ubuntu: `~/proyectos/proyecto`
-> Clonar en `C:\Users\...` y acceder desde WSL2 es mucho más lento.
+> Clonar en `C:\Users\...` y acceder desde WSL2 es mucho mas lento.
 
 ---
 
@@ -79,7 +122,13 @@ docker run --rm \
 cp .env.example .env
 ```
 
-Edita `.env` si necesitas cambiar algún valor (base de datos, mail, etc.).
+Edita `.env` si necesitas cambiar algun valor (base de datos, mail, zona horaria, etc.).
+
+Asegurate de tener la zona horaria correcta:
+
+```env
+APP_TIMEZONE=Europe/Madrid
+```
 
 ---
 
@@ -111,7 +160,7 @@ Si quieres poblar la base de datos con datos de prueba:
 ./vendor/bin/sail artisan db:seed
 ```
 
-> **Aviso:** `db:seed` añade categorías y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
+> **Aviso:** `db:seed` anade categorias y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
 
 ---
 
@@ -128,25 +177,25 @@ Para desarrollo con hot-reload:
 npm run dev
 ```
 
-> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión) y `auth.js` (funciones compartidas de los formularios de autenticación como el toggle de contraseña y la limpieza de errores).
+> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestion) y `auth.js` (formularios de autenticacion).
 
 ---
 
 ## Servicios disponibles
 
-Una vez levantado Docker, accede desde el navegador de Windows con normalidad:
+Una vez levantado Docker, accede desde el navegador:
 
 | Servicio                    | URL                    |
 |-----------------------------|------------------------|
-| Aplicación web              | http://localhost       |
+| Aplicacion web              | http://localhost       |
 | phpMyAdmin                  | http://localhost:8080  |
 | Mailpit (correos de prueba) | http://localhost:8025  |
 
 **phpMyAdmin**
 - Usuario: el definido en `.env` (`DB_USERNAME`)
-- Contraseña: la definida en `.env` (`DB_PASSWORD`)
+- Contrasena: la definida en `.env` (`DB_PASSWORD`)
 
-**Mailpit** — captura todos los emails que envía la app para poder revisarlos sin enviarlos de verdad. Asegúrate de tener en `.env`:
+**Mailpit** — captura todos los emails que envia la app para poder revisarlos sin enviarlos de verdad. Asegurate de tener en `.env`:
 
 ```env
 MAIL_MAILER=smtp
@@ -158,15 +207,15 @@ MAIL_PASSWORD=null
 
 ---
 
-## Roles y administración
+## Roles y administracion
 
-El sistema distingue dos tipos de usuario: **visitantes/usuarios registrados** y **administradores**.
+El sistema distingue dos tipos de usuario: **usuarios registrados** y **administradores**.
 
 ### Campo `is_admin`
 
-La tabla `users` tiene una columna booleana `is_admin` (por defecto `false`). Solo los usuarios con `is_admin = true` pueden acceder al panel de gestión, productos y categorías.
+La tabla `users` tiene una columna booleana `is_admin` (por defecto `false`). Solo los usuarios con `is_admin = true` pueden acceder al panel de gestion.
 
-Los usuarios registrados desde el formulario de registro **nunca** obtienen acceso de administrador automáticamente.
+Los usuarios registrados desde el formulario de registro **nunca** obtienen acceso de administrador automaticamente.
 
 ### Dar permisos de administrador a un usuario
 
@@ -182,17 +231,39 @@ User::where('email', 'correo@ejemplo.com')->update(['is_admin' => true]);
 
 O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 
-### Qué ve cada usuario
+### Que ve cada usuario
 
-| Sección | Usuario normal | Administrador |
-|---|---|---|
-| Tienda pública | ✅ | ✅ |
-| Panel de gestión | ❌ | ✅ |
-| Productos (CRUD) | ❌ | ✅ |
-| Categorías (CRUD) | ❌ | ✅ |
-| Perfil propio | ✅ | ✅ |
+| Seccion                          | Usuario normal | Administrador |
+|----------------------------------|:--------------:|:-------------:|
+| Tienda publica                   | Si             | Si            |
+| Busqueda y filtros               | Si             | Si            |
+| Dar like a productos             | Si (con login) | Si            |
+| Mis favoritos                    | Si             | Si            |
+| Chat con el vendedor             | Si             | Si            |
+| Mis mensajes                     | Si             | Si (todos)    |
+| Publicar productos               | Si             | Si            |
+| Mi perfil (editar datos)         | Si             | Si            |
+| Ver perfil de cualquier usuario  | No             | Si            |
+| Panel de gestion                 | No             | Si            |
+| CRUD productos y categorias      | No             | Si            |
 
-El enlace **"Panel de gestión"** en el menú de la tienda solo aparece si el usuario es administrador.
+---
+
+## Rutas principales
+
+| Metodo | Ruta                      | Descripcion                                  |
+|--------|---------------------------|----------------------------------------------|
+| GET    | `/`                       | Catalogo de productos                        |
+| GET    | `/producto/{product}`     | Detalle del producto                         |
+| GET    | `/mis-favoritos`          | Productos marcados con like                  |
+| GET    | `/publicar`               | Formulario para publicar un nuevo producto   |
+| POST   | `/publicar`               | Guardar nuevo producto                       |
+| GET    | `/mis-mensajes`           | Lista de conversaciones                      |
+| GET    | `/chat/{product}`         | Chat del comprador con el vendedor           |
+| GET    | `/chat/{product}/{user}`  | Hilo especifico (solo admin)                 |
+| GET    | `/mi-perfil`              | Perfil propio (editar datos + mis productos) |
+| GET    | `/usuarios/{user}`        | Perfil de otro usuario (solo admin)          |
+| GET    | `/dashboard`              | Panel de gestion (solo admin)                |
 
 ---
 
@@ -204,15 +275,13 @@ El proyecto incluye un comando artisan para generar backups completos de la BD. 
 ./vendor/bin/sail artisan backup:database
 ```
 
-**Recomendación:** haz un backup antes de cualquier cambio importante en la BD o antes de cambiar de equipo.
+**Recomendacion:** haz un backup antes de cualquier cambio importante en la BD o antes de cambiar de equipo.
 
-El comando guarda automáticamente solo los **últimos 5 backups** — cuando se crea el sexto, elimina el más antiguo.
-
-El backup **no se ejecuta automáticamente** en desarrollo, ejecútalo manualmente cuando lo necesites.
+El comando guarda automaticamente solo los **ultimos 5 backups** — cuando se crea el sexto, elimina el mas antiguo.
 
 ---
 
-## Comandos útiles
+## Comandos utiles
 
 ```bash
 # Ver logs en tiempo real
@@ -227,7 +296,7 @@ El backup **no se ejecuta automáticamente** en desarrollo, ejecútalo manualmen
 # Ejecutar tests
 ./vendor/bin/sail test
 
-# Limpiar caché (útil si algo no se actualiza visualmente)
+# Limpiar cache (util si algo no se actualiza visualmente)
 ./vendor/bin/sail artisan cache:clear
 ./vendor/bin/sail artisan config:clear
 ./vendor/bin/sail artisan view:clear
@@ -238,7 +307,7 @@ El backup **no se ejecuta automáticamente** en desarrollo, ejecútalo manualmen
 
 ---
 
-## Mensaje diario automático
+## Mensaje diario automatico
 
 La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
 
@@ -246,7 +315,7 @@ La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
 ./vendor/bin/sail artisan app:generate-daily-message
 ```
 
-En producción, añade un cron para que se ejecute automáticamente:
+En produccion, anade un cron para que se ejecute automaticamente:
 
 ```bash
 * * * * * cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
@@ -257,14 +326,14 @@ En producción, añade un cron para que se ejecute automáticamente:
 ## Problemas frecuentes en Windows
 
 **Docker no arranca o da error de WSL2**
-- Abre Docker Desktop y comprueba que el icono de la barra de tareas está verde.
+- Abre Docker Desktop y comprueba que el icono de la barra de tareas esta verde.
 - Ejecuta `wsl --update` en PowerShell para actualizar WSL2.
 
 **`./vendor/bin/sail` da "Permission denied"**
 - Ejecuta `chmod +x vendor/bin/sail` desde la terminal de WSL2.
 
 **Los cambios en archivos no se reflejan / Vite no detecta cambios**
-- Asegúrate de que el proyecto está clonado dentro de WSL2 (`~/...`) y no en `/mnt/c/...`. El rendimiento y la detección de cambios de archivos son muy deficientes desde la ruta de Windows.
+- Asegurate de que el proyecto esta clonado dentro de WSL2 (`~/...`) y no en `/mnt/c/...`. El rendimiento y la deteccion de cambios de archivos son muy deficientes desde la ruta de Windows.
 
 **Puerto 80 ocupado**
-- Algún programa (IIS, Skype, otro Docker) puede estar usando el puerto 80. Detén ese servicio o cambia el puerto en `docker-compose.yml`.
+- Algun programa (IIS, Skype, otro Docker) puede estar usando el puerto 80. Detena ese servicio o cambia el puerto en `docker-compose.yml`.

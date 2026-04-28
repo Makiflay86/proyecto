@@ -12,13 +12,24 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display the user's profile form (admin panel layout).
      */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
+    }
+
+    /**
+     * Display the user's profile in the store layout.
+     */
+    public function storeEdit(Request $request): View
+    {
+        $user     = $request->user();
+        $products = $user->products()->with('images')->latest()->get();
+
+        return view('store.my-profile', compact('user', 'products'));
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -18,6 +19,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'category_id',
         'nombre',
         'descripcion',
@@ -35,6 +37,12 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /** Relación: un producto fue creado por un usuario. */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     /** Relación: un producto puede tener muchas imágenes. */
     public function images(): HasMany
     {
@@ -45,5 +53,10 @@ class Product extends Model
     public function scopeActivos($query)
     {
         return $query->where('estado', 'activo');
+    }
+
+    public function likedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'product_likes')->withPivot('created_at');
     }
 }

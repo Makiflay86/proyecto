@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StoreController extends Controller
 {
     public function index(Request $request)
     {
         $query = Product::activos()
-            ->with(['category', 'images'])
+            ->with(['category', 'images', 'user'])
             ->latest();
 
         if ($request->filled('buscar')) {
@@ -45,11 +46,22 @@ class StoreController extends Controller
         return view('store.index', compact('products', 'categories'));
     }
 
+    public function favorites()
+    {
+        $products = Auth::user()
+            ->likedProducts()
+            ->with(['images', 'category.parent'])
+            ->latest('product_likes.created_at')
+            ->get();
+
+        return view('store.favorites', compact('products'));
+    }
+
     public function show(Product $product)
     {
         abort_if($product->estado !== 'activo', 404);
 
-        $product->load(['category.parent', 'images']);
+        $product->load(['category.parent', 'images', 'user']);
 
         return view('store.show', compact('product'));
     }

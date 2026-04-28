@@ -104,10 +104,18 @@
                             </span>
                         @endif
                         <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h1>
+                        @if($product->user)
+                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                                Publicado por <span class="font-medium text-gray-600 dark:text-gray-300">{{ $product->user->name }}</span>
+                            </p>
+                        @endif
                     </div>
-                    <span class="bg-gold-50 dark:bg-gold-900/30 text-gold-700 dark:text-gold-400 px-5 py-2 rounded-xl text-2xl font-bold shrink-0">
-                        {{ number_format($product->precio, 2, ',', '.') }} €
-                    </span>
+                    <div class="flex items-center gap-3 shrink-0">
+                        @livewire('toggle-like', ['productId' => $product->id], key('show-'.$product->id))
+                        <span class="bg-gold-50 dark:bg-gold-900/30 text-gold-700 dark:text-gold-400 px-5 py-2 rounded-xl text-2xl font-bold">
+                            {{ number_format($product->precio, 2, ',', '.') }} €
+                        </span>
+                    </div>
                 </div>
 
                 <p class="mt-6 text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">{{ $product->descripcion }}</p>
@@ -130,9 +138,14 @@
                 {{-- CTA --}}
                 <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
                     @auth
-                        <button class="bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                        <a href="{{ route('chat.show', $product) }}"
+                           class="inline-flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
                             Contactar con el vendedor
-                        </button>
+                        </a>
                     @else
                         <div class="flex items-center gap-4 flex-wrap">
                             <a href="{{ route('login') }}"

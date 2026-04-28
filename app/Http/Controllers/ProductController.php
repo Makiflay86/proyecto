@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -47,7 +48,7 @@ class ProductController extends Controller
         ]);
 
         $product = DB::transaction(function () use ($request, $validatedData) {
-            $product = Product::create($validatedData);
+            $product = Product::create($validatedData + ['user_id' => Auth::id()]);
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
