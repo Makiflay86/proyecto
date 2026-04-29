@@ -34,36 +34,44 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 - Los productos marcados se guardan en "Mis favoritos", accesible desde el menú de usuario
 - Si el usuario no está autenticado, el botón redirige al login
 
-### Chat entre comprador y vendedor
+### Chat entre usuarios (comprador ↔ vendedor)
 - Desde el detalle de un producto, el botón "Contactar con el vendedor" abre un chat privado
-- La cabecera del chat muestra la imagen y nombre del producto, **clickable** al detalle del producto, y el nombre real del vendedor
+- **Cualquier usuario registrado puede ser comprador o vendedor** — el chat funciona entre usuarios normales sin requerir rol de administrador
+- La cabecera del chat muestra el nombre del producto y el nombre de la contraparte (comprador ve al vendedor, vendedor ve al comprador)
 - Las conversaciones se identifican por producto + comprador, de modo que el vendedor puede tener hilos separados con cada interesado
-- Actualizacion automatica cada 3 segundos (Livewire polling)
-- Auto-scroll al mensaje mas reciente
-- "Mis mensajes" muestra todos los hilos activos con indicador de mensajes no leidos
-- Badge en el menú de usuario con el número de conversaciones con mensajes sin leer
+- El vendedor puede ver y responder todos los mensajes recibidos en sus productos desde "Mis mensajes"
+- Actualización automática cada 3 segundos (Livewire polling)
+- Auto-scroll al mensaje más reciente
+- Indicador "leído" en los mensajes enviados por el vendedor
+
+### Notificaciones de mensajes no leídos
+- **Punto rojo en el avatar** del navbar — aparece automáticamente en menos de 5 segundos cuando llega un mensaje nuevo, sin necesidad de recargar la página (polling JS)
+- **Badge con número** en el menú desplegable junto a "Mis mensajes"
+- **Indicador visual** en la lista de conversaciones: texto en negrita + punto azul en los hilos con mensajes sin leer
+- Funciona tanto para compradores (cuando el vendedor responde) como para vendedores (cuando un comprador escribe)
+- Totalmente adaptado a **dark mode**
 
 ### Publicar productos (todos los usuarios)
-- Cualquier usuario registrado puede publicar productos desde el menu de usuario ("Publicar producto") o desde su perfil ("Anadir producto")
-- Formulario con subida de multiples imagenes, categoria, precio, descripcion y estado
-- Los productos publicados aparecen en la tienda publica
+- Cualquier usuario registrado puede publicar productos desde el menú de usuario ("Publicar producto") o desde su perfil ("Añadir producto")
+- Formulario con subida de múltiples imágenes, categoría, precio, descripción y estado
+- Los productos publicados aparecen en la tienda pública
 
 ### Perfil de usuario
-- Pagina `/mi-perfil` con edicion de nombre, email y contrasena
-- Seccion "Mis productos" con las publicaciones propias, incluyendo badge de vendido en los ya cerrados
+- Página `/mi-perfil` con edición de nombre, email y contraseña
+- Sección "Mis productos" con las publicaciones propias, incluyendo badge de vendido en los ya cerrados
 
-### Panel de administracion
+### Panel de administración
 - Solo accesible para usuarios con `is_admin = true`
-- CRUD completo de productos y categorias (con jerarquia padre-hijo y filtro drill-down)
+- CRUD completo de productos y categorías (con jerarquía padre-hijo y filtro drill-down)
 - Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos
 - Los hilos de chat de todos los usuarios son visibles para el administrador
 
 ---
 
-## Instrucciones de instalacion con Docker
+## Instrucciones de instalación con Docker
 
-> **Este proyecto esta pensado principalmente para Windows con WSL2.**
-> Todos los comandos de esta guia se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
+> **Este proyecto está pensado principalmente para Windows con WSL2.**
+> Todos los comandos de esta guía se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
 
 ---
 
@@ -71,7 +79,7 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Windows (recomendado)
 
-1. **WSL2** instalado y configurado — [Guia oficial de Microsoft](https://learn.microsoft.com/es-es/windows/wsl/install)
+1. **WSL2** instalado y configurado — [Guía oficial de Microsoft](https://learn.microsoft.com/es-es/windows/wsl/install)
    - Abre PowerShell como administrador y ejecuta:
      ```powershell
      wsl --install
@@ -79,25 +87,25 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
    - Reinicia el equipo. Por defecto instala Ubuntu.
 
 2. **Docker Desktop** — [Descargar](https://www.docker.com/products/docker-desktop/)
-   - Durante la instalacion, activa la opcion **"Use the WSL 2 based engine"**
+   - Durante la instalación, activa la opción **"Use the WSL 2 based engine"**
    - En Docker Desktop > Settings > Resources > WSL Integration: activa tu distro de Ubuntu
 
-3. **Git** — instalalo dentro de WSL2:
+3. **Git** — instálalo dentro de WSL2:
    ```bash
    sudo apt update && sudo apt install git -y
    ```
 
-4. **Node.js** — instalalo dentro de WSL2 (para compilar assets con Vite):
+4. **Node.js** — instálalo dentro de WSL2 (para compilar assets con Vite):
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
    sudo apt install -y nodejs
    ```
 
-> A partir de aqui, **todos los comandos se ejecutan en la terminal de WSL2** (busca "Ubuntu" en el menu inicio).
+> A partir de aquí, **todos los comandos se ejecutan en la terminal de WSL2** (busca "Ubuntu" en el menú inicio).
 
 ### macOS / Linux
 
-- Docker Desktop instalado y en ejecucion
+- Docker Desktop instalado y en ejecución
 - Git y Node.js instalados
 
 ---
@@ -113,7 +121,7 @@ cd proyecto
 
 > **Windows:** clona el proyecto dentro del sistema de archivos de WSL2, no en `/mnt/c/...`.
 > La ruta recomendada es tu home de Ubuntu: `~/proyectos/proyecto`
-> Clonar en `C:\Users\...` y acceder desde WSL2 es mucho mas lento.
+> Clonar en `C:\Users\...` y acceder desde WSL2 es mucho más lento.
 
 ---
 
@@ -137,9 +145,9 @@ docker run --rm \
 cp .env.example .env
 ```
 
-Edita `.env` si necesitas cambiar algun valor (base de datos, mail, zona horaria, etc.).
+Edita `.env` si necesitas cambiar algún valor (base de datos, mail, zona horaria, etc.).
 
-Asegurate de tener la zona horaria correcta:
+Asegúrate de tener la zona horaria correcta:
 
 ```env
 APP_TIMEZONE=Europe/Madrid
@@ -175,7 +183,7 @@ Si quieres poblar la base de datos con datos de prueba:
 ./vendor/bin/sail artisan db:seed
 ```
 
-> **Aviso:** `db:seed` anade categorias y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
+> **Aviso:** `db:seed` añade categorías y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
 
 ---
 
@@ -192,7 +200,7 @@ Para desarrollo con hot-reload:
 npm run dev
 ```
 
-> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestion) y `auth.js` (formularios de autenticacion).
+> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión) y `auth.js` (formularios de autenticación).
 
 ---
 
@@ -202,15 +210,15 @@ Una vez levantado Docker, accede desde el navegador:
 
 | Servicio                    | URL                    |
 |-----------------------------|------------------------|
-| Aplicacion web              | http://localhost       |
+| Aplicación web              | http://localhost       |
 | phpMyAdmin                  | http://localhost:8080  |
 | Mailpit (correos de prueba) | http://localhost:8025  |
 
 **phpMyAdmin**
 - Usuario: el definido en `.env` (`DB_USERNAME`)
-- Contrasena: la definida en `.env` (`DB_PASSWORD`)
+- Contraseña: la definida en `.env` (`DB_PASSWORD`)
 
-**Mailpit** — captura todos los emails que envia la app para poder revisarlos sin enviarlos de verdad. Asegurate de tener en `.env`:
+**Mailpit** — captura todos los emails que envía la app para poder revisarlos sin enviarlos de verdad. Asegúrate de tener en `.env`:
 
 ```env
 MAIL_MAILER=smtp
@@ -222,15 +230,15 @@ MAIL_PASSWORD=null
 
 ---
 
-## Roles y administracion
+## Roles y administración
 
 El sistema distingue dos tipos de usuario: **usuarios registrados** y **administradores**.
 
 ### Campo `is_admin`
 
-La tabla `users` tiene una columna booleana `is_admin` (por defecto `false`). Solo los usuarios con `is_admin = true` pueden acceder al panel de gestion.
+La tabla `users` tiene una columna booleana `is_admin` (por defecto `false`). Solo los usuarios con `is_admin = true` pueden acceder al panel de gestión.
 
-Los usuarios registrados desde el formulario de registro **nunca** obtienen acceso de administrador automaticamente.
+Los usuarios registrados desde el formulario de registro **nunca** obtienen acceso de administrador automáticamente.
 
 ### Dar permisos de administrador a un usuario
 
@@ -246,42 +254,44 @@ User::where('email', 'correo@ejemplo.com')->update(['is_admin' => true]);
 
 O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 
-### Que ve cada usuario
+### Qué ve cada usuario
 
-| Seccion                              | Visitante | Usuario normal | Administrador |
+| Sección                              | Visitante | Usuario normal | Administrador |
 |--------------------------------------|:---------:|:--------------:|:-------------:|
-| Tienda publica                       | Si        | Si             | Si            |
-| Busqueda y filtros drill-down        | Si        | Si             | Si            |
-| Ver perfil publico de un usuario     | Si        | Si             | Si            |
-| Dar like a productos                 | No        | Si             | Si            |
-| Mis favoritos                        | No        | Si             | Si            |
-| Chat con el vendedor                 | No        | Si             | Si            |
-| Mis mensajes (badge no leidos)       | No        | Si             | Si (todos)    |
-| Publicar productos                   | No        | Si             | Si            |
-| Marcar producto como vendido         | No        | Si (propio)    | Si            |
-| Mi perfil (editar datos)             | No        | Si             | Si            |
-| Panel de gestion                     | No        | No             | Si            |
-| CRUD productos y categorias          | No        | No             | Si            |
+| Tienda pública                       | Sí        | Sí             | Sí            |
+| Búsqueda y filtros drill-down        | Sí        | Sí             | Sí            |
+| Ver perfil público de un usuario     | Sí        | Sí             | Sí            |
+| Dar like a productos                 | No        | Sí             | Sí            |
+| Mis favoritos                        | No        | Sí             | Sí            |
+| Contactar con el vendedor (chat)     | No        | Sí             | Sí            |
+| Mis mensajes + notificaciones        | No        | Sí             | Sí (todos)    |
+| Publicar productos                   | No        | Sí             | Sí            |
+| Marcar producto como vendido         | No        | Sí (propio)    | Sí            |
+| Mi perfil (editar datos)             | No        | Sí             | Sí            |
+| Panel de gestión                     | No        | No             | Sí            |
+| CRUD productos y categorías          | No        | No             | Sí            |
 
 ---
 
 ## Rutas principales
 
-| Metodo | Ruta                               | Descripcion                                  |
-|--------|------------------------------------|----------------------------------------------|
-| GET    | `/`                                | Catalogo de productos                        |
-| GET    | `/producto/{product}`              | Detalle del producto                         |
-| PATCH  | `/producto/{product}/vendido`      | Marcar producto como vendido (dueño)         |
-| PATCH  | `/producto/{product}/reactivar`    | Volver a poner en venta (dueño)              |
-| GET    | `/mis-favoritos`                   | Productos marcados con like                  |
-| GET    | `/publicar`                        | Formulario para publicar un nuevo producto   |
-| POST   | `/publicar`                        | Guardar nuevo producto                       |
-| GET    | `/mis-mensajes`                    | Lista de conversaciones                      |
-| GET    | `/chat/{product}`                  | Chat del comprador con el vendedor           |
-| GET    | `/chat/{product}/{user}`           | Hilo especifico (solo admin)                 |
-| GET    | `/mi-perfil`                       | Perfil propio (editar datos + mis productos) |
-| GET    | `/usuarios/{user}`                 | Perfil publico de cualquier usuario          |
-| GET    | `/dashboard`                       | Panel de gestion (solo admin)                |
+| Método | Ruta                                     | Descripción                                    |
+|--------|------------------------------------------|------------------------------------------------|
+| GET    | `/`                                      | Catálogo de productos                          |
+| GET    | `/producto/{product}`                    | Detalle del producto                           |
+| PATCH  | `/producto/{product}/vendido`            | Marcar producto como vendido (dueño)           |
+| PATCH  | `/producto/{product}/reactivar`          | Volver a poner en venta (dueño)                |
+| GET    | `/mis-favoritos`                         | Productos marcados con like                    |
+| GET    | `/publicar`                              | Formulario para publicar un nuevo producto     |
+| POST   | `/publicar`                              | Guardar nuevo producto                         |
+| GET    | `/mis-mensajes`                          | Lista de conversaciones (comprador + vendedor) |
+| GET    | `/chat/{product}`                        | Chat del comprador con el vendedor             |
+| GET    | `/chat/{product}/vendedor/{buyer}`       | Hilo del vendedor con un comprador concreto    |
+| GET    | `/chat/{product}/{user}`                 | Hilo específico (solo admin)                   |
+| GET    | `/mensajes/no-leidos`                    | API: devuelve nº de mensajes no leídos (JSON)  |
+| GET    | `/mi-perfil`                             | Perfil propio (editar datos + mis productos)   |
+| GET    | `/usuarios/{user}`                       | Perfil público de cualquier usuario            |
+| GET    | `/dashboard`                             | Panel de gestión (solo admin)                  |
 
 ---
 
@@ -293,13 +303,13 @@ El proyecto incluye un comando artisan para generar backups completos de la BD. 
 ./vendor/bin/sail artisan backup:database
 ```
 
-**Recomendacion:** haz un backup antes de cualquier cambio importante en la BD o antes de cambiar de equipo.
+**Recomendación:** haz un backup antes de cualquier cambio importante en la BD o antes de cambiar de equipo.
 
-El comando guarda automaticamente solo los **ultimos 5 backups** — cuando se crea el sexto, elimina el mas antiguo.
+El comando guarda automáticamente solo los **últimos 5 backups** — cuando se crea el sexto, elimina el más antiguo.
 
 ---
 
-## Comandos utiles
+## Comandos útiles
 
 ```bash
 # Ver logs en tiempo real
@@ -314,10 +324,11 @@ El comando guarda automaticamente solo los **ultimos 5 backups** — cuando se c
 # Ejecutar tests
 ./vendor/bin/sail test
 
-# Limpiar cache (util si algo no se actualiza visualmente)
+# Limpiar caché (útil si algo no se actualiza visualmente)
 ./vendor/bin/sail artisan cache:clear
 ./vendor/bin/sail artisan config:clear
 ./vendor/bin/sail artisan view:clear
+./vendor/bin/sail artisan route:clear
 
 # Backup de la BD
 ./vendor/bin/sail artisan backup:database
@@ -325,7 +336,7 @@ El comando guarda automaticamente solo los **ultimos 5 backups** — cuando se c
 
 ---
 
-## Mensaje diario automatico
+## Mensaje diario automático
 
 La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
 
@@ -333,7 +344,7 @@ La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
 ./vendor/bin/sail artisan app:generate-daily-message
 ```
 
-En produccion, anade un cron para que se ejecute automaticamente:
+En producción, añade un cron para que se ejecute automáticamente:
 
 ```bash
 * * * * * cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
@@ -344,14 +355,14 @@ En produccion, anade un cron para que se ejecute automaticamente:
 ## Problemas frecuentes en Windows
 
 **Docker no arranca o da error de WSL2**
-- Abre Docker Desktop y comprueba que el icono de la barra de tareas esta verde.
+- Abre Docker Desktop y comprueba que el icono de la barra de tareas está verde.
 - Ejecuta `wsl --update` en PowerShell para actualizar WSL2.
 
 **`./vendor/bin/sail` da "Permission denied"**
 - Ejecuta `chmod +x vendor/bin/sail` desde la terminal de WSL2.
 
 **Los cambios en archivos no se reflejan / Vite no detecta cambios**
-- Asegurate de que el proyecto esta clonado dentro de WSL2 (`~/...`) y no en `/mnt/c/...`. El rendimiento y la deteccion de cambios de archivos son muy deficientes desde la ruta de Windows.
+- Asegúrate de que el proyecto está clonado dentro de WSL2 (`~/...`) y no en `/mnt/c/...`. El rendimiento y la detección de cambios de archivos son muy deficientes desde la ruta de Windows.
 
 **Puerto 80 ocupado**
-- Algun programa (IIS, Skype, otro Docker) puede estar usando el puerto 80. Detena ese servicio o cambia el puerto en `docker-compose.yml`.
+- Algún programa (IIS, Skype, otro Docker) puede estar usando el puerto 80. Detén ese servicio o cambia el puerto en `docker-compose.yml`.

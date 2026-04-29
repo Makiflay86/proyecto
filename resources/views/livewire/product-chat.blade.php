@@ -22,7 +22,7 @@
             </div>
             <div class="min-w-0">
                 <h3 class="font-semibold text-gray-900 dark:text-white text-sm truncate">{{ $product->nombre }}</h3>
-                @if(Auth::user()->is_admin)
+                @if($threadUser->id !== Auth::id())
                     <p class="text-xs text-gray-500 dark:text-gray-400">Conversación con <span class="font-medium">{{ $threadUser->name }}</span></p>
                 @else
                     <p class="text-xs text-gray-500 dark:text-gray-400">

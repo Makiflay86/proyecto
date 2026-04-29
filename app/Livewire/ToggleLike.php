@@ -8,7 +8,7 @@ use Livewire\Component;
 
 class ToggleLike extends Component
 {
-    public int $productId;
+    public int $productId = 0;
     public bool $liked = false;
     public int $count = 0;
 
@@ -30,6 +30,7 @@ class ToggleLike extends Component
             return;
         }
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if ($this->liked) {

@@ -11,8 +11,8 @@ use Livewire\Component;
 
 class ProductChat extends Component
 {
-    public int $productId;
-    public int $threadUserId;
+    public int $productId = 0;
+    public int $threadUserId = 0;
 
     #[Validate('required|string|max:1000')]
     public string $body = '';
@@ -28,8 +28,11 @@ class ProductChat extends Component
     {
         $this->validate();
 
-        // Un usuario normal solo puede enviar en su propio hilo
-        if (! Auth::user()->is_admin && Auth::id() !== $this->threadUserId) {
+        // Permitir: admin, comprador (thread_user) o dueño del producto (vendedor)
+        $product = Product::find($this->productId);
+        $isBuyer  = Auth::id() === $this->threadUserId;
+        $isSeller = $product && Auth::id() === $product->user_id;
+        if (! Auth::user()->is_admin && ! $isBuyer && ! $isSeller) {
             abort(403);
         }
 
@@ -57,8 +60,6 @@ class ProductChat extends Component
 
     public function render()
     {
-        $this->markRead();
-
         $messages    = Message::with('sender')
             ->where('product_id', $this->productId)
             ->where('thread_user_id', $this->threadUserId)

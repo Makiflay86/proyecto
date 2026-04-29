@@ -14,11 +14,27 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        // Obtenemos el ID del último mensaje de cada hilo para luego cargarlo con relaciones
-        $lastIds = Message::selectRaw('MAX(id) as id')
-            ->when(! $user->is_admin, fn ($q) => $q->where('thread_user_id', $user->id))
-            ->groupBy('product_id', 'thread_user_id')
-            ->pluck('id');
+        if ($user->is_admin) {
+            // Admin ve todos los hilos
+            $lastIds = Message::selectRaw('MAX(id) as id')
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+        } else {
+            // Como comprador: hilos donde el usuario es el thread_user
+            $buyerIds = Message::selectRaw('MAX(id) as id')
+                ->where('thread_user_id', $user->id)
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+
+            // Como vendedor: hilos de sus productos donde el comprador es otro usuario
+            $sellerIds = Message::selectRaw('MAX(id) as id')
+                ->whereHas('product', fn ($q) => $q->where('user_id', $user->id))
+                ->where('thread_user_id', '!=', $user->id)
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+
+            $lastIds = $buyerIds->merge($sellerIds)->unique();
+        }
 
         $threads = Message::with(['product.images', 'sender', 'threadUser'])
             ->whereIn('id', $lastIds)
@@ -34,6 +50,17 @@ class ChatController extends Controller
         return view('store.chat', [
             'product'      => $product,
             'threadUserId' => Auth::id(),
+        ]);
+    }
+
+    /** Vista del chat para el vendedor viendo el hilo de un comprador concreto. */
+    public function showAsSeller(Product $product, User $buyer)
+    {
+        abort_if(Auth::id() !== $product->user_id && ! Auth::user()->is_admin, 403);
+
+        return view('store.chat', [
+            'product'      => $product,
+            'threadUserId' => $buyer->id,
         ]);
     }
 

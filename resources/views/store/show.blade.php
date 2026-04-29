@@ -149,7 +149,7 @@
                             Este producto ya ha sido vendido
                         </div>
                         @auth
-                            @if(auth()->id() === $product->user_id)
+                            @if(auth()->id() === $product->user_id || auth()->user()->is_admin)
                                 <form method="POST" action="{{ route('publish.reactivate', $product) }}">
                                     @csrf @method('PATCH')
                                     <button type="submit"
@@ -163,7 +163,7 @@
                     @else
                         @auth
                             @if(auth()->id() === $product->user_id)
-                                {{-- Botón marcar como vendido --}}
+                                {{-- Botón marcar como vendido (solo el dueño del producto) --}}
                                 <form method="POST" action="{{ route('publish.sold', $product) }}">
                                     @csrf @method('PATCH')
                                     <button type="submit"

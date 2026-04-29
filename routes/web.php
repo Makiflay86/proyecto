@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
@@ -31,6 +32,7 @@ Route::patch('/producto/{product}/reactivar', [PublishController::class, 'reacti
 Route::middleware('auth')->group(function () {
     Route::get('/mis-mensajes',                      [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{product}',                    [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/{product}/vendedor/{buyer}',    [ChatController::class, 'showAsSeller'])->name('chat.seller');
     Route::get('/chat/{product}/{user}',             [ChatController::class, 'showThread'])->name('chat.thread');
 });
 
@@ -85,6 +87,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/usuarios/{user}', [UserProfileController::class, 'show'])->name('users.profile');
+
+Route::middleware('auth')->get('/mensajes/no-leidos', function () {
+    return response()->json(['count' => Auth::user()->unreadThreadsCount()]);
+})->name('api.unread.count');
 
 // Rutas de autenticación generadas por Laravel Breeze (login, registro, etc.)
 require __DIR__.'/auth.php';

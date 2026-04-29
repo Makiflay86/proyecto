@@ -77,12 +77,16 @@
                             </button>
 
                             @auth
+                                @php $unreadNav = Auth::user()->unreadThreadsCount() @endphp
                                 {{-- Menú de usuario autenticado --}}
                                 <div class="relative" x-data="{ open: false }">
                                     <button @click="open = !open"
-                                            class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium text-gray-800 dark:text-white">
-                                        <div class="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center text-white text-xs font-bold">
-                                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                            class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium text-gray-800 dark:text-white">
+                                        <div class="relative w-6 h-6">
+                                            <div class="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center text-white text-xs font-bold">
+                                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                            </div>
+                                            <span id="unread-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
                                         </div>
                                         <span class="hidden sm:block">{{ Auth::user()->name }}</span>
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,12 +128,7 @@
                                                       d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                                             </svg>
                                             Mis mensajes
-                                            @php $unread = Auth::user()->unreadThreadsCount() @endphp
-                                            @if($unread > 0)
-                                                <span class="ml-auto bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">
-                                                    {{ $unread > 99 ? '99+' : $unread }}
-                                                </span>
-                                            @endif
+                                            <span id="unread-badge-count" class="{{ $unreadNav > 0 ? '' : 'hidden' }} ml-auto bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">{{ $unreadNav > 99 ? '99+' : $unreadNav }}</span>
                                         </a>
                                         <a href="{{ route('profile.store') }}"
                                            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
@@ -194,5 +193,37 @@
         @livewireScripts
 
         @stack('scripts')
+
+        @auth
+        <script>
+            (function () {
+                function updateUnread() {
+                    fetch('/mensajes/no-leidos', {
+                        credentials: 'same-origin',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                    })
+                    .then(function(r) {
+                        if (!r.ok) return;
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        if (!data) return;
+                        var dot   = document.getElementById('unread-dot');
+                        var badge = document.getElementById('unread-badge-count');
+                        if (data.count > 0) {
+                            if (dot)   dot.classList.remove('hidden');
+                            if (badge) { badge.textContent = data.count > 99 ? '99+' : data.count; badge.classList.remove('hidden'); }
+                        } else {
+                            if (dot)   dot.classList.add('hidden');
+                            if (badge) badge.classList.add('hidden');
+                        }
+                    });
+                }
+
+                updateUnread();
+                setInterval(updateUnread, 5000);
+            })();
+        </script>
+        @endauth
     </body>
 </html>

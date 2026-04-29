@@ -41,11 +41,15 @@
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700 overflow-hidden">
                 @foreach($threads as $thread)
                     @php
-                        $isAdmin   = Auth::user()->is_admin;
-                        $chatUrl   = $isAdmin
+                        $isAdmin     = Auth::user()->is_admin;
+                        $isSeller    = $thread->product->user_id === Auth::id();
+                        $isBuyer     = $thread->thread_user_id === Auth::id();
+                        $chatUrl     = $isAdmin
                             ? route('chat.thread', [$thread->product, $thread->threadUser])
-                            : route('chat.show', $thread->product);
-                        $isUnread  = $thread->read_at === null && $thread->sender_id !== Auth::id();
+                            : ($isSeller && ! $isBuyer
+                                ? route('chat.seller', [$thread->product, $thread->threadUser])
+                                : route('chat.show', $thread->product));
+                        $isUnread    = $thread->read_at === null && $thread->sender_id !== Auth::id();
                     @endphp
                     <div onclick="window.location='{{ $chatUrl }}'"
                          class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer group">
@@ -77,20 +81,11 @@
                                 </span>
                             </div>
 
-                            @if($isAdmin)
-                                <a href="{{ route('users.profile', $thread->threadUser) }}"
-                                   onclick="event.stopPropagation()"
-                                   class="inline-flex items-center gap-1 text-xs text-indigo-500 dark:text-indigo-400 font-medium mb-0.5 hover:text-indigo-700 dark:hover:text-indigo-300 transition">
-                                    {{ $thread->threadUser->name }}
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            @endif
-
                             <p class="text-sm text-gray-500 dark:text-gray-400 truncate {{ $isUnread ? 'font-semibold text-gray-700 dark:text-gray-200' : '' }}">
                                 @if($thread->sender_id === Auth::id())
                                     <span class="text-gray-400 dark:text-gray-500">Tú: </span>
+                                @elseif($isAdmin || $isSeller)
+                                    <span class="text-gray-400 dark:text-gray-500">{{ $thread->threadUser->name }}: </span>
                                 @endif
                                 {{ $thread->body }}
                             </p>
@@ -98,7 +93,7 @@
 
                         {{-- Indicador de no leído --}}
                         @if($isUnread)
-                            <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-indigo-400 shrink-0"></div>
                         @endif
 
                         <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 transition shrink-0"

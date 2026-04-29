@@ -62,10 +62,26 @@ class User extends Authenticatable
 
     public function unreadThreadsCount(): int
     {
-        $lastIds = Message::selectRaw('MAX(id) as id')
-            ->when(! $this->is_admin, fn ($q) => $q->where('thread_user_id', $this->id))
-            ->groupBy('product_id', 'thread_user_id')
-            ->pluck('id');
+        if ($this->is_admin) {
+            $lastIds = Message::selectRaw('MAX(id) as id')
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+        } else {
+            // Como comprador: hilos donde el usuario es el thread_user
+            $buyerIds = Message::selectRaw('MAX(id) as id')
+                ->where('thread_user_id', $this->id)
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+
+            // Como vendedor: hilos de sus productos donde el comprador es otro
+            $sellerIds = Message::selectRaw('MAX(id) as id')
+                ->whereHas('product', fn ($q) => $q->where('user_id', $this->id))
+                ->where('thread_user_id', '!=', $this->id)
+                ->groupBy('product_id', 'thread_user_id')
+                ->pluck('id');
+
+            $lastIds = $buyerIds->merge($sellerIds)->unique();
+        }
 
         return Message::whereIn('id', $lastIds)
             ->whereNull('read_at')
