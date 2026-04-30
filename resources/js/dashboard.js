@@ -36,6 +36,8 @@ function readChartData() {
         categoryLabels: JSON.parse(el.dataset.categories || '[]'),
         categoryValues: JSON.parse(el.dataset.values     || '[]'),
         activeCount:    parseInt(el.dataset.active        || '0', 10),
+        reservedCount:  parseInt(el.dataset.reserved      || '0', 10),
+        soldCount:      parseInt(el.dataset.sold          || '0', 10),
         inactiveCount:  parseInt(el.dataset.inactive      || '0', 10),
     };
 }
@@ -50,7 +52,7 @@ function updateCharts() {
     const data = readChartData();
     if (!data || !window._barChart || !window._doughnutChart) return;
 
-    const { categoryLabels, categoryValues, activeCount, inactiveCount } = data;
+    const { categoryLabels, categoryValues, activeCount, reservedCount, soldCount, inactiveCount } = data;
 
     // Actualizar gráfico de barras
     window._barChart.data.labels                      = categoryLabels.length ? categoryLabels : ['Sin datos'];
@@ -59,7 +61,7 @@ function updateCharts() {
     window._barChart.update('none'); // sin animación para que el refresco sea silencioso
 
     // Actualizar gráfico doughnut
-    window._doughnutChart.data.datasets[0].data = [activeCount, inactiveCount];
+    window._doughnutChart.data.datasets[0].data = [activeCount, reservedCount, soldCount, inactiveCount];
     window._doughnutChart.update('none');
 }
 
@@ -94,7 +96,7 @@ function initDashboardCharts() {
     const data = readChartData();
     if (!data) return;
 
-    const { categoryLabels, categoryValues, activeCount, inactiveCount } = data;
+    const { categoryLabels, categoryValues, activeCount, reservedCount, soldCount, inactiveCount } = data;
 
     // Destruir instancias previas para evitar el error "Canvas already in use"
     if (window._barChart)           window._barChart.destroy();
@@ -126,14 +128,14 @@ function initDashboardCharts() {
         },
     });
 
-    // ── Gráfico doughnut: productos activos vs inactivos ─────────
+    // ── Gráfico doughnut: productos por estado ─────────
     window._doughnutChart = new Chart(doughnutCanvas.getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Activos', 'Inactivos'],
+            labels: ['Activos', 'Reservados', 'Vendidos', 'Inactivos'],
             datasets: [{
-                data: [activeCount, inactiveCount],
-                backgroundColor: ['#22c55e', '#ef4444'],
+                data: [activeCount, reservedCount, soldCount, inactiveCount],
+                backgroundColor: ['#22c55e', '#f59e0b', '#ef4444', '#9ca3af'],
                 borderWidth: 0,
                 hoverOffset: 6,
             }],

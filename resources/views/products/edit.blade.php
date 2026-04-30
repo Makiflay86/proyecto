@@ -70,8 +70,10 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
                             <select name="estado"
                                     class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
-                                <option value="activo"   {{ old('estado', $product->estado) === 'activo'   ? 'selected' : '' }}>Activo</option>
-                                <option value="inactivo" {{ old('estado', $product->estado) === 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                                <option value="activo"    {{ old('estado', $product->estado) === 'activo'    ? 'selected' : '' }}>Activo</option>
+                                <option value="reservado" {{ old('estado', $product->estado) === 'reservado' ? 'selected' : '' }}>Reservado</option>
+                                <option value="vendido"   {{ old('estado', $product->estado) === 'vendido'   ? 'selected' : '' }}>Vendido</option>
+                                <option value="inactivo"  {{ old('estado', $product->estado) === 'inactivo'  ? 'selected' : '' }}>Inactivo</option>
                             </select>
                         </div>
                     </div>

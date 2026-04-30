@@ -118,10 +118,23 @@
         {{-- GRID DE TARJETAS DE PRODUCTOS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300 relative group">
+
+                    {{-- Badges centrados (Estilo tienda) --}}
+                    @if($product->isSold() || $product->isReserved() || $product->estado === 'inactivo')
+                        <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                            @if($product->isSold())
+                                <span class="bg-red-600/90 dark:bg-red-700/90 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-2xl backdrop-blur-sm transform -rotate-12 border-2 border-white/20">Vendido</span>
+                            @elseif($product->isReserved())
+                                <span class="bg-amber-500/90 dark:bg-amber-600/90 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-2xl backdrop-blur-sm transform -rotate-12 border-2 border-white/20">Reservado</span>
+                            @else
+                                <span class="bg-gray-800/90 dark:bg-gray-700/90 text-white text-[10px] sm:text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-lg shadow-2xl backdrop-blur-sm transform -rotate-12 border-2 border-white/20">Inactivo</span>
+                            @endif
+                        </div>
+                    @endif
 
                     {{-- IMAGEN DEL PRODUCTO --}}
-                    <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 {{ $product->isSold() || $product->isReserved() || $product->estado === 'inactivo' ? 'opacity-60 grayscale-[0.5]' : '' }}">
                         @if($product->images->isNotEmpty())
                             {{-- Mostramos la primera imagen de la colección --}}
                             <img src="{{ asset('storage/' . $product->images->first()->path) }}" class="w-full h-full object-cover">
@@ -131,19 +144,6 @@
                     </div>
 
                     <div class="p-5">
-                        {{--
-                            CABECERA: categoría raíz + badge de estado
-                            Se muestran en la misma línea con justify-between.
-
-                            $product->category->root sube por la cadena de padres hasta la raíz.
-                            El operador ?-> (null-safe) evita error si category es null.
-
-                            BADGE DE ESTADO:
-                            - 'activo'   → fondo verde, punto verde, texto "Activo"
-                            - cualquier otro valor → fondo gris, punto gris, texto "Inactivo"
-                            El punto de color (w-1.5 h-1.5 rounded-full) es un círculo pequeño
-                            que actúa como indicador visual rápido.
-                        --}}
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">{{ $product->category?->root->name }}</span>
                             @if($product->estado === 'activo')
@@ -151,10 +151,20 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>
                                     Activo
                                 </span>
+                            @elseif($product->isSold())
+                                <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400"></span>
+                                    Vendido
+                                </span>
+                            @elseif($product->isReserved())
+                                <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400"></span>
+                                    Reservado
+                                </span>
                             @else
                                 <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
                                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500"></span>
-                                    Inactivo
+                                    {{ ucfirst($product->estado) }}
                                 </span>
                             @endif
                         </div>

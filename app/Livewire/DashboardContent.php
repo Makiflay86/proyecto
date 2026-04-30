@@ -25,15 +25,20 @@ class DashboardContent extends Component
         // ── Query 1: stats en una sola consulta ──────────────────────────────
         $stats = DB::selectOne('
             SELECT
-                COUNT(*)                                             AS total,
-                SUM(CASE WHEN estado = ? THEN 1 ELSE 0 END)        AS active,
-                COUNT(DISTINCT category_id)                          AS categories
+                COUNT(*)                                              AS total,
+                SUM(CASE WHEN estado = "activo" THEN 1 ELSE 0 END)    AS active,
+                SUM(CASE WHEN estado = "reservado" THEN 1 ELSE 0 END) AS reserved,
+                SUM(CASE WHEN estado = "vendido" THEN 1 ELSE 0 END)   AS sold,
+                SUM(CASE WHEN estado = "inactivo" THEN 1 ELSE 0 END)  AS inactive,
+                COUNT(DISTINCT category_id)                           AS categories
             FROM products
-        ', ['activo']);
+        ');
 
         $totalProducts    = (int) $stats->total;
         $activeProducts   = (int) $stats->active;
-        $inactiveProducts = $totalProducts - $activeProducts;
+        $reservedProducts = (int) $stats->reserved;
+        $soldProducts     = (int) $stats->sold;
+        $inactiveProducts = (int) $stats->inactive;
         $categoriesCount  = (int) $stats->categories;
 
         // ── Query 2: últimos 5 productos ──────────────────────────────────────
@@ -69,6 +74,8 @@ class DashboardContent extends Component
             'message'            => $dailyMessage?->message,
             'totalProducts'      => $totalProducts,
             'activeProducts'     => $activeProducts,
+            'reservedProducts'   => $reservedProducts,
+            'soldProducts'       => $soldProducts,
             'inactiveProducts'   => $inactiveProducts,
             'categoriesCount'    => $categoriesCount,
             'recentProducts'     => $recentProducts,

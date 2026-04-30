@@ -113,9 +113,13 @@
                     <div class="mt-6 flex items-center gap-2">
                         <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold
-                            {{ $product->estado === 'activo'
-                                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400' }}">
+                            {{ $product->isSold()
+                                ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'
+                                : ($product->isReserved()
+                                    ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400'
+                                    : ($product->estado === 'activo'
+                                        ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400')) }}">
                             {{ ucfirst($product->estado) }}
                         </span>
                     </div>
