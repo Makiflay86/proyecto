@@ -68,7 +68,9 @@ class StoreProductList extends Component
         }
 
         // Consulta de productos
-        $query = Product::activos()->with(['category', 'images', 'user'])->latest();
+        $query = Product::whereIn('estado', ['activo', 'reservado'])
+            ->with(['category', 'images', 'user'])
+            ->latest();
 
         if (!empty($filterIds)) {
             $query->whereIn('category_id', $filterIds);

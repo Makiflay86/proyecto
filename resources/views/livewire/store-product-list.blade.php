@@ -72,9 +72,20 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group">
 
-                    <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    {{-- Badges centrados --}}
+                    @if($product->isSold() || $product->isReserved())
+                        <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                            @if($product->isSold())
+                                <span class="bg-red-600/90 dark:bg-red-700/90 text-white text-sm font-black uppercase tracking-widest px-6 py-2 rounded-lg shadow-2xl backdrop-blur-sm transform -rotate-12 border-2 border-white/20">Vendido</span>
+                            @else
+                                <span class="bg-amber-500/90 dark:bg-amber-600/90 text-white text-sm font-black uppercase tracking-widest px-6 py-2 rounded-lg shadow-2xl backdrop-blur-sm transform -rotate-12 border-2 border-white/20">Reservado</span>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 {{ $product->isSold() || $product->isReserved() ? 'opacity-60 grayscale-[0.5]' : '' }}">
                         @if($product->images->isNotEmpty())
                             <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                  alt="{{ $product->nombre }}"

@@ -59,4 +59,16 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'product_likes')->withPivot('created_at');
     }
+
+    /** Comprueba si el producto está vendido. */
+    public function isSold(): bool
+    {
+        return $this->estado === 'vendido';
+    }
+
+    /** Comprueba si el producto está reservado. */
+    public function isReserved(): bool
+    {
+        return $this->estado === 'reservado';
+    }
 }

@@ -46,8 +46,20 @@
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($products as $product)
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group">
-                            <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
+
+                            {{-- Badge estado --}}
+                            @if($product->isSold())
+                                <div class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">
+                                    Vendido
+                                </div>
+                            @elseif($product->isReserved())
+                                <div class="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">
+                                    Reservado
+                                </div>
+                            @endif
+
+                            <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600 {{ $product->isSold() || $product->isReserved() ? 'opacity-75' : '' }}">
                                 @if($product->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                          alt="{{ $product->nombre }}"

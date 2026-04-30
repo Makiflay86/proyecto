@@ -120,61 +120,57 @@
 
                 <p class="mt-6 text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">{{ $product->descripcion }}</p>
 
-                <div class="mt-6 flex items-center gap-4 flex-wrap">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold
-                            {{ $product->estado === 'activo'
-                                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
-                                : ($product->estado === 'vendido'
-                                    ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400') }}">
-                            {{ $product->estado === 'vendido' ? 'Vendido' : ucfirst($product->estado) }}
-                        </span>
-                    </div>
-                    <span class="text-xs text-gray-400 dark:text-gray-500">
-                        Publicado el {{ $product->created_at->format('d/m/Y') }}
-                    </span>
-                </div>
-
-                {{-- CTA --}}
-                <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex flex-wrap items-center gap-3">
-
-                    @if($product->estado === 'vendido')
-                        {{-- Banner vendido --}}
-                        <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-5 py-3 rounded-xl font-semibold text-sm">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Este producto ya ha sido vendido
+                @auth
+                    @if(auth()->id() === $product->user_id)
+                        {{-- Dueño --}}
+                        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">Gestión del vendedor</p>
+                            @livewire('manage-product-status', ['product' => $product])
                         </div>
-                        @auth
-                            @if(auth()->id() === $product->user_id || auth()->user()->is_admin)
-                                <form method="POST" action="{{ route('publish.reactivate', $product) }}">
-                                    @csrf @method('PATCH')
-                                    <button type="submit"
-                                            class="text-sm text-gray-500 dark:text-gray-400 hover:text-gold-500 dark:hover:text-gold-400 underline transition">
-                                        Volver a poner en venta
-                                    </button>
-                                </form>
-                            @endif
-                        @endauth
-
                     @else
-                        @auth
-                            @if(auth()->id() === $product->user_id)
-                                {{-- Botón marcar como vendido (solo el dueño del producto) --}}
-                                <form method="POST" action="{{ route('publish.sold', $product) }}">
-                                    @csrf @method('PATCH')
-                                    <button type="submit"
-                                            onclick="return confirm('¿Marcar este producto como vendido? Desaparecerá de la tienda.')"
-                                            class="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-900 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-bold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                        {{-- Otros usuarios autenticados --}}
+                        <div class="mt-6 flex items-center gap-4 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                    {{ $product->isSold()
+                                        ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'
+                                        : ($product->isReserved()
+                                            ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400'
+                                            : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300') }}">
+                                    {{ ucfirst($product->estado) }}
+                                </span>
+                            </div>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">
+                                Publicado el {{ $product->created_at->format('d/m/Y') }}
+                            </span>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                            @if($product->isSold())
+                                <div class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-5 py-3 rounded-xl font-semibold text-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Este producto ya ha sido vendido
+                                </div>
+                            @elseif($product->isReserved())
+                                <div class="flex flex-wrap items-center gap-4">
+                                    <div class="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 px-5 py-3 rounded-xl font-semibold text-sm h-[52px]">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        Marcar como vendido
-                                    </button>
-                                </form>
+                                        Este producto está reservado
+                                    </div>
+                                    <a href="{{ route('chat.show', $product) }}"
+                                       class="inline-flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all h-[52px]">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                        </svg>
+                                        Preguntar si sigue disponible
+                                    </a>
+                                </div>
                             @else
                                 <a href="{{ route('chat.show', $product) }}"
                                    class="inline-flex items-center gap-2 bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
@@ -185,22 +181,35 @@
                                     Contactar con el vendedor
                                 </a>
                             @endif
-                        @else
-                            <div class="flex items-center gap-4 flex-wrap">
-                                <a href="{{ route('login') }}"
-                                   class="bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
-                                    Inicia sesión para contactar
-                                </a>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">¿No tienes cuenta?
-                                    <a href="{{ route('register') }}" class="text-gold-500 hover:text-gold-400 font-semibold transition">Regístrate gratis</a>
-                                </span>
-                            </div>
-                        @endauth
+                        </div>
                     @endif
+                @else
+                    {{-- Visitantes --}}
+                    <div class="mt-6 flex items-center gap-4 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Estado:</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                {{ $product->isSold()
+                                    ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400'
+                                    : ($product->isReserved()
+                                        ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400'
+                                        : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300') }}">
+                                {{ ucfirst($product->estado) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center gap-4 flex-wrap">
+                        <a href="{{ route('login') }}"
+                           class="bg-gold-600 hover:bg-gold-700 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition-all">
+                            Inicia sesión para contactar
+                        </a>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">¿No tienes cuenta?
+                            <a href="{{ route('register') }}" class="text-gold-500 hover:text-gold-400 font-semibold transition">Regístrate gratis</a>
+                        </span>
+                    </div>
+                @endauth
 
-                </div>
             </div>
-
         </div>
     </div>
 </x-store-layout>

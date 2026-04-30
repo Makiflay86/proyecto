@@ -50,6 +50,24 @@ class PublishController extends Controller
         return back()->with('success', '¡Producto marcado como vendido!');
     }
 
+    public function markAsReserved(Product $product)
+    {
+        abort_if($product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => 'reservado']);
+
+        return back()->with('success', '¡Producto marcado como reservado!');
+    }
+
+    public function unreserve(Product $product)
+    {
+        abort_if($product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => 'activo']);
+
+        return back()->with('success', '¡Reserva cancelada correctamente!');
+    }
+
     public function reactivate(Product $product)
     {
         abort_if($product->user_id !== Auth::id(), 403);

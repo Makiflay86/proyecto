@@ -35,9 +35,19 @@
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative">
 
-                        <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                        @if($product->isSold())
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="bg-red-600 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">Vendido</span>
+                            </div>
+                        @elseif($product->isReserved())
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="bg-amber-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">Reservado</span>
+                            </div>
+                        @endif
+
+                        <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 {{ $product->isSold() || $product->isReserved() ? 'opacity-75' : '' }}">
                             @if($product->images->isNotEmpty())
                                 <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                      alt="{{ $product->nombre }}"
