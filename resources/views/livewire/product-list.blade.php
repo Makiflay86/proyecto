@@ -1,4 +1,19 @@
 <div>
+    {{-- Barra de opciones: contador + ordenar --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $products->total() }}</span>
+            {{ $products->total() === 1 ? 'producto' : 'productos' }}
+        </p>
+
+        <select wire:model.live="orden"
+                class="w-full sm:w-auto text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
+            <option value="">Más recientes</option>
+            <option value="precio_asc">Precio: menor a mayor</option>
+            <option value="precio_desc">Precio: mayor a menor</option>
+        </select>
+    </div>
+
     {{--
         FILTRO DE CATEGORÍAS EN MODO DRILL-DOWN
         =========================================
@@ -192,5 +207,12 @@
                 </div>
             @endforeach
         </div>
+
+        {{-- Paginación --}}
+        @if($products->hasPages())
+            <div class="mt-8">
+                {{ $products->links() }}
+            </div>
+        @endif
     @endif
 </div>
