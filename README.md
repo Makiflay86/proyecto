@@ -12,8 +12,10 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Tienda pública
 - Catálogo de productos con filtrado por categoría en modo **drill-down** reactivo (Livewire): seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente
-- Búsqueda por nombre/descripción desde la barra de navegación
+- Búsqueda por nombre/descripción integrada en el catálogo (reactiva, sin recargar la página)
 - Ordenación por precio (asc/desc) o por más recientes, reactiva sin recargar la página
+- Paginación de 12 productos por página
+- Los productos en estado **activo** y **reservado** aparecen en la tienda; los vendidos o inactivos no
 - Galería de imágenes con lightbox y navegación por teclado en el detalle del producto
 - Nombre del autor visible en cada tarjeta y en el detalle, **clickable** — lleva al perfil público del vendedor
 
@@ -22,11 +24,26 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 - Muestra foto/inicial, nombre, fecha de registro, número de productos en venta y la grid de productos
 - Si es tu propio perfil, aparece un botón "Editar perfil"
 
-### Sistema de ventas (marcar como vendido)
-- El dueño de un producto puede marcarlo como **vendido** desde la página del producto
+### Estados de un producto
+
+Cada producto puede estar en uno de estos cuatro estados:
+
+| Estado      | Visible en tienda | Descripción                                              |
+|-------------|:-----------------:|----------------------------------------------------------|
+| `activo`    | Sí                | En venta normalmente                                     |
+| `reservado` | Sí (con badge)    | Pendiente de recogida; sigue visible pero marcado        |
+| `vendido`   | No                | Cerrado; su página sigue accesible con badge rojo        |
+| `inactivo`  | No                | Oculto por el dueño sin marcarlo como vendido            |
+
+### Sistema de ventas y reservas
+- El dueño de un producto puede **reservarlo** desde la página del producto (indica que hay trato pendiente)
+- Los productos reservados siguen apareciendo en la tienda con un badge visual
+- El dueño puede **cancelar la reserva** y volver el producto a activo
+- El dueño puede **marcar como vendido** el producto (activo o reservado)
 - Los productos vendidos desaparecen de la tienda pero su página sigue accesible con un badge rojo "Vendido"
 - En "Mis productos" los vendidos aparecen con badge rojo y la imagen a media opacidad
-- El dueño puede volver a poner el producto en venta en cualquier momento
+- El dueño puede **reactivar** un producto vendido o inactivo en cualquier momento
+- Todos los cambios de estado son reactivos via Livewire — sin recargar la página
 - La venta es siempre en persona; la plataforma solo gestiona la comunicación
 
 ### Sistema de likes (favoritos)
@@ -53,18 +70,29 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Publicar productos (todos los usuarios)
 - Cualquier usuario registrado puede publicar productos desde el menú de usuario ("Publicar producto") o desde su perfil ("Añadir producto")
-- Formulario con subida de múltiples imágenes, categoría, precio, descripción y estado
-- Los productos publicados aparecen en la tienda pública
+- Formulario con subida de múltiples imágenes (JPEG/PNG, máx. 2 MB c/u), categoría, precio y descripción
+- Los productos publicados aparecen en la tienda pública con estado `activo`
 
 ### Perfil de usuario
 - Página `/mi-perfil` con edición de nombre, email y contraseña
-- Sección "Mis productos" con las publicaciones propias, incluyendo badge de vendido en los ya cerrados
+- Sección "Mis productos" con las publicaciones propias, incluyendo badge de estado en los reservados/vendidos
 
 ### Panel de administración
-- Solo accesible para usuarios con `is_admin = true`
-- CRUD completo de productos y categorías (con jerarquía padre-hijo y filtro drill-down)
-- Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos
-- Los hilos de chat de todos los usuarios son visibles para el administrador
+- Solo accesible para usuarios con `is_admin = true`.
+- **Dashboard con estadísticas en tiempo real** (auto-refresco cada 30 s):
+  - Totales por estado: activos, reservados, vendidos, inactivos
+  - Número de categorías en uso
+  - Últimos 5 productos publicados
+  - Gráfico de productos por categoría raíz (Chart.js)
+  - Mensaje motivacional del día
+- **Gestión avanzada de productos:**
+  - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
+  - Filtro de ordenación por precio (menor/mayor) y fecha
+  - Contador total de productos visibles según los filtros aplicados
+  - Paginación integrada para una navegación fluida entre grandes catálogos
+- **Categorías:** CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
+- **Usuarios:** Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos
+- **Chat:** Los hilos de chat de todos los usuarios son visibles para el administrador para fines de soporte o moderación
 
 ---
 
@@ -266,7 +294,9 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Contactar con el vendedor (chat)     | No        | Sí             | Sí            |
 | Mis mensajes + notificaciones        | No        | Sí             | Sí (todos)    |
 | Publicar productos                   | No        | Sí             | Sí            |
+| Reservar / cancelar reserva          | No        | Sí (propio)    | Sí            |
 | Marcar producto como vendido         | No        | Sí (propio)    | Sí            |
+| Reactivar producto                   | No        | Sí (propio)    | Sí            |
 | Mi perfil (editar datos)             | No        | Sí             | Sí            |
 | Panel de gestión                     | No        | No             | Sí            |
 | CRUD productos y categorías          | No        | No             | Sí            |
@@ -279,6 +309,8 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 |--------|------------------------------------------|------------------------------------------------|
 | GET    | `/`                                      | Catálogo de productos                          |
 | GET    | `/producto/{product}`                    | Detalle del producto                           |
+| PATCH  | `/producto/{product}/reservar`           | Marcar producto como reservado (dueño)         |
+| PATCH  | `/producto/{product}/quitar-reserva`     | Cancelar reserva (dueño)                       |
 | PATCH  | `/producto/{product}/vendido`            | Marcar producto como vendido (dueño)           |
 | PATCH  | `/producto/{product}/reactivar`          | Volver a poner en venta (dueño)                |
 | GET    | `/mis-favoritos`                         | Productos marcados con like                    |
