@@ -34,7 +34,7 @@
     </div>
 
     {{-- Área de mensajes con auto-scroll y polling cada 3s --}}
-    <div wire:poll.3000ms
+    <div wire:poll.3000ms="refreshMessages"
          x-data="{
              init() {
                  this.$nextTick(() => { this.$el.scrollTop = this.$el.scrollHeight; });
