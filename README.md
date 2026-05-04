@@ -79,12 +79,13 @@ Cada producto puede estar en uno de estos cuatro estados:
 
 ### Panel de administración
 - Solo accesible para usuarios con `is_admin = true`.
-- **Dashboard con estadísticas en tiempo real** (auto-refresco cada 30 s):
-  - Totales por estado: activos, reservados, vendidos, inactivos
-  - Número de categorías en uso
-  - Últimos 5 productos publicados
-  - Gráfico de productos por categoría raíz (Chart.js)
-  - Mensaje motivacional del día
+- **Dashboard con estadísticas detalladas:**
+  - Totales por estado: activos, reservados, vendidos, inactivos.
+  - Gráfico de barras interactivo (Chart.js) que muestra la distribución de productos por categorías padre.
+  - Tabla comparativa detallada con el desglose numérico de estados por cada categoría raíz.
+  - Mensaje motivacional del día con sistema de generación automática.
+  - Últimos 5 productos publicados.
+  - Auto-refresco inteligente (polling) para mantener los datos siempre actualizados.
 - **Gestión avanzada de productos:**
   - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
   - Filtro de ordenación por precio (menor/mayor) y fecha
@@ -370,16 +371,19 @@ El comando guarda automáticamente solo los **últimos 5 backups** — cuando se
 
 ## Mensaje diario automático
 
-La app genera un mensaje motivacional diario. Para ejecutarlo manualmente:
+La app genera un mensaje motivacional diario.
 
-```bash
-./vendor/bin/sail artisan app:generate-daily-message
-```
-
-En producción, añade un cron para que se ejecute automáticamente:
+- **En desarrollo:** No requiere configuración. El Dashboard detecta si no hay mensaje para hoy y lo genera automáticamente al cargar la página.
+- **En producción:** Se recomienda añadir un cron para que se ejecute independientemente de la entrada de usuarios:
 
 ```bash
 * * * * * cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Para ejecutarlo manualmente en cualquier momento:
+
+```bash
+./vendor/bin/sail artisan app:generate-daily-message
 ```
 
 ---

@@ -1,8 +1,12 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
+                {{ __('Dashboard') }}
+            </h2>
+            {{-- Botón invisible para igualar la altura con las otras páginas que tienen botón de crear --}}
+            <div class="h-10"></div>
+        </div>
     </x-slot>
 
     {{-- Chart.js cargado en el <head> una sola vez.

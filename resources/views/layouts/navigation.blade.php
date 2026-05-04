@@ -46,6 +46,14 @@
             </a>
         </li> --}}
         <li>
+            <a href="{{ route('admin.stats') }}"
+                @click="sidebarOpen = false"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.stats') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                wire:navigate.hover>
+                <i class="bi bi-bar-chart-line text-lg"></i> Estadísticas
+            </a>
+        </li>
+        <li>
             <a href="{{ route('products.index') }}"
                 @click="sidebarOpen = false"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"

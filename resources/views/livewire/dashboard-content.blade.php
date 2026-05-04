@@ -27,7 +27,7 @@
     </div>
 
     <div class="py-8 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
             {{-- ── Welcome banner ── --}}
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 transition-colors duration-300">

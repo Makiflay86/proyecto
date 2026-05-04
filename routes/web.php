@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/categories',                    [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/admin/stats', \App\Livewire\AdminCharts::class)->name('admin.stats');
     Route::post('/categories',                   [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/create',             [CategoryController::class, 'create'])->name('categories.create');
     Route::get('/categories/{category}',         [CategoryController::class, 'show'])->name('categories.show');

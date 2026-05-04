@@ -70,6 +70,12 @@ class DashboardContent extends Component
         // ── Query 4: mensaje del día ───────────────────────────────────────────
         $dailyMessage = DailyMessage::whereDate('date', today())->first();
 
+        // Si no hay mensaje hoy (típico en local sin cron), lo generamos al vuelo
+        if (!$dailyMessage) {
+            \Illuminate\Support\Facades\Artisan::call('app:generate-daily-message');
+            $dailyMessage = DailyMessage::whereDate('date', today())->first();
+        }
+
         return view('livewire.dashboard-content', [
             'message'            => $dailyMessage?->message,
             'totalProducts'      => $totalProducts,
