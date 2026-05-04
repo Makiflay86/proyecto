@@ -59,12 +59,15 @@ Cada producto puede estar en uno de estos cuatro estados:
 - El vendedor puede ver y responder todos los mensajes recibidos en sus productos desde "Mis mensajes"
 - Actualización automática cada 3 segundos (Livewire polling)
 - Auto-scroll al mensaje más reciente
-- Indicador "leído" en los mensajes enviados por el vendedor
+- **Separadores de fecha** entre mensajes de días distintos: muestra "Hoy", "Ayer" o la fecha completa en español
+- La hora de cada mensaje aparece integrada en el globo al estilo WhatsApp: en la misma línea si el texto es corto, o en la esquina inferior derecha si el texto ocupa varias líneas
+- **Sistema de presencia online:** el chat actualiza silenciosamente la actividad del usuario cada 3 segundos; si el destinatario lleva más de 30 segundos sin tener el chat abierto se le envía una notificación por correo al recibir un mensaje nuevo
 
 ### Notificaciones de mensajes no leídos
 - **Punto rojo en el avatar** del navbar — aparece automáticamente en menos de 5 segundos cuando llega un mensaje nuevo, sin necesidad de recargar la página (polling JS)
 - **Badge con número** en el menú desplegable junto a "Mis mensajes"
 - **Indicador visual** en la lista de conversaciones: texto en negrita + punto azul en los hilos con mensajes sin leer
+- **Notificación por correo** cuando el destinatario lleva más de 30 segundos sin tener el chat abierto
 - Funciona tanto para compradores (cuando el vendedor responde) como para vendedores (cuando un comprador escribe)
 - Totalmente adaptado a **dark mode**
 

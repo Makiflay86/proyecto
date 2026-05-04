@@ -46,19 +46,38 @@
          class="flex-1 overflow-y-auto px-5 py-4">
 
         @forelse($messages as $message)
-            @php $isMe = $message->sender_id === Auth::id(); @endphp
+            @php
+                $isMe = $message->sender_id === Auth::id();
+                $msgDate = $message->created_at->startOfDay();
+                $prevDate = $loop->first ? null : $messages[$loop->index - 1]->created_at->startOfDay();
+                $showDate = $loop->first || ! $msgDate->eq($prevDate);
+            @endphp
+
+            @if($showDate)
+                <div class="flex items-center gap-3 my-4">
+                    <div class="flex-1 h-px bg-gray-200 dark:bg-gray-600"></div>
+                    <span class="text-xs text-gray-400 dark:text-gray-500 font-medium shrink-0">
+                        @if($message->created_at->isToday())
+                            Hoy
+                        @elseif($message->created_at->isYesterday())
+                            Ayer
+                        @else
+                            {{ $message->created_at->translatedFormat('j \d\e F \d\e Y') }}
+                        @endif
+                    </span>
+                    <div class="flex-1 h-px bg-gray-200 dark:bg-gray-600"></div>
+                </div>
+            @endif
+
             <div class="flex mb-3 {{ $isMe ? 'justify-end' : 'justify-start' }}">
-                <div class="max-w-xs lg:max-w-sm px-4 py-2.5 rounded-2xl text-sm leading-relaxed
+                <div class="relative max-w-xs lg:max-w-sm px-4 pt-2.5 pb-2 rounded-2xl text-sm leading-relaxed
                     {{ $isMe
                         ? 'bg-gold-500 text-white rounded-br-sm'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-sm' }}">
-                    <p class="whitespace-pre-wrap break-words">{{ $message->body }}</p>
-                    <p class="text-xs mt-1 {{ $isMe ? 'text-yellow-100' : 'text-gray-400 dark:text-gray-500' }}">
+                    <p class="whitespace-pre-wrap break-words">{{ $message->body }}<span class="inline-block w-10 h-3 align-bottom shrink-0"></span></p>
+                    <span class="absolute bottom-1.5 right-3 text-xs {{ $isMe ? 'text-yellow-100' : 'text-gray-400 dark:text-gray-500' }}">
                         {{ $message->created_at->format('H:i') }}
-                        @if($isMe && $message->read_at)
-                            · leído
-                        @endif
-                    </p>
+                    </span>
                 </div>
             </div>
         @empty

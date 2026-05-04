@@ -24,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'last_seen_at',
     ];
 
     /**
@@ -47,7 +48,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'last_seen_at' => 'datetime',
         ];
+    }
+
+    public function isOnline(): bool
+    {
+        return $this->last_seen_at !== null && $this->last_seen_at->gte(now()->subSeconds(30));
     }
 
     public function likedProducts(): BelongsToMany
