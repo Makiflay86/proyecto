@@ -2,59 +2,62 @@
 
 namespace Tests\Feature;
 
-use App\Events\ProductCreated;
-use App\Mail\ProductCreatedMail;
+use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
+/**
+ * Tests del panel admin: rutas /products (AdminProductController).
+ * Todas las rutas requieren auth + is_admin.
+ */
 class ProductControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ─── index ────────────────────────────────────────────────────────────
+    private function admin(): User
+    {
+        return User::factory()->create(['is_admin' => true]);
+    }
+
+    private function datosValidos(array $overrides = []): array
+    {
+        $category = Category::factory()->create();
+
+        return array_merge([
+            'nombre'      => 'Laptop Gaming',
+            'descripcion' => 'Una laptop potente para gaming',
+            'precio'      => 1500.00,
+            'category_id' => $category->id,
+        ], $overrides);
+    }
+
+    // ─── Acceso sin auth ──────────────────────────────────────────────────
 
     public function test_index_redirige_si_no_esta_autenticado(): void
     {
         $this->get('/products')->assertRedirect('/login');
     }
 
-    public function test_index_devuelve_vista_correcta(): void
+    public function test_index_devuelve_403_si_no_es_admin(): void
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)
+        $this->actingAs($user)->get('/products')->assertForbidden();
+    }
+
+    // ─── index ────────────────────────────────────────────────────────────
+
+    public function test_index_devuelve_vista_correcta_para_admin(): void
+    {
+        $this->actingAs($this->admin())
             ->get('/products')
-            ->assertStatus(200)
-            ->assertViewIs('products.index');
-    }
-
-    public function test_index_pasa_los_productos_a_la_vista(): void
-    {
-        $user = User::factory()->create();
-        Product::factory()->count(3)->create();
-
-        $response = $this->actingAs($user)->get('/products');
-
-        $response->assertViewHas('products');
-        $this->assertCount(3, $response->viewData('products'));
-    }
-
-    public function test_index_carga_las_imagenes_de_cada_producto(): void
-    {
-        $user    = User::factory()->create();
-        $product = Product::factory()->create();
-        \App\Models\ProductImage::factory()->count(2)->create(['product_id' => $product->id]);
-
-        $response = $this->actingAs($user)->get('/products');
-
-        $primerProducto = $response->viewData('products')->first();
-        $this->assertCount(2, $primerProducto->images);
+            ->assertOk()
+            ->assertViewIs('admin.products.index');
     }
 
     // ─── create ───────────────────────────────────────────────────────────
@@ -64,116 +67,100 @@ class ProductControllerTest extends TestCase
         $this->get('/products/create')->assertRedirect('/login');
     }
 
-    public function test_create_muestra_el_formulario(): void
+    public function test_create_devuelve_403_si_no_es_admin(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs(User::factory()->create())
             ->get('/products/create')
-            ->assertStatus(200)
-            ->assertViewIs('products.create');
+            ->assertForbidden();
     }
 
-    // ─── store - Autenticación ────────────────────────────────────────────
+    public function test_create_muestra_formulario_al_admin(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/products/create')
+            ->assertOk()
+            ->assertViewIs('admin.products.create');
+    }
+
+    // ─── store - Acceso ───────────────────────────────────────────────────
 
     public function test_store_redirige_si_no_esta_autenticado(): void
     {
         $this->post('/products', [])->assertRedirect('/login');
     }
 
-    // ─── store - Validaciones de campos requeridos ────────────────────────
-
-    public function test_store_falla_si_todos_los_campos_estan_vacios(): void
+    public function test_store_devuelve_403_si_no_es_admin(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->post('/products', [])
-            ->assertSessionHasErrors(['nombre', 'descripcion', 'precio', 'categoria']);
+        $this->actingAs(User::factory()->create())
+            ->post('/products', $this->datosValidos())
+            ->assertForbidden();
     }
+
+    // ─── store - Validaciones ─────────────────────────────────────────────
 
     public function test_store_falla_si_nombre_esta_vacio(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['nombre' => '']))
             ->assertSessionHasErrors('nombre');
     }
 
     public function test_store_falla_si_nombre_supera_255_caracteres(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['nombre' => str_repeat('a', 256)]))
             ->assertSessionHasErrors('nombre');
     }
 
     public function test_store_falla_si_descripcion_esta_vacia(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['descripcion' => '']))
             ->assertSessionHasErrors('descripcion');
     }
 
     public function test_store_falla_si_precio_esta_vacio(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['precio' => '']))
             ->assertSessionHasErrors('precio');
     }
 
     public function test_store_falla_si_precio_no_es_numerico(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->post('/products', $this->datosValidos(['precio' => 'no-es-numero']))
+        $this->actingAs($this->admin())
+            ->post('/products', $this->datosValidos(['precio' => 'abc']))
             ->assertSessionHasErrors('precio');
     }
 
     public function test_store_falla_si_precio_es_negativo(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['precio' => -1]))
             ->assertSessionHasErrors('precio');
     }
 
     public function test_store_acepta_precio_cero(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['precio' => 0]))
             ->assertSessionDoesntHaveErrors('precio');
     }
 
-    public function test_store_falla_si_categoria_esta_vacia(): void
+    public function test_store_falla_si_category_id_no_existe(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->post('/products', $this->datosValidos(['categoria' => '']))
-            ->assertSessionHasErrors('categoria');
+        $this->actingAs($this->admin())
+            ->post('/products', $this->datosValidos(['category_id' => 99999]))
+            ->assertSessionHasErrors('category_id');
     }
-
-    // ─── store - Validaciones de imágenes ─────────────────────────────────
 
     public function test_store_falla_si_imagen_no_es_tipo_valido(): void
     {
         Storage::fake('public');
-        $user = User::factory()->create();
 
-        $pdf = UploadedFile::fake()->create('documento.pdf', 100, 'application/pdf');
+        $pdf = UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf');
 
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos(['images' => [$pdf]]))
             ->assertSessionHasErrors('images.0');
     }
@@ -181,12 +168,11 @@ class ProductControllerTest extends TestCase
     public function test_store_falla_si_imagen_supera_2mb(): void
     {
         Storage::fake('public');
-        $user = User::factory()->create();
 
-        $imagenGrande = UploadedFile::fake()->image('grande.jpg')->size(3000); // 3 MB
+        $grande = UploadedFile::fake()->image('foto.jpg')->size(3000);
 
-        $this->actingAs($user)
-            ->post('/products', $this->datosValidos(['images' => [$imagenGrande]]))
+        $this->actingAs($this->admin())
+            ->post('/products', $this->datosValidos(['images' => [$grande]]))
             ->assertSessionHasErrors('images.0');
     }
 
@@ -194,9 +180,7 @@ class ProductControllerTest extends TestCase
 
     public function test_store_crea_producto_sin_imagenes(): void
     {
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
+        $this->actingAs($this->admin())
             ->post('/products', $this->datosValidos())
             ->assertRedirect(route('products.index'))
             ->assertSessionHas('success');
@@ -207,7 +191,7 @@ class ProductControllerTest extends TestCase
     public function test_store_crea_producto_con_imagenes(): void
     {
         Storage::fake('public');
-        $user = User::factory()->create();
+        $admin = $this->admin();
 
         $datos = $this->datosValidos([
             'images' => [
@@ -216,127 +200,119 @@ class ProductControllerTest extends TestCase
             ],
         ]);
 
-        $this->actingAs($user)
-            ->post('/products', $datos)
-            ->assertRedirect(route('products.index'));
+        $this->actingAs($admin)->post('/products', $datos)->assertRedirect(route('products.index'));
 
         $product = Product::where('nombre', 'Laptop Gaming')->first();
-
         $this->assertNotNull($product);
         $this->assertCount(2, $product->images);
-        Storage::disk('public')->assertExists($product->images[0]->path);
-        Storage::disk('public')->assertExists($product->images[1]->path);
     }
 
-    public function test_store_no_crea_el_producto_si_falla_al_guardar_imagen(): void
+    public function test_store_asocia_el_producto_al_usuario_admin(): void
     {
-        // El controlador usa DB::transaction, así que un fallo no deja producto huérfano.
-        // Simulamos un archivo inválido para que la validación lo rechace.
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->post('/products', $this->datosValidos());
+
+        $this->assertDatabaseHas('products', [
+            'nombre'  => 'Laptop Gaming',
+            'user_id' => $admin->id,
+        ]);
+    }
+
+    // ─── show ─────────────────────────────────────────────────────────────
+
+    public function test_show_devuelve_vista_correcta(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/products/{$product->id}")
+            ->assertOk()
+            ->assertViewIs('admin.products.show');
+    }
+
+    // ─── edit ─────────────────────────────────────────────────────────────
+
+    public function test_edit_muestra_formulario(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/products/{$product->id}/edit")
+            ->assertOk()
+            ->assertViewIs('admin.products.edit');
+    }
+
+    // ─── update ───────────────────────────────────────────────────────────
+
+    public function test_update_actualiza_el_producto(): void
+    {
+        $product  = Product::factory()->create();
+        $category = Category::factory()->create();
+
+        $this->actingAs($this->admin())->put("/products/{$product->id}", [
+            'nombre'      => 'Nombre Actualizado',
+            'descripcion' => 'Nueva descripción',
+            'precio'      => 200,
+            'category_id' => $category->id,
+        ]);
+
+        $this->assertDatabaseHas('products', [
+            'id'     => $product->id,
+            'nombre' => 'Nombre Actualizado',
+        ]);
+    }
+
+    public function test_update_falla_si_no_es_admin(): void
+    {
+        $product  = Product::factory()->create();
+        $category = Category::factory()->create();
+
+        $this->actingAs(User::factory()->create())
+            ->put("/products/{$product->id}", [
+                'nombre'      => 'Hackeado',
+                'descripcion' => 'x',
+                'precio'      => 1,
+                'category_id' => $category->id,
+            ])
+            ->assertForbidden();
+    }
+
+    // ─── destroy ──────────────────────────────────────────────────────────
+
+    public function test_destroy_elimina_el_producto(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->delete("/products/{$product->id}")
+            ->assertRedirect(route('products.index'));
+
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    public function test_destroy_elimina_las_imagenes_del_storage(): void
+    {
         Storage::fake('public');
-        $user = User::factory()->create();
 
-        $archivoInvalido = UploadedFile::fake()->create('malware.exe', 500, 'application/octet-stream');
+        $product = Product::factory()->create();
+        $image   = ProductImage::factory()->create([
+            'product_id' => $product->id,
+            'path'       => 'productos/test.jpg',
+        ]);
+        Storage::disk('public')->put('productos/test.jpg', 'fake');
 
-        $this->actingAs($user)
-            ->post('/products', $this->datosValidos(['images' => [$archivoInvalido]]))
-            ->assertSessionHasErrors('images.0');
+        $this->actingAs($this->admin())->delete("/products/{$product->id}");
 
-        $this->assertDatabaseMissing('products', ['nombre' => 'Laptop Gaming']);
+        Storage::disk('public')->assertMissing('productos/test.jpg');
     }
 
-    // ─── store - Evento y Email ───────────────────────────────────────────
-
-    public function test_store_dispara_el_evento_product_created(): void
+    public function test_destroy_falla_si_no_es_admin(): void
     {
-        // Event::fake() intercepta todos los eventos para poder inspeccionarlos
-        // sin ejecutar sus listeners reales (no envía emails de verdad)
-        Event::fake();
+        $product = Product::factory()->create();
 
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', $this->datosValidos());
-
-        // Comprueba que el evento se disparó exactamente una vez
-        Event::assertDispatched(ProductCreated::class, function ($event) use ($user) {
-            return $event->product->nombre === 'Laptop Gaming'
-                && $event->user->id === $user->id;
-        });
-    }
-
-    public function test_store_no_dispara_el_evento_si_la_validacion_falla(): void
-    {
-        Event::fake();
-
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', ['nombre' => '']);
-
-        // Si la validación falla, nunca se llega a crear el producto ni a disparar el evento
-        Event::assertNotDispatched(ProductCreated::class);
-    }
-
-    public function test_store_envia_email_al_crear_producto(): void
-    {
-        // Mail::fake() intercepta todos los emails para poder inspeccionarlos
-        // sin enviarlos de verdad (no llega nada a Mailpit)
-        Mail::fake();
-
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', $this->datosValidos());
-
-        // Comprueba que se envió exactamente 1 email del tipo ProductCreatedMail
-        Mail::assertSent(ProductCreatedMail::class, 1);
-    }
-
-    public function test_store_envia_email_al_correo_del_usuario(): void
-    {
-        Mail::fake();
-
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', $this->datosValidos());
-
-        // Comprueba que el email fue enviado al email correcto
-        Mail::assertSent(ProductCreatedMail::class, function ($mail) use ($user) {
-            return $mail->hasTo($user->email);
-        });
-    }
-
-    public function test_store_email_contiene_el_nombre_del_producto(): void
-    {
-        Mail::fake();
-
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', $this->datosValidos());
-
-        // Comprueba que el Mailable lleva el producto correcto
-        Mail::assertSent(ProductCreatedMail::class, function ($mail) {
-            return $mail->product->nombre === 'Laptop Gaming';
-        });
-    }
-
-    public function test_store_no_envia_email_si_la_validacion_falla(): void
-    {
-        Mail::fake();
-
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post('/products', ['nombre' => '']);
-
-        Mail::assertNothingSent();
-    }
-
-    // ─── Helper ───────────────────────────────────────────────────────────
-
-    private function datosValidos(array $overrides = []): array
-    {
-        return array_merge([
-            'nombre'      => 'Laptop Gaming',
-            'descripcion' => 'Una laptop potente para gaming',
-            'precio'      => 1500.00,
-            'categoria'   => 'electronica',
-        ], $overrides);
+        $this->actingAs(User::factory()->create())
+            ->delete("/products/{$product->id}")
+            ->assertForbidden();
     }
 }

@@ -102,38 +102,42 @@ Cada producto puede estar en uno de estos cuatro estados:
 
 ## Instrucciones de instalación con Docker
 
-> **Este proyecto está pensado principalmente para Windows con WSL2.**
-> Todos los comandos de esta guía se ejecutan desde la **terminal de WSL2** (o Git Bash), no desde CMD ni PowerShell.
+> **Todos los comandos de esta guía se ejecutan desde la terminal de WSL2 (Windows) o terminal normal (macOS/Linux). Nunca desde CMD ni PowerShell.**
 
 ---
 
 ## Requisitos previos
 
-### Windows (recomendado)
+### Windows
 
-1. **WSL2** instalado y configurado — [Guía oficial de Microsoft](https://learn.microsoft.com/es-es/windows/wsl/install)
-   - Abre PowerShell como administrador y ejecuta:
-     ```powershell
-     wsl --install
-     ```
-   - Reinicia el equipo. Por defecto instala Ubuntu.
+1. **WSL2** — abre PowerShell **como administrador** y ejecuta:
+   ```powershell
+   wsl --install
+   ```
+   Reinicia el equipo. Instala Ubuntu por defecto.
 
 2. **Docker Desktop** — [Descargar](https://www.docker.com/products/docker-desktop/)
-   - Durante la instalación, activa la opción **"Use the WSL 2 based engine"**
-   - En Docker Desktop > Settings > Resources > WSL Integration: activa tu distro de Ubuntu
+   - Durante la instalación activa **"Use the WSL 2 based engine"**
+   - Abre Docker Desktop → Settings → Resources → WSL Integration → activa tu distro de Ubuntu
+   - Comprueba que el icono de Docker en la barra de tareas está **verde** antes de continuar
 
-3. **Git** — instálalo dentro de WSL2:
+3. **Git** — dentro de la terminal de Ubuntu (WSL2):
    ```bash
    sudo apt update && sudo apt install git -y
    ```
 
-4. **Node.js** — instálalo dentro de WSL2 (para compilar assets con Vite):
+4. **Node.js** — dentro de la terminal de Ubuntu (WSL2):
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
    sudo apt install -y nodejs
    ```
 
-> A partir de aquí, **todos los comandos se ejecutan en la terminal de WSL2** (busca "Ubuntu" en el menú inicio).
+5. **Configura Git para line endings** — evita problemas con los saltos de línea de Windows:
+   ```bash
+   git config --global core.autocrlf input
+   ```
+
+> A partir de aquí, **todos los comandos se ejecutan en la terminal de Ubuntu/WSL2** (búscala en el menú inicio como "Ubuntu").
 
 ### macOS / Linux
 
@@ -144,16 +148,14 @@ Cada producto puede estar en uno de estos cuatro estados:
 
 ## 1. Clonar el repositorio
 
-Desde la terminal de WSL2 (en Windows) o terminal normal (macOS/Linux):
-
 ```bash
 git clone https://github.com/Makiflay86/proyecto.git
 cd proyecto
 ```
 
-> **Windows:** clona el proyecto dentro del sistema de archivos de WSL2, no en `/mnt/c/...`.
-> La ruta recomendada es tu home de Ubuntu: `~/proyectos/proyecto`
-> Clonar en `C:\Users\...` y acceder desde WSL2 es mucho más lento.
+> **Windows — IMPORTANTE:** clona **dentro** del sistema de archivos de WSL2, no en `/mnt/c/...`.
+> La ruta recomendada es `~/proyectos/proyecto` (home de Ubuntu).
+> Clonar en `C:\Users\...` y trabajar desde WSL2 es extremadamente lento y Vite no detectará cambios.
 
 ---
 
@@ -177,9 +179,9 @@ docker run --rm \
 cp .env.example .env
 ```
 
-Edita `.env` si necesitas cambiar algún valor (base de datos, mail, zona horaria, etc.).
+El `.env.example` ya incluye la configuración correcta para Docker (MySQL, Mailpit). No necesitas editar nada para empezar.
 
-Asegúrate de tener la zona horaria correcta:
+Si quieres cambiar la zona horaria (ya está en `Europe/Madrid` por defecto):
 
 ```env
 APP_TIMEZONE=Europe/Madrid
@@ -343,6 +345,49 @@ El proyecto incluye un comando artisan para generar backups completos de la BD. 
 
 El comando guarda automáticamente solo los **últimos 5 backups** — cuando se crea el sexto, elimina el más antiguo.
 
+### Restaurar un backup
+
+Copia el archivo `.sql` en `storage/backups/` y ejecuta:
+
+```bash
+./vendor/bin/sail mysql laravel < storage/backups/backup_YYYYMMDD_HHMMSS.sql
+```
+
+Sustituye `backup_YYYYMMDD_HHMMSS.sql` por el nombre real del archivo. Esto carga todos los datos (usuarios, productos, categorías, mensajes...) sin necesidad de ejecutar `db:seed`.
+
+> **Importante:** la restauración sobreescribe los datos existentes. Asegúrate de que los contenedores están levantados (`sail up -d`) antes de ejecutar el comando.
+
+---
+
+## Tests
+
+El proyecto incluye una suite de tests automatizados. Para ejecutarlos necesitas los contenedores levantados (`sail up -d`):
+
+```bash
+./vendor/bin/sail test
+```
+
+Los tests usan una base de datos separada (`testing`) que se resetea automáticamente en cada ejecución — nunca tocan los datos reales.
+
+### Qué se testea
+
+| Suite | Archivo | Qué cubre |
+|---|---|---|
+| Unit | `ProductTest` | Fillable, casts, estados, relaciones, cascada |
+| Unit | `ProductImageTest` | Fillable, relación con producto, cascada |
+| Unit | `CategoryTest` | Mutador de nombre, jerarquía, breadcrumb, flatOptions |
+| Unit | `UserTest` | isOnline, mensajes no leídos, likes |
+| Feature | `StoreTest` | Catálogo público, detalle, estados visibles, favoritos, perfil público |
+| Feature | `PublishControllerTest` | Publicar producto, validaciones, imágenes, cambios de estado |
+| Feature | `ChatTest` | Chat comprador/vendedor/admin, API de mensajes no leídos |
+| Feature | `ProductControllerTest` | CRUD admin de productos, acceso por rol |
+| Feature/Admin | `AdminCategoryTest` | CRUD admin de categorías, jerarquías, imágenes |
+| Feature/Auth | `AuthenticationTest` | Login, logout, contraseña incorrecta |
+| Feature/Auth | `RegistrationTest` | Registro de nuevo usuario |
+| Feature/Auth | `PasswordResetTest` | Recuperación de contraseña |
+| Feature/Auth | `PasswordUpdateTest` | Cambio de contraseña |
+| Feature | `ProfileTest` | Editar perfil, eliminar cuenta |
+
 ---
 
 ## Comandos útiles
@@ -357,8 +402,15 @@ El comando guarda automáticamente solo los **últimos 5 backups** — cuando se
 # Ejecutar comandos artisan
 ./vendor/bin/sail artisan <comando>
 
-# Ejecutar tests
+# Ejecutar todos los tests
 ./vendor/bin/sail test
+
+# Ejecutar solo los tests de una clase
+./vendor/bin/sail test --filter ProductControllerTest
+
+# Ejecutar solo los tests de una carpeta
+./vendor/bin/sail test tests/Unit
+./vendor/bin/sail test tests/Feature/Admin
 
 # Limpiar caché (útil si algo no se actualiza visualmente)
 ./vendor/bin/sail artisan cache:clear
@@ -393,15 +445,55 @@ Para ejecutarlo manualmente en cualquier momento:
 
 ## Problemas frecuentes en Windows
 
-**Docker no arranca o da error de WSL2**
-- Abre Docker Desktop y comprueba que el icono de la barra de tareas está verde.
-- Ejecuta `wsl --update` en PowerShell para actualizar WSL2.
+**Docker no arranca / "Cannot connect to the Docker daemon"**
+- Abre Docker Desktop y espera a que el icono de la barra de tareas esté **verde**.
+- Si sigue fallando: `wsl --update` en PowerShell como administrador y reinicia.
+
+**`./vendor/bin/sail` da "No such file or directory"**
+- La carpeta `vendor` no existe aún. Ejecuta primero el paso 2 (instalación de dependencias con Docker).
 
 **`./vendor/bin/sail` da "Permission denied"**
-- Ejecuta `chmod +x vendor/bin/sail` desde la terminal de WSL2.
+```bash
+chmod +x vendor/bin/sail
+```
+
+**`sail up` falla con "port is already allocated" en el puerto 80**
+- IIS, Skype o algún otro proceso ocupa el puerto 80. Detén ese servicio, o cambia el puerto en `compose.yaml`:
+  ```yaml
+  ports:
+    - '8000:80'   # cambia 80 por otro puerto libre
+  ```
+  Y actualiza `APP_URL=http://localhost:8000` en `.env`.
+
+**`sail up` falla con "port 3306 already allocated"**
+- Tienes MySQL corriendo localmente en Windows. Detén el servicio MySQL de Windows o cambia el puerto en `compose.yaml`:
+  ```yaml
+  ports:
+    - '3307:3306'
+  ```
 
 **Los cambios en archivos no se reflejan / Vite no detecta cambios**
-- Asegúrate de que el proyecto está clonado dentro de WSL2 (`~/...`) y no en `/mnt/c/...`. El rendimiento y la detección de cambios de archivos son muy deficientes desde la ruta de Windows.
+- El proyecto **debe** estar clonado dentro de WSL2 (`~/proyectos/...`), nunca en `/mnt/c/...`.
+- Desde Windows Explorer puedes acceder a WSL2 escribiendo `\\wsl$\Ubuntu` en la barra de direcciones.
 
-**Puerto 80 ocupado**
-- Algún programa (IIS, Skype, otro Docker) puede estar usando el puerto 80. Detén ese servicio o cambia el puerto en `docker-compose.yml`.
+**`npm run dev` da error de EACCES o permisos**
+- Ejecuta `npm install` y `npm run dev` **dentro de la terminal WSL2**, nunca desde CMD o PowerShell de Windows.
+
+**La app carga pero las imágenes no aparecen**
+```bash
+./vendor/bin/sail artisan storage:link
+```
+
+**Los scripts de blade/Livewire no cargan (404 en assets)**
+```bash
+npm run build
+```
+O si estás en modo desarrollo, asegúrate de tener `npm run dev` corriendo en otra terminal.
+
+**Error "Access denied for user 'sail'@..." al migrar**
+- MySQL tarda unos segundos en arrancar. Espera 10 segundos tras `sail up -d` y vuelve a intentarlo.
+
+**Artisan da "No application encryption key"**
+```bash
+./vendor/bin/sail artisan key:generate
+```

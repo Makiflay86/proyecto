@@ -49,12 +49,6 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    /** Scope: devuelve solo productos con estado 'activo'. */
-    public function scopeActivos($query)
-    {
-        return $query->where('estado', 'activo');
-    }
-
     public function likedByUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'product_likes')->withPivot('created_at');

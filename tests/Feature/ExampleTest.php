@@ -14,6 +14,6 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertStatus(302); // redirige a login por estar protegida con auth
+        $response->assertStatus(200); // la tienda es pública
     }
 }

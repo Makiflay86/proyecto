@@ -2,8 +2,10 @@
 
 namespace Tests\Unit;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,7 +17,7 @@ class ProductTest extends TestCase
 
     public function test_tiene_los_campos_fillable_correctos(): void
     {
-        $fillable = ['nombre', 'descripcion', 'precio', 'categoria', 'estado'];
+        $fillable = ['user_id', 'category_id', 'nombre', 'descripcion', 'precio', 'estado'];
 
         $this->assertEquals($fillable, (new Product)->getFillable());
     }
@@ -26,7 +28,6 @@ class ProductTest extends TestCase
     {
         $product = Product::factory()->create(['precio' => 10.5]);
 
-        // El cast 'decimal:2' devuelve string en PHP
         $this->assertEquals('10.50', $product->precio);
     }
 
@@ -39,7 +40,55 @@ class ProductTest extends TestCase
         $this->assertEquals('activo', $product->estado);
     }
 
+    // ─── Métodos de estado ────────────────────────────────────────────────
+
+    public function test_is_sold_devuelve_true_si_estado_es_vendido(): void
+    {
+        $product = Product::factory()->vendido()->create();
+
+        $this->assertTrue($product->isSold());
+    }
+
+    public function test_is_sold_devuelve_false_si_estado_no_es_vendido(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->assertFalse($product->isSold());
+    }
+
+    public function test_is_reserved_devuelve_true_si_estado_es_reservado(): void
+    {
+        $product = Product::factory()->reservado()->create();
+
+        $this->assertTrue($product->isReserved());
+    }
+
+    public function test_is_reserved_devuelve_false_si_estado_no_es_reservado(): void
+    {
+        $product = Product::factory()->create();
+
+        $this->assertFalse($product->isReserved());
+    }
+
     // ─── Relaciones ───────────────────────────────────────────────────────
+
+    public function test_un_producto_pertenece_a_un_usuario(): void
+    {
+        $user    = User::factory()->create();
+        $product = Product::factory()->create(['user_id' => $user->id]);
+
+        $this->assertInstanceOf(User::class, $product->user);
+        $this->assertEquals($user->id, $product->user->id);
+    }
+
+    public function test_un_producto_pertenece_a_una_categoria(): void
+    {
+        $category = Category::factory()->create();
+        $product  = Product::factory()->create(['category_id' => $category->id]);
+
+        $this->assertInstanceOf(Category::class, $product->category);
+        $this->assertEquals($category->id, $product->category->id);
+    }
 
     public function test_un_producto_tiene_muchas_imagenes(): void
     {
@@ -57,42 +106,23 @@ class ProductTest extends TestCase
         $this->assertCount(0, $product->images);
     }
 
-    // ─── Scope activos ────────────────────────────────────────────────────
-
-    public function test_scope_activos_retorna_solo_productos_activos(): void
-    {
-        Product::factory()->count(3)->create(['estado' => 'activo']);
-        Product::factory()->count(2)->inactivo()->create();
-
-        $activos = Product::activos()->get();
-
-        $this->assertCount(3, $activos);
-        $activos->each(fn ($p) => $this->assertEquals('activo', $p->estado));
-    }
-
-    public function test_scope_activos_retorna_vacio_si_no_hay_activos(): void
-    {
-        Product::factory()->count(2)->inactivo()->create();
-
-        $this->assertCount(0, Product::activos()->get());
-    }
-
     // ─── Persistencia ─────────────────────────────────────────────────────
 
     public function test_se_puede_crear_un_producto_en_base_de_datos(): void
     {
+        $user     = User::factory()->create();
+        $category = Category::factory()->create();
+
         Product::create([
+            'user_id'     => $user->id,
+            'category_id' => $category->id,
             'nombre'      => 'Laptop Pro',
             'descripcion' => 'Una laptop potente',
             'precio'      => 999.99,
-            'categoria'   => 'electronica',
             'estado'      => 'activo',
         ]);
 
-        $this->assertDatabaseHas('products', [
-            'nombre'    => 'Laptop Pro',
-            'categoria' => 'electronica',
-        ]);
+        $this->assertDatabaseHas('products', ['nombre' => 'Laptop Pro']);
     }
 
     public function test_se_puede_eliminar_un_producto(): void
@@ -102,5 +132,25 @@ class ProductTest extends TestCase
         $product->delete();
 
         $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    public function test_al_eliminar_producto_se_eliminan_sus_imagenes(): void
+    {
+        $product = Product::factory()->create();
+        ProductImage::factory()->count(2)->create(['product_id' => $product->id]);
+
+        $product->delete();
+
+        $this->assertDatabaseMissing('product_images', ['product_id' => $product->id]);
+    }
+
+    public function test_al_eliminar_usuario_el_user_id_queda_en_null(): void
+    {
+        $user    = User::factory()->create();
+        $product = Product::factory()->create(['user_id' => $user->id]);
+
+        $user->delete();
+
+        $this->assertNull($product->fresh()->user_id);
     }
 }
