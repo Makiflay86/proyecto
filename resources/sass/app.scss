@@ -1,5 +1,5 @@
-@import 'dist/navigation.min.css';
-@import 'dist/success-message.min.css';
+@import 'navigation';
+@import 'success-message';
 @import 'product-search';
 
 // Evita el flash blanco durante wire:navigate en dark mode.

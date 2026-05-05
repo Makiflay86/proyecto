@@ -73,7 +73,7 @@
 
     {{-- Barra de búsqueda --}}
     <div class="my-4">
-        <livewire:product-search />
+        <livewire:shop.product-search />
     </div>
 
     {{-- Ver tienda + Toggle dark / light mode --}}

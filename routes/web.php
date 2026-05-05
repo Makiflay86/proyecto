@@ -1,14 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PublishController;
-use App\Http\Controllers\StoreController;
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Shop\ChatController;
+use App\Http\Controllers\Shop\ProfileController;
+use App\Http\Controllers\Shop\PublishController;
+use App\Http\Controllers\Shop\StoreController;
+use App\Http\Controllers\Shop\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,7 +66,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/categories',                    [CategoryController::class, 'index'])->name('categories.index');
-    Route::get('/admin/stats', \App\Livewire\AdminCharts::class)->name('admin.stats');
+    Route::get('/admin/stats', \App\Livewire\Admin\Charts::class)->name('admin.stats');
     Route::post('/categories',                   [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/create',             [CategoryController::class, 'create'])->name('categories.create');
     Route::get('/categories/{category}',         [CategoryController::class, 'show'])->name('categories.show');

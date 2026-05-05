@@ -1,1 +1,0 @@
-{"version":3,"names":[],"mappings":"","sources":["app.scss"],"sourcesContent":["@import 'dist/navigation.min.css';\n@import 'dist/success-message.min.css';"],"file":"app.css"}
