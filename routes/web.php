@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Shop\ChatController;
 use App\Http\Controllers\Shop\ProfileController;
 use App\Http\Controllers\Shop\PublishController;
@@ -64,6 +65,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/products/{product}/edit',   [ProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}',        [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
+
+    Route::get('/admin/users',                       [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/users/{user}',                [UserController::class, 'show'])->name('admin.users.show');
+    Route::patch('/admin/users/{user}/toggle-admin', [UserController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
+    Route::delete('/admin/users/{user}',             [UserController::class, 'destroy'])->name('admin.users.destroy');
 
     Route::get('/categories',                    [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/admin/stats', \App\Livewire\Admin\Charts::class)->name('admin.stats');

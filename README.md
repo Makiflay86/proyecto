@@ -95,7 +95,9 @@ Cada producto puede estar en uno de estos cuatro estados:
   - Contador total de productos visibles según los filtros aplicados
   - Paginación integrada para una navegación fluida entre grandes catálogos
 - **Categorías:** CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
-- **Usuarios:** Vista de perfil de cualquier usuario (`/usuarios/{user}`) con sus productos
+- **Gestión de usuarios:** Sección dedicada con dos pestañas:
+  - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil, promover a admin o eliminar la cuenta
+  - **Administradores** — cards con avatar, badge de rol y acciones para degradar a cliente o eliminar. No se puede modificar la propia cuenta desde el panel
 - **Chat:** Los hilos de chat de todos los usuarios son visibles para el administrador para fines de soporte o moderación
 
 ---
@@ -276,7 +278,9 @@ Los usuarios registrados desde el formulario de registro **nunca** obtienen acce
 
 ### Dar permisos de administrador a un usuario
 
-Desde Tinker:
+**Desde el panel de administración** — la forma más fácil. Ve a `/admin/users`, pestaña "Clientes", y pulsa el botón de escudo junto al usuario.
+
+**Desde Tinker** — útil para crear el primer administrador cuando aún no hay ninguno:
 
 ```bash
 ./vendor/bin/sail artisan tinker
@@ -306,6 +310,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Mi perfil (editar datos)             | No        | Sí             | Sí            |
 | Panel de gestión                     | No        | No             | Sí            |
 | CRUD productos y categorías          | No        | No             | Sí            |
+| Gestión de usuarios (panel admin)    | No        | No             | Sí            |
 
 ---
 
@@ -330,6 +335,10 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | GET    | `/mi-perfil`                             | Perfil propio (editar datos + mis productos)   |
 | GET    | `/usuarios/{user}`                       | Perfil público de cualquier usuario            |
 | GET    | `/dashboard`                             | Panel de gestión (solo admin)                  |
+| GET    | `/admin/users`                           | Lista de usuarios — clientes y admins          |
+| GET    | `/admin/users/{user}`                    | Perfil detallado de un usuario                 |
+| PATCH  | `/admin/users/{user}/toggle-admin`       | Promover a admin o degradar a cliente          |
+| DELETE | `/admin/users/{user}`                    | Eliminar cuenta de usuario                     |
 
 ---
 

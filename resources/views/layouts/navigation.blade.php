@@ -69,6 +69,14 @@
                 <i class="bi bi-tag text-lg"></i> Categorías
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.users.index') }}"
+                @click="sidebarOpen = false"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                wire:navigate.hover>
+                <i class="bi bi-people text-lg"></i> Usuarios
+            </a>
+        </li>
     </ul>
 
     {{-- Barra de búsqueda --}}
