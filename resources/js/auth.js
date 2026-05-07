@@ -10,6 +10,13 @@ window.limpiarError = function limpiarError(id) {
     if (error) error.remove();
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    ['email', 'password', 'name', 'password_confirmation'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', function () { limpiarError(id); });
+    });
+});
+
 window.togglePassword = function togglePassword(id) {
     const input = document.getElementById(id);
     const eyeOpen = document.getElementById(id + '-eye-open');

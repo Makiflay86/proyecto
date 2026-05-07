@@ -67,7 +67,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/admin/users',                       [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/admin/users/create',                [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users',                      [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/admin/users/{user}',                [UserController::class, 'show'])->name('admin.users.show');
+    Route::get('/admin/users/{user}/edit',           [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/admin/users/{user}',                [UserController::class, 'update'])->name('admin.users.update');
     Route::patch('/admin/users/{user}/toggle-admin', [UserController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
     Route::delete('/admin/users/{user}',             [UserController::class, 'destroy'])->name('admin.users.destroy');
 

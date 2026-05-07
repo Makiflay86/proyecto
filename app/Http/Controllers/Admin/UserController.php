@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 /**
  * Gestión de usuarios desde el panel admin.
@@ -28,11 +30,84 @@ class UserController extends Controller
         return view('admin.users.index', compact('admins', 'customers', 'tab'));
     }
 
+    public function create()
+    {
+        return view('admin.users.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.required'     => 'El nombre es obligatorio.',
+            'name.max'          => 'El nombre no puede superar los 255 caracteres.',
+            'email.required'    => 'El email es obligatorio.',
+            'email.email'       => 'Introduce un email válido.',
+            'email.unique'      => 'Este email ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.min'      => 'La contraseña debe tener al menos 8 caracteres.',
+        ]);
+
+        $user = User::create([
+            'name'              => $request->name,
+            'email'             => $request->email,
+            'password'          => Hash::make($request->password),
+            'is_admin'          => $request->boolean('is_admin'),
+            'email_verified_at' => now(),
+        ]);
+
+        $tab = $user->is_admin ? 'admins' : 'customers';
+
+        return redirect()->route('admin.users.index', ['tab' => $tab])
+            ->with('success', "Usuario {$user->name} creado correctamente.");
+    }
+
     public function show(User $user)
     {
         $user->loadCount(['products', 'likedProducts']);
 
         return view('admin.users.show', compact('user'));
+    }
+
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'name.required'      => 'El nombre es obligatorio.',
+            'name.max'           => 'El nombre no puede superar los 255 caracteres.',
+            'email.required'     => 'El email es obligatorio.',
+            'email.email'        => 'Introduce un email válido.',
+            'email.unique'       => 'Este email ya está registrado.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
+            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
+        ]);
+
+        $data = [
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'is_admin' => $request->boolean('is_admin'),
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.users.show', $user)
+            ->with('success', 'Usuario actualizado correctamente.');
     }
 
     public function toggleAdmin(User $user)

@@ -79,9 +79,5 @@
     </form>
 
     @vite('resources/js/auth.js')
-    <script>
-        document.getElementById('email').addEventListener('change', function () { limpiarError('email'); });
-        document.getElementById('password').addEventListener('change', function () { limpiarError('password'); });
-    </script>
 
 </x-guest-layout>

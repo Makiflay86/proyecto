@@ -99,11 +99,5 @@
     </form>
 
     @vite('resources/js/auth.js')
-    <script>
-        document.getElementById('name').addEventListener('change', function () { limpiarError('name'); });
-        document.getElementById('email').addEventListener('change', function () { limpiarError('email'); });
-        document.getElementById('password').addEventListener('change', function () { limpiarError('password'); });
-        document.getElementById('password_confirmation').addEventListener('change', function () { limpiarError('password_confirmation'); });
-    </script>
 
 </x-guest-layout>

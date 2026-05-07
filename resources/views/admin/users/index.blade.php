@@ -4,7 +4,11 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                 Usuarios
             </h2>
-            <div class="h-10"></div>
+            <a href="{{ route('admin.users.create') }}"
+               class="bg-gold-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-gold-700 transition duration-200"
+               wire:navigate.hover>
+                + Crear usuario
+            </a>
         </div>
     </x-slot>
 
@@ -81,7 +85,8 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                 @foreach ($customers as $user)
-                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        x-data="{ openDelete: false }">
 
                                         {{-- Nombre + indicador online --}}
                                         <td class="px-6 py-4">
@@ -110,34 +115,76 @@
                                             <div class="flex items-center justify-end gap-1.5">
 
                                                 {{-- Ver --}}
-                                                <a href="{{ route('admin.users.show', $user) }}"
-                                                   wire:navigate.hover
-                                                   class="group/btn inline-flex items-center gap-1.5 h-8 px-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gold-100 dark:hover:bg-gold-900/40 hover:text-gold-600 dark:hover:text-gold-400 transition-all duration-200">
-                                                    <i class="bi bi-eye text-sm shrink-0"></i>
-                                                    <span class="text-xs font-medium overflow-hidden max-w-0 group-hover/btn:max-w-[3rem] transition-all duration-200 whitespace-nowrap">Ver</span>
-                                                </a>
-
-                                                {{-- Hacer admin --}}
-                                                <form action="{{ route('admin.users.toggle-admin', $user) }}" method="POST">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit"
-                                                            onclick="return confirm('¿Convertir a {{ addslashes($user->name) }} en administrador?')"
-                                                            class="group/btn inline-flex items-center gap-1.5 h-8 px-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200">
-                                                        <i class="bi bi-shield-plus text-sm shrink-0"></i>
-                                                        <span class="text-xs font-medium overflow-hidden max-w-0 group-hover/btn:max-w-[6rem] transition-all duration-200 whitespace-nowrap">Hacer admin</span>
-                                                    </button>
-                                                </form>
+                                                <div class="relative group/tip">
+                                                    <a href="{{ route('admin.users.show', $user) }}"
+                                                       wire:navigate.hover
+                                                       class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gold-100 dark:hover:bg-gold-900/40 hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
+                                                        <i class="bi bi-eye text-sm"></i>
+                                                    </a>
+                                                    <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium bg-gray-900 dark:bg-gray-950 text-white rounded-lg whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20">
+                                                        Ver
+                                                    </span>
+                                                </div>
 
                                                 {{-- Eliminar --}}
-                                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit"
-                                                            onclick="return confirm('¿Eliminar al usuario {{ addslashes($user->name) }}? Esta acción no se puede deshacer.')"
-                                                            class="group/btn inline-flex items-center gap-1.5 h-8 px-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200">
-                                                        <i class="bi bi-trash text-sm shrink-0"></i>
-                                                        <span class="text-xs font-medium overflow-hidden max-w-0 group-hover/btn:max-w-[4rem] transition-all duration-200 whitespace-nowrap">Eliminar</span>
+                                                <div class="relative group/tip">
+                                                    <button @click="openDelete = true"
+                                                            class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                                        <i class="bi bi-trash text-sm"></i>
                                                     </button>
-                                                </form>
+                                                    <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium bg-gray-900 dark:bg-gray-950 text-white rounded-lg whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20">
+                                                        Eliminar
+                                                    </span>
+                                                </div>
+
+                                                {{-- Modal eliminar --}}
+                                                <div x-show="openDelete"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     x-transition:enter-start="opacity-0"
+                                                     x-transition:enter-end="opacity-100"
+                                                     x-transition:leave="transition ease-in duration-150"
+                                                     x-transition:leave-start="opacity-100"
+                                                     x-transition:leave-end="opacity-0"
+                                                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+                                                     @keydown.escape.window="openDelete = false">
+                                                    <div x-show="openDelete"
+                                                         x-transition:enter="transition ease-out duration-200"
+                                                         x-transition:enter-start="opacity-0 scale-95"
+                                                         x-transition:enter-end="opacity-100 scale-100"
+                                                         x-transition:leave="transition ease-in duration-150"
+                                                         x-transition:leave-start="opacity-100 scale-100"
+                                                         x-transition:leave-end="opacity-0 scale-95"
+                                                         @click.outside="openDelete = false"
+                                                         class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+                                                        <div class="flex justify-center mb-5">
+                                                            <div class="bg-red-100 dark:bg-red-900/50 rounded-full p-4">
+                                                                <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                        <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">¿Eliminar usuario?</h3>
+                                                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                                            Vas a eliminar la cuenta de
+                                                            <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $user->name }}</span>.
+                                                            Esta acción no se puede deshacer.
+                                                        </p>
+                                                        <div class="mt-6 flex gap-3">
+                                                            <button @click="openDelete = false"
+                                                                    class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
+                                                                Cancelar
+                                                            </button>
+                                                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="flex-1">
+                                                                @csrf @method('DELETE')
+                                                                <button type="submit"
+                                                                        class="w-full px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium transition shadow-md">
+                                                                    Sí
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                             </div>
                                         </td>
@@ -164,7 +211,8 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($admins as $user)
-                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300">
+                            <div x-data="{ openAdmin: false, openDelete: false }"
+                                 class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300">
                                 <div class="p-6 flex flex-col gap-4">
 
                                     {{-- Avatar + nombre --}}
@@ -206,31 +254,117 @@
 
                                         @if ($user->id !== Auth::id())
                                             <div class="relative group/tip ml-auto">
-                                                <form action="{{ route('admin.users.toggle-admin', $user) }}" method="POST">
-                                                    @csrf @method('PATCH')
-                                                    <button type="submit"
-                                                            onclick="return confirm('¿Quitar los permisos de administrador a {{ addslashes($user->name) }}?')"
-                                                            class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
-                                                        <i class="bi bi-shield-minus text-sm"></i>
-                                                    </button>
-                                                </form>
+                                                <button @click="openAdmin = true"
+                                                        class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+                                                    <i class="bi bi-shield-minus text-sm"></i>
+                                                </button>
                                                 <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium bg-gray-900 dark:bg-gray-950 text-white rounded-lg whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20">
                                                     Quitar admin
                                                 </span>
                                             </div>
 
                                             <div class="relative group/tip">
-                                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit"
-                                                            onclick="return confirm('¿Eliminar al usuario {{ addslashes($user->name) }}? Esta acción no se puede deshacer.')"
-                                                            class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                                                        <i class="bi bi-trash text-sm"></i>
-                                                    </button>
-                                                </form>
+                                                <button @click="openDelete = true"
+                                                        class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 transition-colors">
+                                                    <i class="bi bi-trash text-sm"></i>
+                                                </button>
                                                 <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium bg-gray-900 dark:bg-gray-950 text-white rounded-lg whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20">
                                                     Eliminar
                                                 </span>
+                                            </div>
+
+                                            {{-- Modal: Quitar admin --}}
+                                            <div x-show="openAdmin"
+                                                 x-transition:enter="transition ease-out duration-200"
+                                                 x-transition:enter-start="opacity-0"
+                                                 x-transition:enter-end="opacity-100"
+                                                 x-transition:leave="transition ease-in duration-150"
+                                                 x-transition:leave-start="opacity-100"
+                                                 x-transition:leave-end="opacity-0"
+                                                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+                                                 @keydown.escape.window="openAdmin = false">
+                                                <div x-show="openAdmin"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     x-transition:enter-start="opacity-0 scale-95"
+                                                     x-transition:enter-end="opacity-100 scale-100"
+                                                     x-transition:leave="transition ease-in duration-150"
+                                                     x-transition:leave-start="opacity-100 scale-100"
+                                                     x-transition:leave-end="opacity-0 scale-95"
+                                                     @click.outside="openAdmin = false"
+                                                     class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+                                                    <div class="flex justify-center mb-5">
+                                                        <div class="bg-amber-100 dark:bg-amber-900/50 rounded-full p-4">
+                                                            <i class="bi bi-shield-x text-2xl text-amber-600 dark:text-amber-400"></i>
+                                                        </div>
+                                                    </div>
+                                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">¿Quitar rol de administrador?</h3>
+                                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                                        Se quitarán los permisos de administrador a
+                                                        <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $user->name }}</span>.
+                                                    </p>
+                                                    <div class="mt-6 flex gap-3">
+                                                        <button @click="openAdmin = false"
+                                                                class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
+                                                            Cancelar
+                                                        </button>
+                                                        <form action="{{ route('admin.users.toggle-admin', $user) }}" method="POST" class="flex-1">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit"
+                                                                    class="w-full px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-medium transition shadow-md">
+                                                                Sí
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Modal: Eliminar --}}
+                                            <div x-show="openDelete"
+                                                 x-transition:enter="transition ease-out duration-200"
+                                                 x-transition:enter-start="opacity-0"
+                                                 x-transition:enter-end="opacity-100"
+                                                 x-transition:leave="transition ease-in duration-150"
+                                                 x-transition:leave-start="opacity-100"
+                                                 x-transition:leave-end="opacity-0"
+                                                 class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+                                                 @keydown.escape.window="openDelete = false">
+                                                <div x-show="openDelete"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     x-transition:enter-start="opacity-0 scale-95"
+                                                     x-transition:enter-end="opacity-100 scale-100"
+                                                     x-transition:leave="transition ease-in duration-150"
+                                                     x-transition:leave-start="opacity-100 scale-100"
+                                                     x-transition:leave-end="opacity-0 scale-95"
+                                                     @click.outside="openDelete = false"
+                                                     class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+                                                    <div class="flex justify-center mb-5">
+                                                        <div class="bg-red-100 dark:bg-red-900/50 rounded-full p-4">
+                                                            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">¿Eliminar usuario?</h3>
+                                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                                        Vas a eliminar la cuenta de
+                                                        <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $user->name }}</span>.
+                                                        Esta acción no se puede deshacer.
+                                                    </p>
+                                                    <div class="mt-6 flex gap-3">
+                                                        <button @click="openDelete = false"
+                                                                class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
+                                                            Cancelar
+                                                        </button>
+                                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="flex-1">
+                                                            @csrf @method('DELETE')
+                                                            <button type="submit"
+                                                                    class="w-full px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium transition shadow-md">
+                                                                Sí
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
                                             </div>
                                         @else
                                             <span class="ml-auto text-xs text-gray-300 dark:text-gray-600 italic">Eres tú</span>

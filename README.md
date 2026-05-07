@@ -123,8 +123,11 @@ Cada producto puede estar en uno de estos cuatro estados:
   - Paginación integrada para una navegación fluida entre grandes catálogos
 - **Categorías:** CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
 - **Gestión de usuarios:** Sección dedicada con dos pestañas:
-  - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil, promover a admin o eliminar la cuenta
-  - **Administradores** — cards con avatar, badge de rol y acciones para degradar a cliente o eliminar. No se puede modificar la propia cuenta desde el panel
+  - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil o eliminar la cuenta (con modal de confirmación)
+  - **Administradores** — cards con avatar, badge de rol y acciones (con modales Alpine) para degradar a cliente o eliminar. No se puede modificar la propia cuenta desde el panel
+  - **Perfil detallado** — estadísticas del usuario (productos publicados, favoritos, último acceso, email verificado) y acciones: editar datos, promover/degradar rol de administrador y eliminar cuenta, todas con modales de confirmación
+  - **Crear usuario** — formulario dedicado para crear usuarios desde el panel con nombre, email, contraseña y opción de asignar rol de administrador
+  - **Editar usuario** — formulario para modificar nombre, email y contraseña (dejar en blanco para no cambiarla); el rol de administrador también se puede cambiar desde aquí (excepto en la propia cuenta)
 - **Chat:** Los hilos de chat de todos los usuarios son visibles para el administrador para fines de soporte o moderación
 
 ---
@@ -263,7 +266,7 @@ Para desarrollo con hot-reload:
 npm run dev
 ```
 
-> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión) y `auth.js` (formularios de autenticación).
+> El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión), `auth.js` (formularios de autenticación) y `admin-users.js` (formularios de creación/edición de usuarios en el panel).
 
 ---
 
@@ -305,7 +308,7 @@ Los usuarios registrados desde el formulario de registro **nunca** obtienen acce
 
 ### Dar permisos de administrador a un usuario
 
-**Desde el panel de administración** — la forma más fácil. Ve a `/admin/users`, pestaña "Clientes", y pulsa el botón de escudo junto al usuario.
+**Desde el panel de administración** — la forma más fácil. Ve a `/admin/users`, pestaña "Clientes", entra al perfil del usuario y pulsa el botón "Hacer administrador".
 
 **Desde Tinker** — útil para crear el primer administrador cuando aún no hay ninguno:
 
@@ -338,6 +341,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Panel de gestión                     | No        | No             | Sí            |
 | CRUD productos y categorías          | No        | No             | Sí            |
 | Gestión de usuarios (panel admin)    | No        | No             | Sí            |
+| Crear / editar usuarios (panel admin)| No        | No             | Sí            |
 
 ---
 
@@ -363,7 +367,11 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | GET    | `/usuarios/{user}`                       | Perfil público de cualquier usuario            |
 | GET    | `/dashboard`                             | Panel de gestión (solo admin)                  |
 | GET    | `/admin/users`                           | Lista de usuarios — clientes y admins          |
+| GET    | `/admin/users/create`                    | Formulario para crear un nuevo usuario         |
+| POST   | `/admin/users`                           | Guardar nuevo usuario                          |
 | GET    | `/admin/users/{user}`                    | Perfil detallado de un usuario                 |
+| GET    | `/admin/users/{user}/edit`               | Formulario para editar un usuario              |
+| PUT    | `/admin/users/{user}`                    | Actualizar datos de un usuario                 |
 | PATCH  | `/admin/users/{user}/toggle-admin`       | Promover a admin o degradar a cliente          |
 | DELETE | `/admin/users/{user}`                    | Eliminar cuenta de usuario                     |
 

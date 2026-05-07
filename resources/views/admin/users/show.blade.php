@@ -82,29 +82,140 @@
             </div>
 
             {{-- Acciones --}}
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col sm:flex-row gap-3">
-                @if ($user->id !== Auth::id())
-                    <form action="{{ route('admin.users.toggle-admin', $user) }}" method="POST">
-                        @csrf @method('PATCH')
-                        <button type="submit"
-                                onclick="return confirm('{{ $user->is_admin ? '¿Quitar permisos de administrador a ' . addslashes($user->name) . '?' : '¿Convertir a ' . addslashes($user->name) . ' en administrador?' }}')"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all
-                                       {{ $user->is_admin
-                                           ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800'
-                                           : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800' }}">
-                            <i class="bi bi-shield{{ $user->is_admin ? '-x' : '-fill-check' }}"></i>
-                            {{ $user->is_admin ? 'Quitar rol admin' : 'Hacer administrador' }}
-                        </button>
-                    </form>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col sm:flex-row gap-3"
+                 x-data="{ openAdmin: false, openDelete: false }">
+                    {{-- Botón Editar --}}
+                    <a href="{{ route('admin.users.edit', $user) }}"
+                       wire:navigate.hover
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-gold-600 text-white hover:bg-gold-700 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                        Editar
+                    </a>
 
-                    <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="sm:ml-auto">
-                        @csrf @method('DELETE')
-                        <button type="submit"
-                                onclick="return confirm('¿Eliminar al usuario {{ addslashes($user->name) }}? Esta acción no se puede deshacer.')"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition-all">
-                            <i class="bi bi-trash"></i> Eliminar usuario
-                        </button>
-                    </form>
+                @if ($user->id !== Auth::id())
+
+                    {{-- Botón Hacer/Quitar admin --}}
+                    <button @click="openAdmin = true"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all
+                                   {{ $user->is_admin
+                                       ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800'
+                                       : 'bg-gold-100 dark:bg-gold-900/30 text-gold-700 dark:text-gold-400 hover:bg-gold-200 dark:hover:bg-gold-900/50 border border-gold-200 dark:border-gold-700' }}">
+                        <i class="bi bi-shield{{ $user->is_admin ? '-x' : '-fill-check' }}"></i>
+                        {{ $user->is_admin ? 'Quitar rol admin' : 'Hacer administrador' }}
+                    </button>
+
+                    {{-- Botón Eliminar --}}
+                    <button @click="openDelete = true"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition-all sm:ml-auto">
+                        <i class="bi bi-trash"></i> Eliminar usuario
+                    </button>
+
+                    {{-- Modal: Hacer/Quitar admin --}}
+                    <div x-show="openAdmin"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+                         @keydown.escape.window="openAdmin = false">
+                        <div x-show="openAdmin"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             @click.outside="openAdmin = false"
+                             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+                            <div class="flex justify-center mb-5">
+                                <div class="{{ $user->is_admin ? 'bg-amber-100 dark:bg-amber-900/50' : 'bg-gold-100 dark:bg-gold-900/30' }} rounded-full p-4">
+                                    <i class="bi bi-shield{{ $user->is_admin ? '-x' : '-fill-check' }} text-2xl {{ $user->is_admin ? 'text-amber-600 dark:text-amber-400' : 'text-gold-600 dark:text-gold-400' }}"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">
+                                {{ $user->is_admin ? '¿Quitar rol de administrador?' : '¿Hacer administrador?' }}
+                            </h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                {{ $user->is_admin
+                                    ? 'Se quitarán los permisos de administrador a'
+                                    : 'Se otorgarán permisos de administrador a' }}
+                                <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $user->name }}</span>.
+                            </p>
+                            <div class="mt-6 flex gap-3">
+                                <button @click="openAdmin = false"
+                                        class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
+                                    Cancelar
+                                </button>
+                                <form action="{{ route('admin.users.toggle-admin', $user) }}" method="POST" class="flex-1">
+                                    @csrf @method('PATCH')
+                                    <button type="submit"
+                                            class="w-full px-4 py-2.5 rounded-lg font-medium transition shadow-md
+                                                   {{ $user->is_admin
+                                                       ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                                                       : 'bg-gold-600 hover:bg-gold-700 text-white' }}">
+                                        {{ $user->is_admin ? 'Sí' : 'Sí' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Modal: Eliminar usuario --}}
+                    <div x-show="openDelete"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+                         @keydown.escape.window="openDelete = false">
+                        <div x-show="openDelete"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             @click.outside="openDelete = false"
+                             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+                            <div class="flex justify-center mb-5">
+                                <div class="bg-red-100 dark:bg-red-900/50 rounded-full p-4">
+                                    <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">
+                                ¿Eliminar usuario?
+                            </h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+                                Vas a eliminar la cuenta de
+                                <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $user->name }}</span>.
+                                Esta acción no se puede deshacer.
+                            </p>
+                            <div class="mt-6 flex gap-3">
+                                <button @click="openDelete = false"
+                                        class="flex-1 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition">
+                                    Cancelar
+                                </button>
+                                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="flex-1">
+                                    @csrf @method('DELETE')
+                                    <button type="submit"
+                                            class="w-full px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium transition shadow-md">
+                                        Sí
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 @else
                     <p class="text-sm text-gray-400 dark:text-gray-500 italic">No puedes modificar tu propia cuenta desde aquí.</p>
                 @endif
