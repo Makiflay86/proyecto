@@ -111,7 +111,7 @@ class ProductList extends Component
         return view('livewire.shop.product-list', compact('products', 'categoryRows', 'total'));
     }
 
-    private function collectIds($children): array
+    private function collectIds(\Illuminate\Support\Collection $children): array
     {
         $ids = [];
         foreach ($children as $child) {
