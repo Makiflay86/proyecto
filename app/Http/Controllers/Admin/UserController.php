@@ -41,15 +41,6 @@ class UserController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'name.required'     => 'El nombre es obligatorio.',
-            'name.max'          => 'El nombre no puede superar los 255 caracteres.',
-            'email.required'    => 'El email es obligatorio.',
-            'email.email'       => 'Introduce un email válido.',
-            'email.unique'      => 'Este email ya está registrado.',
-            'password.required' => 'La contraseña es obligatoria.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.min'      => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         $user = User::create([
@@ -84,14 +75,6 @@ class UserController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'name.required'      => 'El nombre es obligatorio.',
-            'name.max'           => 'El nombre no puede superar los 255 caracteres.',
-            'email.required'     => 'El email es obligatorio.',
-            'email.email'        => 'Introduce un email válido.',
-            'email.unique'       => 'Este email ya está registrado.',
-            'password.confirmed' => 'Las contraseñas no coinciden.',
-            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         $data = [
