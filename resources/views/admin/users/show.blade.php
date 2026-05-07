@@ -44,9 +44,14 @@
             {{-- Tarjeta principal --}}
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
                 <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 rounded-full {{ $user->is_admin ? 'bg-gold-500' : 'bg-gold-500' }} flex items-center justify-center text-white font-bold text-2xl shrink-0">
-                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                    </div>
+                    @if($user->avatar)
+                        <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}"
+                             class="w-16 h-16 rounded-full object-cover shrink-0">
+                    @else
+                        <div class="w-16 h-16 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold text-2xl shrink-0">
+                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                        </div>
+                    @endif
                     <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ $user->name }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>

@@ -77,9 +77,14 @@
                                     <button @click="open = !open"
                                             class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium text-gray-800 dark:text-white">
                                         <div class="relative w-6 h-6">
-                                            <div class="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center text-white text-xs font-bold">
-                                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                            </div>
+                                            @if(Auth::user()->avatar)
+                                                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt=""
+                                                     class="w-6 h-6 rounded-full object-cover">
+                                            @else
+                                                <div class="w-6 h-6 rounded-full bg-gold-500 flex items-center justify-center text-white text-xs font-bold">
+                                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                                </div>
+                                            @endif
                                             <span id="unread-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
                                         </div>
                                         <span class="hidden sm:block">{{ Auth::user()->name }}</span>

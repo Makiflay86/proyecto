@@ -12,9 +12,14 @@
 
         {{-- Cabecera del perfil --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex items-center gap-5 flex-wrap">
-            <div class="w-20 h-20 rounded-full bg-gold-500 flex items-center justify-center text-white text-3xl font-bold shrink-0">
-                {{ strtoupper(substr($user->name, 0, 1)) }}
-            </div>
+            @if($user->avatar)
+                <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}"
+                     class="w-20 h-20 rounded-full object-cover shrink-0">
+            @else
+                <div class="w-20 h-20 rounded-full bg-gold-500 flex items-center justify-center text-white text-3xl font-bold shrink-0">
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                </div>
+            @endif
             <div class="min-w-0 flex-1">
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white truncate">{{ $user->name }}</h1>
                 <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Miembro desde {{ $user->created_at->format('d/m/Y') }}</p>

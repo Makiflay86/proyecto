@@ -217,9 +217,14 @@
 
                                     {{-- Avatar + nombre --}}
                                     <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold text-lg shrink-0">
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                                        </div>
+                                        @if($user->avatar)
+                                            <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}"
+                                                 class="w-12 h-12 rounded-full object-cover shrink-0">
+                                        @else
+                                            <div class="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold text-lg shrink-0">
+                                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                                            </div>
+                                        @endif
                                         <div class="overflow-hidden flex-1 min-w-0">
                                             <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ $user->name }}</h3>
                                             <p class="text-xs text-gray-400 dark:text-gray-500 truncate">{{ $user->email }}</p>

@@ -3,8 +3,39 @@
 
         {{-- Cabecera del perfil --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex items-center gap-5 flex-wrap">
-            <div class="w-16 h-16 rounded-full bg-gold-500 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-                {{ strtoupper(substr($user->name, 0, 1)) }}
+            <div class="relative shrink-0 group">
+                @if($user->avatar)
+                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}"
+                         class="w-16 h-16 rounded-full object-cover">
+                    <form action="{{ route('profile.avatar.delete') }}" method="POST" class="absolute -top-1 -right-1 z-10">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                                class="w-5 h-5 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow transition"
+                                title="Eliminar foto">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </form>
+                @else
+                    <div class="w-16 h-16 rounded-full bg-gold-500 flex items-center justify-center text-white text-2xl font-bold">
+                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                    </div>
+                @endif
+                <label for="avatar-input"
+                       class="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                       title="Cambiar foto">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </label>
+                <form action="{{ route('profile.avatar') }}" method="POST" enctype="multipart/form-data" id="avatar-form">
+                    @csrf
+                    <input id="avatar-input" type="file" name="avatar" accept="image/*" class="hidden"
+                           onchange="document.getElementById('avatar-form').submit()">
+                </form>
             </div>
             <div class="min-w-0 flex-1">
                 <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white truncate">{{ $user->name }}</h1>

@@ -75,8 +75,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/admin/users/{user}',                [UserController::class, 'show'])->name('admin.users.show');
     Route::get('/admin/users/{user}/edit',           [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/admin/users/{user}',                [UserController::class, 'update'])->name('admin.users.update');
-    Route::patch('/admin/users/{user}/toggle-admin', [UserController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
-    Route::delete('/admin/users/{user}',             [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::patch('/admin/users/{user}/toggle-admin',  [UserController::class, 'toggleAdmin'])->name('admin.users.toggle-admin');
+    Route::post('/admin/users/{user}/avatar',          [UserController::class, 'updateAvatar'])->name('admin.users.avatar');
+    Route::delete('/admin/users/{user}/avatar',        [UserController::class, 'deleteAvatar'])->name('admin.users.avatar.delete');
+    Route::delete('/admin/users/{user}',              [UserController::class, 'destroy'])->name('admin.users.destroy');
 
     Route::get('/categories',                    [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/admin/stats', \App\Livewire\Admin\Charts::class)->name('admin.stats');
@@ -95,9 +97,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 | Edición, actualización y eliminación del perfil. Solo requiere autenticación.
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile',          [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile',        [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar',   [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
+    Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+    Route::delete('/profile',       [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/mi-perfil', [ProfileController::class, 'storeEdit'])->name('profile.store');
 });

@@ -116,9 +116,14 @@
                class="block p-4 rounded-2xl mb-4 border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                wire:navigate.hover>
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
+                    @if(Auth::user()->avatar)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt=""
+                             class="w-10 h-10 rounded-full object-cover">
+                    @else
+                        <div class="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </div>
+                    @endif
                     <div class="overflow-hidden">
                         <span class="block text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">Editar perfil</span>
                         <span class="block text-sm font-bold text-gray-900 dark:text-white truncate">{{ Auth::user()->name }}</span>

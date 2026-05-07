@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 
 /**
@@ -91,6 +92,30 @@ class UserController extends Controller
 
         return redirect()->route('admin.users.show', $user)
             ->with('success', 'Usuario actualizado correctamente.');
+    }
+
+    public function updateAvatar(Request $request, User $user)
+    {
+        $request->validate(['avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048']);
+
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->update(['avatar' => $path]);
+
+        return back()->with('success', 'Avatar actualizado correctamente.');
+    }
+
+    public function deleteAvatar(User $user)
+    {
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+            $user->update(['avatar' => null]);
+        }
+
+        return back()->with('success', 'Avatar eliminado correctamente.');
     }
 
     public function toggleAdmin(User $user)
