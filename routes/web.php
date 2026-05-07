@@ -22,6 +22,9 @@ Route::get('/producto/{product}', [StoreController::class, 'show'])->name('store
 Route::get('/mis-favoritos', [StoreController::class, 'favorites'])->middleware('auth')->name('store.favorites');
 Route::get('/publicar',  [PublishController::class, 'create'])->middleware('auth')->name('publish.create');
 Route::post('/publicar', [PublishController::class, 'store'])->middleware('auth')->name('publish.store');
+Route::get('/producto/{product}/editar',       [PublishController::class, 'edit'])->middleware('auth')->name('publish.edit');
+Route::put('/producto/{product}',              [PublishController::class, 'update'])->middleware('auth')->name('publish.update');
+Route::delete('/producto/{product}',           [PublishController::class, 'destroy'])->middleware('auth')->name('publish.destroy');
 Route::patch('/producto/{product}/vendido',   [PublishController::class, 'markAsSold'])->middleware('auth')->name('publish.sold');
 Route::patch('/producto/{product}/reservar',  [PublishController::class, 'markAsReserved'])->middleware('auth')->name('publish.reserve');
 Route::patch('/producto/{product}/quitar-reserva', [PublishController::class, 'unreserve'])->middleware('auth')->name('publish.unreserve');
