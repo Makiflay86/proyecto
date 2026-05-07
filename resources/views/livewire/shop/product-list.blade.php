@@ -1,4 +1,4 @@
-<div>
+<div x-on:set-buscar.window="$wire.set('buscar', $event.detail.value)">
     {{-- Barra de opciones: contador + ordenar --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -63,10 +63,10 @@
             </div>
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">No hay productos disponibles</h3>
             @if(!empty($path) || !empty($buscar))
-                <button wire:click="clearFrom(0)"
-                        class="mt-4 inline-block text-sm text-gold-500 hover:text-gold-600 font-medium transition">
-                    Ver todos los productos
-                </button>
+                <a href="{{ route('store.index') }}" wire:navigate
+                   class="mt-4 inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium text-sm">
+                    Limpiar filtros
+                </a>
             @endif
         </div>
     @else

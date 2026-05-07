@@ -12,7 +12,7 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Tienda pública
 - Catálogo de productos con filtrado por categoría en modo **drill-down** reactivo (Livewire): seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente
-- Búsqueda por nombre/descripción integrada en el catálogo (reactiva, sin recargar la página)
+- Búsqueda por nombre/descripción desde el buscador del navbar: Alpine despacha un evento al window con debounce de 300 ms, el componente Livewire lo escucha y actualiza la propiedad directamente sin recargar la página
 - Ordenación por precio (asc/desc) o por más recientes, reactiva sin recargar la página
 - Paginación de 12 productos por página
 - Los productos en estado **activo** y **reservado** aparecen en la tienda; los vendidos o inactivos no
@@ -117,7 +117,7 @@ Cada producto puede estar en uno de estos cuatro estados:
   - Auto-refresco inteligente (polling) para mantener los datos siempre actualizados.
 - **Gestión avanzada de productos:**
   - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
-  - Búsqueda en tiempo real por nombre y descripción integrada directamente en la lista (debounce de 300 ms)
+  - Búsqueda en tiempo real por nombre y descripción con `wire:model.live` (debounce de 300 ms)
   - Filtro de ordenación por precio (menor/mayor) y fecha
   - Contador total de productos visibles según los filtros aplicados
   - Paginación integrada para una navegación fluida entre grandes catálogos

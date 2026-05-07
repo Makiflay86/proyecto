@@ -44,6 +44,18 @@ class ProductList extends Component
         $this->resetPage();
     }
 
+    public function updatedBuscar(): void
+    {
+        $this->resetPage();
+    }
+
+    public function clearAll(): void
+    {
+        $this->path   = [];
+        $this->buscar = '';
+        $this->resetPage();
+    }
+
     public function render()
     {
         $categoryRows = [];

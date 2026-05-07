@@ -38,6 +38,7 @@
                                 <div class="relative">
                                     <input type="text" name="buscar" value="{{ request('buscar') }}"
                                            placeholder="Buscar productos..."
+                                           x-on:input.debounce.300ms="$dispatch('set-buscar', { value: $el.value })"
                                            class="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gold-400 text-sm transition">
                                     <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gold-500 transition">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,6 +163,7 @@
                             <div class="relative">
                                 <input type="text" name="buscar" value="{{ request('buscar') }}"
                                        placeholder="Buscar productos..."
+                                       x-on:input.debounce.300ms="$dispatch('set-buscar', { value: $el.value })"
                                        class="w-full pl-4 pr-10 py-2 rounded-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400">
                                 <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
