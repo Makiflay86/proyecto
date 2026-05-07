@@ -2,8 +2,8 @@
     {{-- Barra de opciones: contador + ordenar --}}
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <p class="text-sm text-gray-500 dark:text-gray-400">
-            <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $products->total() }}</span>
-            {{ $products->total() === 1 ? 'producto' : 'productos' }}
+            <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $total }}</span>
+            {{ $total === 1 ? 'producto' : 'productos' }}
         </p>
 
         <select wire:model.live="orden"
@@ -127,10 +127,19 @@
             @endforeach
         </div>
 
-        {{-- Paginación --}}
-        @if($products->hasPages())
-            <div class="mt-8">
-                {{ $products->links() }}
+        {{-- Scroll infinito --}}
+        @if($hasMore)
+            <div class="mt-8 flex flex-col items-center gap-4">
+                <div
+                    x-data
+                    x-init="
+                        new IntersectionObserver(([entry]) => {
+                            if (entry.isIntersecting) $wire.loadMore()
+                        }, { rootMargin: '400px' }).observe($el)
+                    "
+                    class="h-1 w-full"
+                ></div>
+                <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
         @endif
     @endif

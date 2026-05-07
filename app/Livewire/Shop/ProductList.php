@@ -6,12 +6,9 @@ use App\Models\Category;
 use App\Models\Product;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class ProductList extends Component
 {
-    use WithPagination;
-
     #[Url(as: 'path')]
     public array $path = [];
 
@@ -21,39 +18,47 @@ class ProductList extends Component
     #[Url]
     public string $orden = '';
 
+    public int $perPage = 12;
+    public bool $hasMore = false;
+
     public function mount(): void
     {
         $this->path = array_map('intval', $this->path);
+    }
+
+    public function loadMore(): void
+    {
+        $this->perPage += 12;
     }
 
     public function selectLevel(int $depth, int $id): void
     {
         $this->path = array_slice($this->path, 0, $depth);
         $this->path[] = $id;
-        $this->resetPage();
+        $this->perPage = 12;
     }
 
     public function clearFrom(int $depth): void
     {
         $this->path = array_slice($this->path, 0, $depth);
-        $this->resetPage();
+        $this->perPage = 12;
     }
 
     public function updatedOrden(): void
     {
-        $this->resetPage();
+        $this->perPage = 12;
     }
 
     public function updatedBuscar(): void
     {
-        $this->resetPage();
+        $this->perPage = 12;
     }
 
     public function clearAll(): void
     {
         $this->path   = [];
         $this->buscar = '';
-        $this->resetPage();
+        $this->perPage = 12;
     }
 
     public function render()
@@ -99,9 +104,11 @@ class ProductList extends Component
             $query->reorder()->orderBy('precio', 'desc');
         }
 
-        $products = $query->paginate(12);
+        $total = $query->count();
+        $products = $query->take($this->perPage)->get();
+        $this->hasMore = $total > $products->count();
 
-        return view('livewire.shop.product-list', compact('products', 'categoryRows'));
+        return view('livewire.shop.product-list', compact('products', 'categoryRows', 'total'));
     }
 
     private function collectIds($children): array
