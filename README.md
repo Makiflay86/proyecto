@@ -89,6 +89,14 @@ Cada producto puede estar en uno de estos cuatro estados:
 - GA4 recibe información del estado de sesión: `user_id` y `logged_in: true` para usuarios autenticados, `logged_in: false` para visitantes anónimos
 - El banner solo aparece en la tienda pública (`store.blade.php`), nunca en el panel de administración
 
+### Footer legal
+
+- El footer de la tienda incluye cuatro enlaces legales: **Aviso Legal**, **Política de Privacidad**, **Política de Cookies** y **Términos y Condiciones**
+- Cada enlace abre un modal Alpine.js con el contenido correspondiente — sin navegación a otra página
+- El scroll del fondo queda bloqueado mientras el modal está abierto (mismo mecanismo que el cookie banner)
+- El overlay del modal se puede pulsar para cerrarlo, o usar el botón "Cerrar"
+- El contenido de cada documento legal vive en partials Blade separados en `resources/views/partials/legal/`
+
 ### Panel de administración
 - Solo accesible para usuarios con `is_admin = true`.
 - **Dashboard con estadísticas detalladas:**

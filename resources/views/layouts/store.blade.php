@@ -187,12 +187,93 @@
             </main>
 
             {{-- Footer --}}
-            <footer class="mt-16 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-8">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-400 dark:text-gray-500">
-                    <img src="{{ asset('images/logo.svg') }}" alt="Venalia" class="h-8 w-auto mx-auto mb-3 opacity-60">
-                    © {{ date('Y') }} Venalia — Compra y vende con confianza.
+            <div x-data="{
+                activeModal: null,
+                init() {
+                    this.$watch('activeModal', val => {
+                        if (val) {
+                            document.body.classList.add('overflow-hidden');
+                        } else {
+                            document.body.classList.remove('overflow-hidden');
+                        }
+                    });
+                }
+            }">
+
+                <footer class="mt-16 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-8">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <img src="{{ asset('images/logo.svg') }}" alt="Venalia" class="h-8 w-auto mx-auto mb-3 opacity-60">
+                        <p class="text-sm text-gray-400 dark:text-gray-500 mb-3">© {{ date('Y') }} Venalia — Compra y vende con confianza.</p>
+                        <nav class="flex flex-wrap justify-center gap-x-4 gap-y-1">
+                            <button @click="activeModal = 'aviso'"     class="text-xs text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Aviso Legal</button>
+                            <button @click="activeModal = 'privacidad'" class="text-xs text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Política de Privacidad</button>
+                            <button @click="activeModal = 'cookies'"   class="text-xs text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Política de Cookies</button>
+                            <button @click="activeModal = 'terminos'"  class="text-xs text-gray-400 dark:text-gray-500 hover:text-indigo-500 dark:hover:text-indigo-400 transition">Términos y Condiciones</button>
+                        </nav>
+                    </div>
+                </footer>
+
+                {{-- Modal legal --}}
+                <div
+                    x-show="activeModal !== null"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center p-4"
+                    style="display: none;"
+                >
+                    {{-- Overlay --}}
+                    <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="activeModal = null"></div>
+
+                    {{-- Panel --}}
+                    <div
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:scale-95"
+                        class="relative z-10 w-full max-w-2xl max-h-[80vh] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl flex flex-col"
+                    >
+                        {{-- Cabecera --}}
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
+                            <span class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Información legal</span>
+                            <button @click="activeModal = null" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {{-- Contenido scrollable --}}
+                        <div class="overflow-y-auto px-6 py-5 text-sm text-gray-600 dark:text-gray-300 leading-relaxed space-y-2">
+                            <template x-if="activeModal === 'aviso'">
+                                <div>@include('partials.legal.aviso-legal')</div>
+                            </template>
+                            <template x-if="activeModal === 'privacidad'">
+                                <div>@include('partials.legal.privacidad')</div>
+                            </template>
+                            <template x-if="activeModal === 'cookies'">
+                                <div>@include('partials.legal.cookies')</div>
+                            </template>
+                            <template x-if="activeModal === 'terminos'">
+                                <div>@include('partials.legal.terminos')</div>
+                            </template>
+                        </div>
+
+                        {{-- Pie del modal --}}
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 shrink-0 text-right">
+                            <button @click="activeModal = null" class="px-4 py-2 text-sm rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium transition">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </footer>
+
+            </div>
 
         </div>
 
