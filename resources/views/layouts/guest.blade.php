@@ -13,14 +13,8 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/sass/app.scss'])
 
-        <script>
-            (function () {
-                var t = localStorage.getItem('theme');
-                if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                }
-            })();
-        </script>
+        {{-- Anti-flash dark mode --}}
+        @include('partials.dark-mode-init')
     </head>
     <body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
 

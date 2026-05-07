@@ -89,6 +89,15 @@ Cada producto puede estar en uno de estos cuatro estados:
 - GA4 recibe información del estado de sesión: `user_id` y `logged_in: true` para usuarios autenticados, `logged_in: false` para visitantes anónimos
 - El banner solo aparece en la tienda pública (`store.blade.php`), nunca en el panel de administración
 
+### Dark mode
+
+- Funciona en todos los layouts: tienda, panel de administración y formularios de autenticación
+- La preferencia se guarda en `localStorage` con la clave `theme` (`dark` o `light`)
+- Si no hay preferencia guardada, respeta el ajuste del sistema operativo (`prefers-color-scheme`)
+- El script de inicialización está inline en el `<head>` para evitar el parpadeo blanco antes de que cargue el JS — centralizado en `resources/views/partials/dark-mode-init.blade.php` e incluido en los tres layouts con `@include`
+- `toggleTheme()` está definido en `resources/js/theme.js` y expuesto en `window` para poder llamarlo desde cualquier botón con `onclick="toggleTheme()"`
+- Durante la navegación con Livewire (`wire:navigate`), se deshabilitan temporalmente las transiciones CSS para evitar el destello blanco al cambiar de página
+
 ### Footer legal
 
 - El footer de la tienda incluye cuatro enlaces legales: **Aviso Legal**, **Política de Privacidad**, **Política de Cookies** y **Términos y Condiciones**

@@ -21,14 +21,7 @@
         @livewireStyles
 
         {{-- Anti-flash: debe estar inline en <head> porque app.js carga diferido con Vite --}}
-        <script>
-            (function () {
-                var t = localStorage.getItem('theme');
-                if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                }
-            })();
-        </script>
+        @include('partials.dark-mode-init')
 
         @stack('head-scripts')
     </head>
