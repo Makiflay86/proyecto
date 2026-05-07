@@ -182,18 +182,23 @@
             </main>
 
             {{-- Footer --}}
-            <div x-data="{
-                activeModal: null,
-                init() {
-                    this.$watch('activeModal', val => {
-                        if (val) {
-                            document.body.classList.add('overflow-hidden');
-                        } else {
-                            document.body.classList.remove('overflow-hidden');
-                        }
-                    });
-                }
-            }">
+            <div
+                x-data="{
+                    activeModal: null,
+                    _wasLocked: false,
+                    init() {
+                        this.$watch('activeModal', val => {
+                            if (val) {
+                                this._wasLocked = document.body.classList.contains('overflow-hidden');
+                                document.body.classList.add('overflow-hidden');
+                            } else {
+                                if (!this._wasLocked) document.body.classList.remove('overflow-hidden');
+                            }
+                        });
+                    }
+                }"
+                x-on:open-legal.window="activeModal = $event.detail"
+            >
 
                 <footer class="mt-16 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-8">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -217,7 +222,7 @@
                     x-transition:leave="transition ease-in duration-150"
                     x-transition:leave-start="opacity-100"
                     x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 z-[9998] flex items-end sm:items-center justify-center p-4"
+                    class="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-4"
                     style="display: none;"
                 >
                     {{-- Overlay --}}

@@ -80,7 +80,7 @@
         <p class="text-sm text-center text-gray-500 dark:text-gray-400 mb-6">
             Utilizamos cookies propias y de terceros para mejorar tu experiencia de navegación.
             Puedes aceptarlas o rechazarlas. Para más información consulta nuestra
-            <a href="#" class="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+            <a href="#" @click.prevent="$dispatch('open-legal', 'cookies')" class="underline text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
                 política de cookies
             </a>.
         </p>
