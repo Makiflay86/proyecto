@@ -200,6 +200,8 @@
 
         @stack('scripts')
 
+        <x-cookie-banner />
+
         @auth
         <script>
             (function () {

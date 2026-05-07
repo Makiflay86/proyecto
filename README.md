@@ -80,6 +80,15 @@ Cada producto puede estar en uno de estos cuatro estados:
 - Página `/mi-perfil` con edición de nombre, email y contraseña
 - Sección "Mis productos" con las publicaciones propias, incluyendo badge de estado en los reservados/vendidos
 
+### Consentimiento de cookies y analítica
+
+- Banner modal bloqueante que aparece en la primera visita a la tienda — el usuario no puede navegar hasta aceptar o rechazar
+- La decisión se guarda en `localStorage` (`cookies_accepted = 1` o `0`) y no vuelve a aparecer
+- El scroll del fondo queda bloqueado mientras el modal está visible
+- **Google Analytics 4** integrado con consentimiento: el script de GA4 solo se carga si el usuario acepta las cookies, nunca si rechaza
+- GA4 recibe información del estado de sesión: `user_id` y `logged_in: true` para usuarios autenticados, `logged_in: false` para visitantes anónimos
+- El banner solo aparece en la tienda pública (`store.blade.php`), nunca en el panel de administración
+
 ### Panel de administración
 - Solo accesible para usuarios con `is_admin = true`.
 - **Dashboard con estadísticas detalladas:**
