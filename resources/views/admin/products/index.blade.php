@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                 {{ __('Productos') }}
             </h2>
-            <a href="{{ route('products.create') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200" wire:navigate.hover>
+            <a href="{{ route('products.create') }}" class="bg-gold-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-gold-700 transition duration-200" wire:navigate.hover>
                 + Crear Producto
             </a>
         </div>

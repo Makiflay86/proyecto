@@ -9,7 +9,7 @@
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
 
             <a href="{{ route('categories.show', $category) }}"
-               class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6 ps-4"
+               class="inline-block text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium text-sm mb-6 ps-4"
                wire:navigate.hover>
                 ← Volver al detalle
             </a>
@@ -31,7 +31,7 @@
                     <div>
                         <x-input-label for="parent_id" :value="__('Categoría padre')" />
                         <select id="parent_id" name="parent_id"
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">
                             <option value="">— Sin categoría padre (raíz) —</option>
                             @foreach($categoryOptions as $opt)
                                 <option value="{{ $opt['id'] }}" {{ old('parent_id', $category->parent_id) == $opt['id'] ? 'selected' : '' }}>
@@ -102,7 +102,7 @@
 
                     <div class="flex items-center pt-2">
                         <button type="submit"
-                                class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-xl">
+                                class="bg-gold-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-gold-700 transition shadow-md hover:shadow-xl">
                             Guardar cambios
                         </button>
                         <a href="{{ route('categories.show', $category) }}"

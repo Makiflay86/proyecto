@@ -40,7 +40,7 @@
         {{-- <li>
             <a href="{{ route('dashboard') }}"
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-gold-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 wire:navigate.hover>
                 <i class="bi bi-speedometer2 text-lg"></i> Dashboard
             </a>
@@ -48,7 +48,7 @@
         <li>
             <a href="{{ route('admin.stats') }}"
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.stats') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.stats') ? 'bg-gold-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 wire:navigate.hover>
                 <i class="bi bi-bar-chart-line text-lg"></i> Estadísticas
             </a>
@@ -56,7 +56,7 @@
         <li>
             <a href="{{ route('products.index') }}"
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-gold-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 wire:navigate.hover>
                 <i class="bi bi-truck text-lg"></i> Productos
             </a>
@@ -64,7 +64,7 @@
         <li>
             <a href="{{ route('categories.index') }}"
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('categories.*') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('categories.*') ? 'bg-gold-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 wire:navigate.hover>
                 <i class="bi bi-tag text-lg"></i> Categorías
             </a>
@@ -72,7 +72,7 @@
         <li>
             <a href="{{ route('admin.users.index') }}"
                 @click="sidebarOpen = false"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-red-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-gold-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600' }}"
                 wire:navigate.hover>
                 <i class="bi bi-people text-lg"></i> Usuarios
             </a>
@@ -100,7 +100,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
             </svg>
-            <div class="relative w-10 h-5 rounded-full bg-gray-300 dark:bg-indigo-600 transition-colors duration-300">
+            <div class="relative w-10 h-5 rounded-full bg-gray-300 dark:bg-gold-600 transition-colors duration-300">
                 <div class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-300 dark:translate-x-5"></div>
             </div>
         </button>
@@ -116,7 +116,7 @@
                class="block p-4 rounded-2xl mb-4 border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                wire:navigate.hover>
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-white font-bold">
+                    <div class="w-10 h-10 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </div>
                     <div class="overflow-hidden">

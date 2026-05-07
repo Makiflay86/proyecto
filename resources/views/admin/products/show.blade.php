@@ -8,7 +8,7 @@
     <div class="py-12 bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-300">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
 
-            <a href="{{ route('products.index') }}" class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6 ps-4" wire:navigate.hover>
+            <a href="{{ route('products.index') }}" class="inline-block text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium text-sm mb-6 ps-4" wire:navigate.hover>
                 ← Volver a productos
             </a>
 
@@ -100,7 +100,7 @@
                 <div class="p-8">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{{ $product->category?->breadcrumb }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-gold-600 dark:text-gold-400">{{ $product->category?->breadcrumb }}</span>
                             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h1>
                         </div>
                         <span class="text-2xl font-bold text-gray-800 dark:text-gray-100 shrink-0">
@@ -132,7 +132,7 @@
 
                         {{-- Editar --}}
                         <a href="{{ route('products.edit', $product) }}"
-                           class="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-xl"
+                           class="flex items-center gap-2 bg-gold-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-gold-700 transition shadow-md hover:shadow-xl"
                            wire:navigate.hover>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -9,7 +9,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
 
             <a href="{{ route('products.show', $product) }}"
-               class="inline-block text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm mb-6 ps-4"
+               class="inline-block text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium text-sm mb-6 ps-4"
                wire:navigate.hover>
                 ← Volver al detalle
             </a>
@@ -34,13 +34,13 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
                         <input type="text" name="nombre" value="{{ old('nombre', $product->nombre) }}"
-                               class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition" required>
+                               class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition" required>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
                         <textarea name="descripcion" rows="4"
-                                  class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">{{ old('descripcion', $product->descripcion) }}</textarea>
+                                  class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">{{ old('descripcion', $product->descripcion) }}</textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -48,7 +48,7 @@
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Precio</label>
                             <div class="relative">
                                 <input type="number" step="0.01" name="precio" value="{{ old('precio', $product->precio) }}"
-                                       class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pl-3 pr-8 transition" required>
+                                       class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 pl-3 pr-8 transition" required>
                                 <span class="absolute right-3 top-2 text-gray-500 dark:text-gray-400">€</span>
                             </div>
                         </div>
@@ -56,7 +56,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
                             <select name="category_id"
-                                    class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition" required>
+                                    class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition" required>
                                 <option value="" disabled>Selecciona una categoría</option>
                                 @foreach($categoryOptions as $opt)
                                     <option value="{{ $opt['id'] }}" {{ old('category_id', $product->category_id) == $opt['id'] ? 'selected' : '' }}>
@@ -69,7 +69,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
                             <select name="estado"
-                                    class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition">
+                                    class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">
                                 <option value="activo"    {{ old('estado', $product->estado) === 'activo'    ? 'selected' : '' }}>Activo</option>
                                 <option value="reservado" {{ old('estado', $product->estado) === 'reservado' ? 'selected' : '' }}>Reservado</option>
                                 <option value="vendido"   {{ old('estado', $product->estado) === 'vendido'   ? 'selected' : '' }}>Vendido</option>
@@ -157,7 +157,7 @@
 
                     <div class="flex items-center pt-4">
                         <button type="submit"
-                                class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-xl">
+                                class="bg-gold-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-gold-700 transition shadow-md hover:shadow-xl">
                             Guardar cambios
                         </button>
                         <a href="{{ route('products.show', $product) }}"

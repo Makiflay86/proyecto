@@ -16,13 +16,13 @@
             --}}
             <nav class="flex items-center gap-1.5 text-sm mb-6 ps-4 flex-wrap">
                 <a href="{{ route('categories.index') }}"
-                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                   class="text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium"
                    wire:navigate.hover>Categorías</a>
                 {{-- Recorremos todos los ancestros: Electrónica › Móvil › Apple --}}
                 @foreach($ancestors as $ancestor)
                     <span class="text-gray-400">›</span>
                     <a href="{{ route('categories.show', $ancestor) }}"
-                       class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                       class="text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium"
                        wire:navigate.hover>{{ $ancestor->name }}</a>
                 @endforeach
                 <span class="text-gray-400">›</span>
@@ -82,8 +82,8 @@
                         </div>
                     @else
                         {{-- Sin imagen: mostramos un icono genérico de etiqueta --}}
-                        <div class="bg-indigo-100 dark:bg-indigo-900 rounded-xl p-4 shrink-0">
-                            <svg class="w-8 h-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="bg-gold-100 dark:bg-gold-900/30 rounded-xl p-4 shrink-0">
+                            <svg class="w-8 h-8 text-gold-600 dark:text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                             </svg>
@@ -92,7 +92,7 @@
 
                     {{-- NOMBRE + BADGE DE PRODUCTOS --}}
                     <div>
-                        <p class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Categoría</p>
+                        <p class="text-xs font-semibold uppercase tracking-wider text-gold-600 dark:text-gold-400">Categoría</p>
                         <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ $category->name }}</h1>
 
                         {{--
@@ -113,7 +113,7 @@
                         <div class="flex items-center gap-4 mt-2">
                             @if($totalProductCount > 0)
                                 <a href="{{ route('products.index') . '?' . http_build_query(['path' => $categoryPath]) }}"
-                                   class="inline-flex items-center gap-1.5 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold px-3 py-1 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-800/60 transition"
+                                   class="inline-flex items-center gap-1.5 bg-gold-50 dark:bg-gold-900/30 text-gold-700 dark:text-gold-300 text-sm font-semibold px-3 py-1 rounded-full hover:bg-gold-100 dark:hover:bg-gold-800/40 transition"
                                    wire:navigate>
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -156,7 +156,7 @@
 
                     {{-- Botón Editar: navega al formulario de edición --}}
                     <a href="{{ route('categories.edit', $category) }}"
-                       class="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition shadow-md hover:shadow-xl"
+                       class="flex items-center gap-2 bg-gold-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-gold-700 transition shadow-md hover:shadow-xl"
                        wire:navigate.hover>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -268,7 +268,7 @@
                                 No se puede usar <a> dentro de <a> (HTML inválido), por eso
                                 la tarjeta es un <div> y cada zona es un <a> independiente.
                             --}}
-                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 hover:border-indigo-300 dark:hover:border-indigo-600 transition-all duration-300">
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 hover:border-gold-300 dark:hover:border-gold-600 transition-all duration-300">
 
                                 {{-- LINK PRINCIPAL → detalle de la subcategoría --}}
                                 <a href="{{ route('categories.show', $child) }}"
@@ -278,8 +278,8 @@
                                         <img src="{{ asset('storage/' . $child->image) }}"
                                              class="w-10 h-10 rounded-xl object-cover shrink-0 border border-gray-200 dark:border-gray-600">
                                     @else
-                                        <div class="bg-indigo-100 dark:bg-indigo-900 rounded-xl p-2.5 shrink-0">
-                                            <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="bg-gold-100 dark:bg-gold-900/30 rounded-xl p-2.5 shrink-0">
+                                            <svg class="w-4 h-4 text-gold-600 dark:text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                             </svg>
@@ -305,7 +305,7 @@
                                 --}}
                                 @if(($childProductCounts[$child->id] ?? 0) > 0)
                                     <a href="{{ route('products.index') . '?' . http_build_query(['path' => $childPaths[$child->id]]) }}"
-                                       class="flex items-center gap-1.5 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition"
+                                       class="flex items-center gap-1.5 px-5 py-2.5 border-t border-gray-100 dark:border-gray-700 text-xs font-medium text-gold-600 dark:text-gold-400 hover:bg-gold-50 dark:hover:bg-gold-900/20 transition"
                                        wire:navigate>
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

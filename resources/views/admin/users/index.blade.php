@@ -28,12 +28,12 @@
                    wire:navigate.hover
                    class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all
                           {{ $tab === 'customers'
-                              ? 'bg-red-600 text-white shadow-md'
+                              ? 'bg-gold-600 text-white shadow-md'
                               : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                     <i class="bi bi-people"></i>
                     Clientes
                     <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-xs font-bold
-                                 {{ $tab === 'customers' ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }}">
+                                 {{ $tab === 'customers' ? 'bg-gold-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }}">
                         {{ $customers->total() }}
                     </span>
                 </a>
@@ -41,12 +41,12 @@
                    wire:navigate.hover
                    class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all
                           {{ $tab === 'admins'
-                              ? 'bg-red-600 text-white shadow-md'
+                              ? 'bg-gold-600 text-white shadow-md'
                               : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                     <i class="bi bi-shield-check"></i>
                     Administradores
                     <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-xs font-bold
-                                 {{ $tab === 'admins' ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }}">
+                                 {{ $tab === 'admins' ? 'bg-gold-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300' }}">
                         {{ $admins->count() }}
                     </span>
                 </a>
@@ -112,7 +112,7 @@
                                                 {{-- Ver --}}
                                                 <a href="{{ route('admin.users.show', $user) }}"
                                                    wire:navigate.hover
-                                                   class="group/btn inline-flex items-center gap-1.5 h-8 px-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200">
+                                                   class="group/btn inline-flex items-center gap-1.5 h-8 px-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gold-100 dark:hover:bg-gold-900/40 hover:text-gold-600 dark:hover:text-gold-400 transition-all duration-200">
                                                     <i class="bi bi-eye text-sm shrink-0"></i>
                                                     <span class="text-xs font-medium overflow-hidden max-w-0 group-hover/btn:max-w-[3rem] transition-all duration-200 whitespace-nowrap">Ver</span>
                                                 </a>
@@ -164,12 +164,12 @@
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($admins as $user)
-                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300">
+                            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300">
                                 <div class="p-6 flex flex-col gap-4">
 
                                     {{-- Avatar + nombre --}}
                                     <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-lg shrink-0">
+                                        <div class="w-12 h-12 rounded-full bg-gold-500 flex items-center justify-center text-white font-bold text-lg shrink-0">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}
                                         </div>
                                         <div class="overflow-hidden flex-1 min-w-0">
@@ -196,7 +196,7 @@
                                         <div class="relative group/tip">
                                             <a href="{{ route('admin.users.show', $user) }}"
                                                wire:navigate.hover
-                                               class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                               class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gold-100 dark:hover:bg-gold-900/40 hover:text-gold-600 dark:hover:text-gold-400 transition-colors">
                                                 <i class="bi bi-eye text-sm"></i>
                                             </a>
                                             <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs font-medium bg-gray-900 dark:bg-gray-950 text-white rounded-lg whitespace-nowrap opacity-0 group-hover/tip:opacity-100 transition-opacity z-20">

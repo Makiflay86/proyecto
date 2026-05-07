@@ -5,7 +5,7 @@
             <input wire:model.live.debounce.300ms="buscar"
                    type="text"
                    placeholder="Buscar por nombre o descripción..."
-                   class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400 transition placeholder-gray-400 dark:placeholder-gray-500">
+                   class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-gold-400 transition placeholder-gray-400 dark:placeholder-gray-500">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
             </svg>
@@ -17,7 +17,7 @@
         </p>
 
         <select wire:model.live="orden"
-                class="w-full sm:w-auto text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
+                class="w-full sm:w-auto text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
             <option value="">Más recientes</option>
             <option value="precio_asc">Precio: menor a mayor</option>
             <option value="precio_desc">Precio: mayor a menor</option>
@@ -57,16 +57,16 @@
                     <button wire:click="clearFrom(0)"
                             class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
                                 {{ empty($path)
-                                    ? 'bg-indigo-600 text-white shadow-md'
-                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                                    ? 'bg-gold-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gold-400 dark:hover:border-gold-500' }}">
                         Todas
                     </button>
                 @else
                     <button wire:click="clearFrom({{ $depth }})"
                             class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
                                 {{ count($path) === $depth
-                                    ? 'bg-indigo-600 text-white shadow-md'
-                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                                    ? 'bg-gold-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gold-400 dark:hover:border-gold-500' }}">
                         Todos
                     </button>
                 @endif
@@ -88,8 +88,8 @@
                     <button wire:click="selectLevel({{ $depth }}, {{ $cat->id }})"
                             class="shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition
                                 {{ ($path[$depth] ?? null) === $cat->id
-                                    ? 'bg-indigo-600 text-white shadow-md'
-                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500' }}">
+                                    ? 'bg-gold-600 text-white shadow-md'
+                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gold-400 dark:hover:border-gold-500' }}">
                         {{ $cat->name }}
                     </button>
                 @endforeach
@@ -107,8 +107,8 @@
         --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-16 text-center transition-colors duration-300">
             <div class="flex justify-center mb-6">
-                <div class="bg-indigo-100 dark:bg-indigo-900 rounded-full p-6">
-                    <svg class="w-12 h-12 text-indigo-400 dark:text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-gold-100 dark:bg-gold-900/30 rounded-full p-6">
+                    <svg class="w-12 h-12 text-gold-400 dark:text-gold-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                               d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
                     </svg>
@@ -120,7 +120,7 @@
                     No hay productos que coincidan con "<span class="font-medium">{{ $buscar }}</span>".
                 </p>
                 <button wire:click="$set('buscar', '')"
-                        class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
+                        class="inline-flex items-center gap-2 bg-gold-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-gold-700 transition duration-200 font-medium">
                     Limpiar búsqueda
                 </button>
             @elseif(!empty($path))
@@ -129,7 +129,7 @@
                     No hay productos en la categoría seleccionada.
                 </p>
                 <button wire:click="clearFrom(0)"
-                        class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
+                        class="inline-flex items-center gap-2 bg-gold-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-gold-700 transition duration-200 font-medium">
                     Ver todos los productos
                 </button>
             @else
@@ -138,7 +138,7 @@
                     Aún no has añadido ningún producto. ¡Crea el primero ahora!
                 </p>
                 <a href="{{ route('products.create') }}"
-                   class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium"
+                   class="inline-flex items-center gap-2 bg-gold-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-gold-700 transition duration-200 font-medium"
                    wire:navigate.hover>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -151,7 +151,7 @@
         {{-- GRID DE TARJETAS DE PRODUCTOS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-indigo-900/50 transition-all duration-300 relative group">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group">
 
                     {{-- Badges centrados (Estilo tienda) --}}
                     @if($product->isSold() || $product->isReserved() || $product->estado === 'inactivo')
@@ -178,7 +178,7 @@
 
                     <div class="p-5">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">{{ $product->category?->root->name }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-gold-600 dark:text-gold-400 truncate">{{ $product->category?->root->name }}</span>
                             @if($product->estado === 'activo')
                                 <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>
@@ -219,7 +219,7 @@
                                 Ejemplo: 1234.5 → "1.234,50€"
                             --}}
                             <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ",", ".") }}€</span>
-                            <a href="{{ route('products.show', $product->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
+                            <a href="{{ route('products.show', $product->id) }}" class="text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
                         </div>
                     </div>
                 </div>

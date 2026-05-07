@@ -47,7 +47,7 @@
                                 <td class="px-6 py-4 font-bold text-gray-800 dark:text-white whitespace-nowrap">
                                     {{ $name }}
                                 </td>
-                                <td class="px-6 py-4 text-center font-black text-indigo-600 dark:text-indigo-400">
+                                <td class="px-6 py-4 text-center font-black text-gold-600 dark:text-gold-400">
                                     {{ $data['total'] }}
                                 </td>
                                 <td class="px-6 py-4 text-center text-gray-600 dark:text-gray-300">

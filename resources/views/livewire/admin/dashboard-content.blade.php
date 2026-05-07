@@ -33,35 +33,35 @@
             <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 transition-colors duration-300">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
-                        ¡Bienvenido, <span class="text-indigo-600 dark:text-indigo-400">{{ Auth::user()->name }}</span>!
+                        ¡Bienvenido, <span class="text-gold-600 dark:text-gold-400">{{ Auth::user()->name }}</span>!
                     </h1>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         Hoy es <strong>{{ now()->translatedFormat('l, d \d\e F \d\e Y') }}</strong>
                     </p>
                 </div>
                 {{-- La hora se actualiza en cada poll --}}
-                <span class="text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full font-medium self-start sm:self-center">
+                <span class="text-xs bg-gold-100 dark:bg-gold-900/30 text-gold-700 dark:text-gold-300 px-3 py-1 rounded-full font-medium self-start sm:self-center">
                     {{ now()->format('H:i') }} hrs
                 </span>
             </div>
 
             {{-- ── Daily message ── --}}
             @if($message)
-            <div class="bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-700 shadow-sm sm:rounded-xl p-5 flex items-start gap-3 transition-colors duration-300">
-                <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-gold-50 dark:bg-gold-900/20 border border-gold-200 dark:border-gold-700/50 shadow-sm sm:rounded-xl p-5 flex items-start gap-3 transition-colors duration-300">
+                <svg class="w-5 h-5 text-gold-500 dark:text-gold-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
                 </svg>
-                <p class="text-indigo-800 dark:text-indigo-200 text-sm font-medium">{{ $message }}</p>
+                <p class="text-gold-800 dark:text-gold-200 text-sm font-medium">{{ $message }}</p>
             </div>
             @endif
 
             {{-- ── Stats cards ── --}}
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
 
-                <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-xl p-4 flex flex-col items-center text-center gap-2 transition-colors duration-300 border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800">
-                    <div class="bg-indigo-100 dark:bg-indigo-900/50 rounded-lg p-2">
-                        <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-xl p-4 flex flex-col items-center text-center gap-2 transition-colors duration-300 border border-transparent hover:border-gold-200 dark:hover:border-gold-700">
+                    <div class="bg-gold-100 dark:bg-gold-900/30 rounded-lg p-2">
+                        <svg class="w-5 h-5 text-gold-600 dark:text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
                         </svg>
                     </div>
@@ -167,7 +167,7 @@
                         Productos recientes
                     </h3>
                     <a href="{{ route('products.index') }}"
-                       class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+                       class="text-xs text-gold-600 dark:text-gold-400 hover:underline font-medium">
                         Ver todos →
                     </a>
                 </div>
@@ -192,7 +192,7 @@
                             @foreach($recentProducts as $product)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors">
                                 <td class="px-6 py-4 font-medium text-gray-800 dark:text-white whitespace-nowrap">
-                                    <a href="{{ route('products.show', $product) }}" class="hover:text-indigo-600 dark:hover:text-indigo-400">
+                                    <a href="{{ route('products.show', $product) }}" class="hover:text-gold-600 dark:hover:text-gold-400">
                                         {{ $product->nombre }}
                                     </a>
                                 </td>
