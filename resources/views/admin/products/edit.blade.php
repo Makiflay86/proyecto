@@ -14,49 +14,48 @@
                 ← Volver al detalle
             </a>
 
-            @if ($errors->any())
-                <div class="bg-red-50 dark:bg-red-900/40 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-4 mb-6 rounded shadow-sm">
-                    <p class="font-bold">Por favor corrige los siguientes errores:</p>
-                    <ul class="list-disc list-inside mt-2 text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
 
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+<div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
 
                 <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     @method('PUT')
 
-                    <div>
+                    <div class="field-group">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
-                        <input type="text" name="nombre" value="{{ old('nombre', $product->nombre) }}"
-                               class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition" required>
+                        <input id="nombre" type="text" name="nombre" value="{{ old('nombre', $product->nombre) }}"
+                               class="w-full bg-white dark:bg-gray-700 @error('nombre') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">
+                        @error('nombre')
+                            <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div>
+                    <div class="field-group">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
-                        <textarea name="descripcion" rows="4"
-                                  class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">{{ old('descripcion', $product->descripcion) }}</textarea>
+                        <textarea id="descripcion" name="descripcion" rows="4"
+                                  class="w-full bg-white dark:bg-gray-700 @error('descripcion') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">{{ old('descripcion', $product->descripcion) }}</textarea>
+                        @error('descripcion')
+                            <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
+                        <div class="field-group">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Precio</label>
                             <div class="relative">
-                                <input type="number" step="0.01" name="precio" value="{{ old('precio', $product->precio) }}"
-                                       class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 pl-3 pr-8 transition" required>
+                                <input id="precio" type="number" step="0.01" name="precio" value="{{ old('precio', $product->precio) }}"
+                                       class="w-full bg-white dark:bg-gray-700 @error('precio') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 pl-3 pr-8 transition">
                                 <span class="absolute right-3 top-2 text-gray-500 dark:text-gray-400">€</span>
                             </div>
+                            @error('precio')
+                                <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
-                        <div>
+                        <div class="field-group">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
-                            <select name="category_id"
-                                    class="w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition" required>
+                            <select id="category_id" name="category_id"
+                                    class="w-full bg-white dark:bg-gray-700 @error('category_id') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">
                                 <option value="" disabled>Selecciona una categoría</option>
                                 @foreach($categoryOptions as $opt)
                                     <option value="{{ $opt['id'] }}" {{ old('category_id', $product->category_id) == $opt['id'] ? 'selected' : '' }}>
@@ -64,6 +63,24 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('category_id')
+                                <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="field-group">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Propietario</label>
+                            <select id="user_id" name="user_id"
+                                    class="w-full bg-white dark:bg-gray-700 @error('user_id') border-red-500 @else border-gray-300 dark:border-gray-600 @enderror text-gray-900 dark:text-white rounded-lg shadow-sm focus:border-gold-500 focus:ring-gold-500 transition">
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ old('user_id', $product->user_id) == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('user_id')
+                                <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -170,4 +187,6 @@
             </div>
         </div>
     </div>
+
+    @vite(['resources/js/auth.js', 'resources/js/admin-products.js'])
 </x-app-layout>

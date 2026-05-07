@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +34,9 @@ class ProductController extends Controller
     public function create()
     {
         $categoryOptions = Category::flatOptions();
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
-        return view('admin.products.create', compact('categoryOptions'));
+        return view('admin.products.create', compact('categoryOptions', 'users'));
     }
 
     /** Valida y guarda un nuevo producto junto con sus imágenes. */
@@ -45,11 +47,12 @@ class ProductController extends Controller
             'descripcion' => 'required|string',
             'precio'      => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
+            'user_id'     => 'required|exists:users,id',
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $product = DB::transaction(function () use ($request, $validatedData) {
-            $product = Product::create($validatedData + ['user_id' => Auth::id()]);
+            $product = Product::create($validatedData);
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -78,8 +81,9 @@ class ProductController extends Controller
     {
         $product->load('images');
         $categoryOptions = Category::flatOptions();
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
 
-        return view('admin.products.edit', compact('product', 'categoryOptions'));
+        return view('admin.products.edit', compact('product', 'categoryOptions', 'users'));
     }
 
     /** Valida y actualiza un producto. Las imágenes nuevas se añaden a las existentes. */
@@ -90,11 +94,12 @@ class ProductController extends Controller
             'descripcion' => 'required|string',
             'precio'      => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
+            'user_id'     => 'required|exists:users,id',
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         DB::transaction(function () use ($request, $product) {
-            $product->update($request->only('nombre', 'descripcion', 'precio', 'category_id', 'estado'));
+            $product->update($request->only('nombre', 'descripcion', 'precio', 'category_id', 'user_id', 'estado'));
 
             if ($request->filled('delete_images')) {
                 $toDelete = $product->images()->whereIn('id', $request->delete_images)->get();
