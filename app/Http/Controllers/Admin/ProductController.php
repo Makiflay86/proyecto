@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -51,7 +50,7 @@ class ProductController extends Controller
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $product = DB::transaction(function () use ($request, $validatedData) {
+        DB::transaction(function () use ($request, $validatedData) {
             $product = Product::create($validatedData);
 
             if ($request->hasFile('images')) {
@@ -60,8 +59,6 @@ class ProductController extends Controller
                     $product->images()->create(['path' => $path]);
                 }
             }
-
-            return $product;
         });
 
         return redirect()->route('products.index')

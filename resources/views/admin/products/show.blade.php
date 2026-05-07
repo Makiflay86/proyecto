@@ -202,7 +202,7 @@
                                         @method('DELETE')
                                         <button type="submit"
                                                 class="w-full px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium transition shadow-md">
-                                            Sí, eliminar
+                                            Sí
                                         </button>
                                     </form>
                                 </div>

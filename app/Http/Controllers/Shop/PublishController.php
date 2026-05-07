@@ -39,7 +39,7 @@ class PublishController extends Controller
             }
         });
 
-        return redirect()->route('profile.store')->with('success', '¡Producto publicado correctamente!');
+        return redirect()->route('store.index')->with('success', '¡Producto publicado correctamente!');
     }
 
     public function markAsSold(Product $product)

@@ -6,46 +6,45 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Rellena los datos y sube fotos para publicar tu producto.</p>
         </div>
 
-        @if($errors->any())
-            <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 p-4 mb-6 rounded-2xl text-sm">
-                <ul class="list-disc list-inside space-y-1">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
             <form action="{{ route('publish.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
-                <div>
+                <div class="field-group">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ old('nombre') }}" required
-                           class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
+                    <input id="nombre" type="text" name="nombre" value="{{ old('nombre') }}"
+                           class="w-full rounded-xl @error('nombre') border-red-500 @else border border-gray-300 dark:border-gray-600 @enderror bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
+                    @error('nombre')
+                        <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <div>
+                <div class="field-group">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
-                    <textarea name="descripcion" rows="4" required
-                              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">{{ old('descripcion') }}</textarea>
+                    <textarea id="descripcion" name="descripcion" rows="4"
+                              class="w-full rounded-xl @error('descripcion') border-red-500 @else border border-gray-300 dark:border-gray-600 @enderror bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">{{ old('descripcion') }}</textarea>
+                    @error('descripcion')
+                        <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
+                    <div class="field-group">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Precio</label>
                         <div class="relative">
-                            <input type="number" step="0.01" min="0" name="precio" value="{{ old('precio') }}" required
-                                   class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2.5 pr-8 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
+                            <input id="precio" type="number" step="0.01" min="0" name="precio" value="{{ old('precio') }}"
+                                   class="w-full rounded-xl @error('precio') border-red-500 @else border border-gray-300 dark:border-gray-600 @enderror bg-gray-50 dark:bg-gray-700 px-4 py-2.5 pr-8 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
                             <span class="absolute right-3 top-2.5 text-gray-400 dark:text-gray-500 text-sm">€</span>
                         </div>
+                        @error('precio')
+                            <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <div>
+                    <div class="field-group">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
-                        <select name="category_id" required
-                                class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
+                        <select id="category_id" name="category_id"
+                                class="w-full rounded-xl @error('category_id') border-red-500 @else border border-gray-300 dark:border-gray-600 @enderror bg-gray-50 dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gold-400 transition">
                             <option value="" disabled selected>Selecciona una categoría</option>
                             @foreach($categoryOptions as $opt)
                                 <option value="{{ $opt['id'] }}" {{ old('category_id') == $opt['id'] ? 'selected' : '' }}>
@@ -53,6 +52,9 @@
                                 </option>
                             @endforeach
                         </select>
+                        @error('category_id')
+                            <p class="field-error text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -119,4 +121,6 @@
         </div>
 
     </div>
+
+    @vite(['resources/js/auth.js', 'resources/js/admin-products.js'])
 </x-store-layout>
