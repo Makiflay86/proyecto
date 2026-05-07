@@ -79,11 +79,6 @@
         </li>
     </ul>
 
-    {{-- Barra de búsqueda --}}
-    <div class="my-4">
-        <livewire:shop.product-search />
-    </div>
-
     {{-- Ver tienda + Toggle dark / light mode --}}
     <div class="px-1 mb-3 flex gap-2">
         <a href="{{ route('store.index') }}"

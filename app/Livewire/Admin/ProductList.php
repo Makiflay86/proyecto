@@ -22,12 +22,20 @@ class ProductList extends Component
     #[Url]
     public string $orden = '';
 
+    #[Url]
+    public string $buscar = '';
+
     public function mount(): void
     {
         $this->path = array_map('intval', $this->path);
     }
 
     public function updatedOrden(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedBuscar(): void
     {
         $this->resetPage();
     }
@@ -71,6 +79,13 @@ class ProductList extends Component
 
         if (!empty($filterIds)) {
             $query->whereIn('products.category_id', $filterIds);
+        }
+
+        if ($this->buscar !== '') {
+            $query->where(function ($q) {
+                $q->where('nombre', 'like', "%{$this->buscar}%")
+                  ->orWhere('descripcion', 'like', "%{$this->buscar}%");
+            });
         }
 
         if ($this->orden === 'precio_asc') {

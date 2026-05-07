@@ -1,6 +1,5 @@
 @import 'navigation';
 @import 'success-message';
-@import 'product-search';
 
 // Evita el flash blanco durante wire:navigate en dark mode.
 // El elemento <html> persiste entre navegaciones SPA, por lo que

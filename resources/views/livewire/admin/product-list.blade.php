@@ -1,7 +1,17 @@
 <div>
-    {{-- Barra de opciones: contador + ordenar --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+    {{-- Barra de opciones: buscador + contador + ordenar --}}
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+        <div class="relative flex-1">
+            <input wire:model.live.debounce.300ms="buscar"
+                   type="text"
+                   placeholder="Buscar por nombre o descripción..."
+                   class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400 transition placeholder-gray-400 dark:placeholder-gray-500">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+            </svg>
+        </div>
+
+        <p class="text-sm text-gray-500 dark:text-gray-400 shrink-0">
             <span class="font-semibold text-gray-800 dark:text-gray-200">{{ $products->total() }}</span>
             {{ $products->total() === 1 ? 'producto' : 'productos' }}
         </p>
@@ -104,12 +114,20 @@
                     </svg>
                 </div>
             </div>
-            @if(!empty($path))
+            @if($buscar !== '')
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Sin resultados</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">
+                    No hay productos que coincidan con "<span class="font-medium">{{ $buscar }}</span>".
+                </p>
+                <button wire:click="$set('buscar', '')"
+                        class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
+                    Limpiar búsqueda
+                </button>
+            @elseif(!empty($path))
                 <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Sin productos en esta categoría</h3>
                 <p class="text-gray-500 dark:text-gray-400 text-sm mb-8">
                     No hay productos en la categoría seleccionada.
                 </p>
-                {{-- wire:click llama al método PHP sin recargar la página --}}
                 <button wire:click="clearFrom(0)"
                         class="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-200 font-medium">
                     Ver todos los productos

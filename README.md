@@ -117,6 +117,7 @@ Cada producto puede estar en uno de estos cuatro estados:
   - Auto-refresco inteligente (polling) para mantener los datos siempre actualizados.
 - **Gestión avanzada de productos:**
   - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
+  - Búsqueda en tiempo real por nombre y descripción integrada directamente en la lista (debounce de 300 ms)
   - Filtro de ordenación por precio (menor/mayor) y fecha
   - Contador total de productos visibles según los filtros aplicados
   - Paginación integrada para una navegación fluida entre grandes catálogos
