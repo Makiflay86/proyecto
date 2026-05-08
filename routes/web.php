@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile',       [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/mi-perfil', [ProfileController::class, 'storeEdit'])->name('profile.store');
+    Route::get('/mis-productos', [ProfileController::class, 'myProducts'])->name('profile.my-products');
 });
 
 Route::get('/usuarios/{user}', [UserProfileController::class, 'show'])->name('users.profile');

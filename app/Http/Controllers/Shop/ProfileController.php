@@ -28,10 +28,17 @@ class ProfileController extends Controller
      */
     public function storeEdit(Request $request): View
     {
+        $user = $request->user();
+
+        return view('shop.my-profile', compact('user'));
+    }
+
+    public function myProducts(Request $request): View
+    {
         $user     = $request->user();
         $products = $user->products()->with('images')->latest()->get();
 
-        return view('shop.my-profile', compact('user', 'products'));
+        return view('shop.my-products', compact('user', 'products'));
     }
 
     /**

@@ -132,6 +132,13 @@
                                             Mis mensajes
                                             <span id="unread-badge-count" class="{{ $unreadNav > 0 ? '' : 'hidden' }} ml-auto bg-indigo-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center">{{ $unreadNav > 99 ? '99+' : $unreadNav }}</span>
                                         </a>
+                                        <a href="{{ route('profile.my-products') }}"
+                                           class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                            <svg class="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+                                            </svg>
+                                            Mis productos
+                                        </a>
                                         <a href="{{ route('profile.store') }}"
                                            class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
