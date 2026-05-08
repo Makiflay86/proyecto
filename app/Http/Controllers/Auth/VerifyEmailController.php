@@ -15,13 +15,15 @@ class VerifyEmailController extends Controller
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('store.index', absolute: false).'?verified=1');
+            return redirect()->route('store.index')
+                ->with('success', '¡Tu correo ya estaba verificado! Ya puedes publicar productos.');
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(route('store.index', absolute: false).'?verified=1');
+        return redirect()->route('store.index')
+            ->with('success', '¡Correo verificado! Ya puedes publicar tus productos en Venalia.');
     }
 }

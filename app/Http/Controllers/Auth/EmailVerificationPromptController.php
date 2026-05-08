@@ -15,7 +15,8 @@ class EmailVerificationPromptController extends Controller
     public function __invoke(Request $request): RedirectResponse|View
     {
         return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(route('dashboard', absolute: false))
-                    : view('auth.verify-email');
+                    ? redirect()->intended(route('store.index'))
+                    : redirect()->route('store.index')
+                        ->with('error', 'Debes verificar tu correo electrónico antes de publicar un producto.');
     }
 }
