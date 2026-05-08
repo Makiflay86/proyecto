@@ -21,7 +21,7 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ### Perfiles públicos de usuario
 - Cualquier visitante puede ver el perfil de un vendedor en `/usuarios/{user}`
-- Muestra foto/inicial, nombre, fecha de registro, número de productos en venta y la grid de productos
+- Muestra foto/inicial, nombre, fecha de registro, número de productos en venta, **valoración media** y la grid de productos
 - Si es tu propio perfil, aparece un botón "Editar perfil"
 
 ### Estados de un producto
@@ -54,7 +54,7 @@ Cada producto puede estar en uno de estos cuatro estados:
 ### Chat entre usuarios (comprador ↔ vendedor)
 - Desde el detalle de un producto, el botón "Contactar con el vendedor" abre un chat privado
 - **Cualquier usuario registrado puede ser comprador o vendedor** — el chat funciona entre usuarios normales sin requerir rol de administrador
-- La cabecera del chat muestra el nombre del producto y el nombre de la contraparte (comprador ve al vendedor, vendedor ve al comprador)
+- La cabecera del chat muestra el nombre del producto y el nombre de la contraparte (comprador ve al vendedor, vendedor ve al comprador) — el nombre es un **enlace al perfil público** del usuario
 - Las conversaciones se identifican por producto + comprador, de modo que el vendedor puede tener hilos separados con cada interesado
 - El vendedor puede ver y responder todos los mensajes recibidos en sus productos desde "Mis mensajes"
 - Actualización automática cada 3 segundos (Livewire polling)
@@ -62,6 +62,19 @@ Cada producto puede estar en uno de estos cuatro estados:
 - **Separadores de fecha** entre mensajes de días distintos: muestra "Hoy", "Ayer" o la fecha completa en español
 - La hora de cada mensaje aparece integrada en el globo al estilo WhatsApp: en la misma línea si el texto es corto, o en la esquina inferior derecha si el texto ocupa varias líneas
 - **Sistema de presencia online:** el chat actualiza silenciosamente la actividad del usuario cada 3 segundos; si el destinatario lleva más de 30 segundos sin tener el chat abierto se le envía una notificación por correo al recibir un mensaje nuevo
+- **Acciones del vendedor desde el chat:** el dueño del producto puede **reservarlo**, **cancelar la reserva** o **marcarlo como vendido** directamente desde la cabecera del chat, sin salir de la conversación. El cambio a "Vendido" requiere confirmación mediante un modal
+- **Modal de valoración post-venta:** al marcar un producto como vendido, el vendedor ve inmediatamente un modal para valorar al comprador (1–5 estrellas). El comprador, la próxima vez que abra ese chat, también ve el modal para valorar al vendedor. Cada parte solo puede valorar una vez por transacción; el modal se puede omitir
+
+### Lista de conversaciones ("Mis mensajes")
+
+La lista diferencia visualmente el estado de cada producto:
+
+| Estado | Imagen | Badge | Nombre |
+|--------|--------|-------|--------|
+| Normal | Color | — | Normal |
+| Reservado | Gris leve | Ámbar "RESERVADO" | Normal |
+| Vendido | Gris 60% | Rojo "VENDIDO" | Tachado |
+| Eliminado | Placeholder | — | "Producto eliminado" (no clicable) |
 
 ### Notificaciones de mensajes no leídos
 - **Punto rojo en el avatar** del navbar — aparece automáticamente en menos de 5 segundos cuando llega un mensaje nuevo, sin necesidad de recargar la página (polling JS)
@@ -71,13 +84,30 @@ Cada producto puede estar en uno de estos cuatro estados:
 - Funciona tanto para compradores (cuando el vendedor responde) como para vendedores (cuando un comprador escribe)
 - Totalmente adaptado a **dark mode**
 
+### Sistema de valoraciones
+- Al completar una venta, comprador y vendedor pueden valorarse mutuamente del **1 al 5 estrellas**
+- La media de valoraciones recibidas aparece en el **perfil público** del usuario y en **Mi perfil**
+- También es visible para el administrador en el panel de gestión dentro del perfil detallado de cada usuario
+- Un usuario solo puede valorar una vez por transacción (constraint único en BD)
+- La valoración es opcional — se puede omitir con el enlace "Omitir valoración"
+- Sin valoraciones se muestra "—" con estrella gris; en cuanto hay al menos una se muestra la media con estrella dorada
+
+### Verificación de email
+- Al registrarse, el usuario recibe un correo de verificación personalizado con el estilo de Venalia (botón dorado, texto en español)
+- Un **banner sticky ámbar** informa al usuario de que debe verificar su correo; incluye un botón "Reenviar email de verificación" con **cooldown de 60 segundos** para evitar spam (el temporizador persiste entre recargas de página usando `localStorage`)
+- Los usuarios sin email verificado **no pueden publicar productos** — son redirigidos con un mensaje de error
+- Tras verificar, se redirige a la tienda con un banner de éxito
+- Los banners de éxito y error se cierran automáticamente tras 5 segundos (o manualmente con la X)
+
 ### Publicar productos (todos los usuarios)
-- Cualquier usuario registrado puede publicar productos desde el menú de usuario ("Publicar producto") o desde su perfil ("Añadir producto")
+- Cualquier usuario registrado **y con email verificado** puede publicar productos desde el menú de usuario ("Publicar producto") o desde su perfil ("Añadir producto")
 - Formulario con subida de múltiples imágenes (JPEG/PNG, máx. 2 MB c/u), categoría, precio y descripción
 - Los productos publicados aparecen en la tienda pública con estado `activo`
 
 ### Perfil de usuario
-- Página `/mi-perfil` con edición de nombre, email y contraseña
+- Página `/mi-perfil` con edición de nombre, email, contraseña y **foto de perfil** (avatar)
+- El avatar se puede cambiar pasando el cursor sobre la foto y haciendo clic; también se puede eliminar con la X roja
+- Muestra la **valoración media** recibida (estrella dorada + número + total de valoraciones)
 - Sección "Mis productos" con las publicaciones propias, incluyendo badge de estado en los reservados/vendidos
 
 ### Consentimiento de cookies y analítica
@@ -107,27 +137,28 @@ Cada producto puede estar en uno de estos cuatro estados:
 - El contenido de cada documento legal vive en partials Blade separados en `resources/views/partials/legal/`
 
 ### Panel de administración
-- Solo accesible para usuarios con `is_admin = true`.
-- **Dashboard con estadísticas detalladas:**
+- Solo accesible para usuarios con `is_admin = true`. Todas las rutas del panel usan el prefijo `/admin/`.
+- **Dashboard con estadísticas detalladas** (`/admin/dashboard`):
   - Totales por estado: activos, reservados, vendidos, inactivos.
   - Gráfico de barras interactivo (Chart.js) que muestra la distribución de productos por categorías padre.
   - Tabla comparativa detallada con el desglose numérico de estados por cada categoría raíz.
   - Mensaje motivacional del día con sistema de generación automática.
   - Últimos 5 productos publicados.
   - Auto-refresco inteligente (polling) para mantener los datos siempre actualizados.
-- **Gestión avanzada de productos:**
+- **Gestión avanzada de productos** (`/admin/products`):
   - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
   - Búsqueda en tiempo real por nombre y descripción con `wire:model.live` (debounce de 300 ms)
   - Filtro de ordenación por precio (menor/mayor) y fecha
   - Contador total de productos visibles según los filtros aplicados
   - Paginación integrada para una navegación fluida entre grandes catálogos
-- **Categorías:** CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
-- **Gestión de usuarios:** Sección dedicada con dos pestañas:
+- **Categorías** (`/admin/categories`): CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
+- **Gestión de usuarios** (`/admin/users`): Sección dedicada con dos pestañas **sin cambio de URL** (Alpine.js):
   - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil o eliminar la cuenta (con modal de confirmación)
   - **Administradores** — cards con avatar, badge de rol y acciones (con modales Alpine) para degradar a cliente o eliminar. No se puede modificar la propia cuenta desde el panel
-  - **Perfil detallado** — estadísticas del usuario (productos publicados, favoritos, último acceso, email verificado) y acciones: editar datos, promover/degradar rol de administrador y eliminar cuenta, todas con modales de confirmación
+  - **Perfil detallado** (`/admin/users/{id}`) — estadísticas del usuario: productos publicados, favoritos, último acceso, email verificado y **valoración media**. Acciones: editar datos, promover/degradar rol de administrador y eliminar cuenta, todas con modales de confirmación. La flecha "atrás" usa `history.back()` para respetar la pestaña activa
   - **Crear usuario** — formulario dedicado para crear usuarios desde el panel con nombre, email, contraseña y opción de asignar rol de administrador
   - **Editar usuario** — formulario para modificar nombre, email y contraseña (dejar en blanco para no cambiarla); el rol de administrador también se puede cambiar desde aquí (excepto en la propia cuenta)
+- **Perfil del administrador** (`/admin/profile`): misma interfaz de edición que el lado cliente (avatar, nombre, email, contraseña, valoración) pero dentro del layout del panel con sidebar
 - **Chat:** Los hilos de chat de todos los usuarios son visibles para el administrador para fines de soporte o moderación
 
 ---
@@ -308,7 +339,7 @@ Los usuarios registrados desde el formulario de registro **nunca** obtienen acce
 
 ### Dar permisos de administrador a un usuario
 
-**Desde el panel de administración** — la forma más fácil. Ve a `/admin/users`, pestaña "Clientes", entra al perfil del usuario y pulsa el botón "Hacer administrador".
+**Desde el panel de administración** — la forma más fácil. Ve a `localhost/admin/users`, pestaña "Clientes", entra al perfil del usuario y pulsa el botón "Hacer administrador".
 
 **Desde Tinker** — útil para crear el primer administrador cuando aún no hay ninguno:
 
@@ -337,7 +368,8 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Reservar / cancelar reserva          | No        | Sí (propio)    | Sí            |
 | Marcar producto como vendido         | No        | Sí (propio)    | Sí            |
 | Reactivar producto                   | No        | Sí (propio)    | Sí            |
-| Mi perfil (editar datos)             | No        | Sí             | Sí            |
+| Valorar una transacción              | No        | Sí             | Sí            |
+| Mi perfil (editar datos + avatar)    | No        | Sí             | Sí            |
 | Panel de gestión                     | No        | No             | Sí            |
 | CRUD productos y categorías          | No        | No             | Sí            |
 | Gestión de usuarios (panel admin)    | No        | No             | Sí            |
@@ -363,9 +395,14 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | GET    | `/chat/{product}/vendedor/{buyer}`       | Hilo del vendedor con un comprador concreto    |
 | GET    | `/chat/{product}/{user}`                 | Hilo específico (solo admin)                   |
 | GET    | `/mensajes/no-leidos`                    | API: devuelve nº de mensajes no leídos (JSON)  |
-| GET    | `/mi-perfil`                             | Perfil propio (editar datos + mis productos)   |
+| GET    | `/mi-perfil`                             | Perfil propio (editar datos, avatar, valoración) |
 | GET    | `/usuarios/{user}`                       | Perfil público de cualquier usuario            |
-| GET    | `/dashboard`                             | Panel de gestión (solo admin)                  |
+| GET    | `/admin/dashboard`                       | Panel de gestión (solo admin)                  |
+| GET    | `/admin/profile`                         | Perfil del administrador (solo admin)          |
+| GET    | `/admin/products`                        | Lista de productos (solo admin)                |
+| GET    | `/admin/products/create`                 | Formulario para crear un producto (solo admin) |
+| GET    | `/admin/categories`                      | Lista de categorías (solo admin)               |
+| GET    | `/admin/stats`                           | Estadísticas con gráficas (solo admin)         |
 | GET    | `/admin/users`                           | Lista de usuarios — clientes y admins          |
 | GET    | `/admin/users/create`                    | Formulario para crear un nuevo usuario         |
 | POST   | `/admin/users`                           | Guardar nuevo usuario                          |
