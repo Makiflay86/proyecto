@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 | Toda la lógica de datos vive en DashboardController@index.
 */
-Route::get('/dashboard', [DashboardController::class, 'index'])
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'admin'])
     ->name('dashboard');
 
@@ -61,13 +61,13 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 */
 
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/products',                  [ProductController::class, 'index'])->name('products.index');
-    Route::post('/products',                 [ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/create',           [ProductController::class, 'create'])->name('products.create');
-    Route::get('/products/{product}',        [ProductController::class, 'show'])->name('products.show');
-    Route::get('/products/{product}/edit',   [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{product}',        [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/admin/products',                  [ProductController::class, 'index'])->name('products.index');
+    Route::post('/admin/products',                 [ProductController::class, 'store'])->name('products.store');
+    Route::get('/admin/products/create',           [ProductController::class, 'create'])->name('products.create');
+    Route::get('/admin/products/{product}',        [ProductController::class, 'show'])->name('products.show');
+    Route::get('/admin/products/{product}/edit',   [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/admin/products/{product}',        [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/admin/products/{product}',     [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/admin/users',                       [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/create',                [UserController::class, 'create'])->name('admin.users.create');
@@ -80,14 +80,14 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::delete('/admin/users/{user}/avatar',        [UserController::class, 'deleteAvatar'])->name('admin.users.avatar.delete');
     Route::delete('/admin/users/{user}',              [UserController::class, 'destroy'])->name('admin.users.destroy');
 
-    Route::get('/categories',                    [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/admin/categories',                    [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/admin/stats', \App\Livewire\Admin\Charts::class)->name('admin.stats');
-    Route::post('/categories',                   [CategoryController::class, 'store'])->name('categories.store');
-    Route::get('/categories/create',             [CategoryController::class, 'create'])->name('categories.create');
-    Route::get('/categories/{category}',         [CategoryController::class, 'show'])->name('categories.show');
-    Route::get('/categories/{category}/edit',    [CategoryController::class, 'edit'])->name('categories.edit');
-    Route::put('/categories/{category}',         [CategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}',      [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/admin/categories',                   [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/admin/categories/create',             [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('/admin/categories/{category}',         [CategoryController::class, 'show'])->name('categories.show');
+    Route::get('/admin/categories/{category}/edit',    [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/admin/categories/{category}',         [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/admin/categories/{category}',      [CategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
 /*
@@ -97,7 +97,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 | Edición, actualización y eliminación del perfil. Solo requiere autenticación.
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/profile',          [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/admin/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',        [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/avatar',   [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
