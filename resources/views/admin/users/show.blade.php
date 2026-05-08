@@ -2,8 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <a href="{{ route('admin.users.index', ['tab' => $user->is_admin ? 'admins' : 'customers']) }}"
-                   wire:navigate.hover
+                <a href="#" onclick="history.back(); return false;"
                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -63,7 +62,7 @@
             </div>
 
             {{-- Stats --}}
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 text-center">
                     <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->products_count }}</p>
                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Productos publicados</p>
@@ -83,6 +82,20 @@
                         {{ $user->email_verified_at ? 'Sí' : 'No' }}
                     </p>
                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Email verificado</p>
+                </div>
+                @php $avg = $user->averageRating(); $total = $user->ratingsCount(); @endphp
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 text-center">
+                    <div class="flex items-center justify-center gap-1">
+                        <svg class="w-5 h-5 {{ $avg !== null ? 'text-gold-400' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <p class="text-2xl font-bold {{ $avg !== null ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500' }}">
+                            {{ $avg !== null ? number_format($avg, 1) : '—' }}
+                        </p>
+                    </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        {{ $total > 0 ? $total . ' ' . ($total === 1 ? 'valoración' : 'valoraciones') : 'Sin valoraciones' }}
+                    </p>
                 </div>
             </div>
 
