@@ -188,6 +188,59 @@
                 </div>
             </header>
 
+            {{-- Banner verificación de email --}}
+            @auth
+                @if(!Auth::user()->hasVerifiedEmail())
+                <div class="sticky top-16 z-40 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800"
+                     x-data="{
+                         seconds: 0,
+                         interval: null,
+                         init() {
+                             const until = parseInt(localStorage.getItem('verify_until') || 0);
+                             const remaining = Math.ceil((until - Date.now()) / 1000);
+                             if (remaining > 0) this.start(remaining);
+                         },
+                         submit(form) {
+                             if (this.seconds > 0) return;
+                             localStorage.setItem('verify_until', Date.now() + 60000);
+                             this.start(60);
+                             form.submit();
+                         },
+                         start(s) {
+                             this.seconds = s;
+                             clearInterval(this.interval);
+                             this.interval = setInterval(() => {
+                                 this.seconds--;
+                                 if (this.seconds <= 0) {
+                                     this.seconds = 0;
+                                     clearInterval(this.interval);
+                                     localStorage.removeItem('verify_until');
+                                 }
+                             }, 1000);
+                         }
+                     }">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                            </svg>
+                            Verifica tu correo electrónico para disfrutar de todas las funciones.
+                        </p>
+                        <form method="POST" action="{{ route('verification.send') }}" @submit.prevent="submit($el)">
+                            @csrf
+                            <button type="submit"
+                                    :disabled="seconds > 0"
+                                    :class="seconds > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:text-amber-900 dark:hover:text-amber-100'"
+                                    class="text-xs font-semibold text-amber-700 dark:text-amber-300 underline transition whitespace-nowrap">
+                                <span x-show="seconds === 0">Reenviar email de verificación</span>
+                                <span x-show="seconds > 0">Reenviar en <span x-text="seconds"></span>s</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endif
+            @endauth
+
             {{-- Contenido --}}
             <main>
                 {{ $slot }}
