@@ -112,10 +112,10 @@
                             class="bg-gold-500 hover:bg-gold-600 text-white font-semibold px-8 py-2.5 rounded-full text-sm transition shadow-sm hover:shadow-md">
                         Publicar producto
                     </button>
-                    <a href="{{ route('profile.store') }}"
-                       class="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition">
+                    <button type="button" onclick="history.back()"
+                            class="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition">
                         Cancelar
-                    </a>
+                    </button>
                 </div>
             </form>
         </div>
