@@ -75,7 +75,7 @@
                                 {{-- Menú de usuario autenticado --}}
                                 <div class="relative" x-data="{ open: false }">
                                     <button @click="open = !open"
-                                            class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium text-gray-800 dark:text-white">
+                                            class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold-500 dark:bg-gold-600 hover:bg-gold-600 dark:hover:bg-gold-500 transition text-sm font-medium text-white dark:text-white">
                                         <div class="relative w-6 h-6">
                                             @if(Auth::user()->avatar)
                                                 <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt=""
@@ -143,7 +143,7 @@
                                         <form action="{{ route('logout') }}" method="post">
                                             @csrf
                                             <button type="submit"
-                                                    class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition">
+                                                    class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition rounded-b-xl">
                                                 Cerrar sesión
                                             </button>
                                         </form>
