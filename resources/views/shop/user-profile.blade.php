@@ -51,7 +51,7 @@
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($products as $product)
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group relative flex flex-col">
 
                             {{-- Badge estado --}}
                             @if($product->isSold())
@@ -78,10 +78,10 @@
                                     </div>
                                 @endif
                             </div>
-                            <div class="p-4">
+                            <div class="p-4 flex flex-col flex-1">
                                 <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ $product->nombre }}</h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ $product->descripcion }}</p>
-                                <div class="mt-3 flex items-center justify-between">
+                                <div class="mt-3 flex-1 flex items-end justify-between">
                                     <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ',', '.') }} €</span>
                                     <a href="{{ route('store.show', $product) }}"
                                        class="text-sm text-gold-600 dark:text-gold-400 hover:text-gold-800 dark:hover:text-gold-300 font-medium transition">

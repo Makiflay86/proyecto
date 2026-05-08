@@ -69,6 +69,22 @@ class ProductChat extends Component
         Auth::user()->update(['last_seen_at' => now()]);
     }
 
+    public function toggleReserved(): void
+    {
+        $product = Product::find($this->productId);
+        abort_if(! $product || $product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => $product->isReserved() ? 'activo' : 'reservado']);
+    }
+
+    public function markAsSold(): void
+    {
+        $product = Product::find($this->productId);
+        abort_if(! $product || $product->user_id !== Auth::id(), 403);
+
+        $product->update(['estado' => 'vendido']);
+    }
+
     public function refreshMessages(): void
     {
         $this->markRead();
