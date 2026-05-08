@@ -42,24 +42,29 @@
                 @foreach($threads as $thread)
                     @php
                         $isAdmin     = Auth::user()->is_admin;
-                        $isSeller    = $thread->product->user_id === Auth::id();
+                        $product     = $thread->product;
+                        $isSeller    = $product && $product->user_id === Auth::id();
                         $isBuyer     = $thread->thread_user_id === Auth::id();
-                        $chatUrl     = $isAdmin
-                            ? route('chat.thread', [$thread->product, $thread->threadUser])
+                        $isDeleted   = ! $product;
+                        $isSold      = $product && $product->isSold();
+                        $isReserved  = $product && $product->isReserved();
+                        $chatUrl     = $isDeleted ? null : ($isAdmin
+                            ? route('chat.thread', [$product, $thread->threadUser])
                             : ($isSeller && ! $isBuyer
-                                ? route('chat.seller', [$thread->product, $thread->threadUser])
-                                : route('chat.show', $thread->product));
+                                ? route('chat.seller', [$product, $thread->threadUser])
+                                : route('chat.show', $product)));
                         $isUnread    = $thread->read_at === null && $thread->sender_id !== Auth::id();
                     @endphp
-                    <div onclick="window.location='{{ $chatUrl }}'"
-                         class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer group">
+                    <div @if($chatUrl) onclick="window.location='{{ $chatUrl }}'" @endif
+                         class="flex items-center gap-4 px-5 py-4 transition group
+                             {{ $isDeleted ? 'opacity-50 cursor-default' : 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer' }}">
 
                         {{-- Imagen del producto --}}
                         <div style="position:relative;width:3.5rem;height:3.5rem;min-width:3.5rem;min-height:3.5rem;flex-shrink:0;border-radius:0.75rem;overflow:hidden;background:#374151">
-                            @if($thread->product->images->isNotEmpty())
-                                <img src="{{ asset('storage/' . $thread->product->images->first()->path) }}"
-                                     alt="{{ $thread->product->nombre }}"
-                                     style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block">
+                            @if(! $isDeleted && $product->images->isNotEmpty())
+                                <img src="{{ asset('storage/' . $product->images->first()->path) }}"
+                                     alt="{{ $product->nombre }}"
+                                     style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;{{ $isSold ? 'filter:grayscale(60%)' : ($isReserved ? 'filter:grayscale(30%)' : '') }}">
                             @else
                                 <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#6b7280">
                                     <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,13 +73,29 @@
                                     </svg>
                                 </div>
                             @endif
+
+                            {{-- Badge estado sobre la imagen --}}
+                            @if($isSold)
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(220,38,38,0.85);color:white;font-size:0.55rem;font-weight:700;text-align:center;padding:2px 0;letter-spacing:0.05em;text-transform:uppercase">
+                                    Vendido
+                                </div>
+                            @elseif($isReserved)
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(217,119,6,0.85);color:white;font-size:0.55rem;font-weight:700;text-align:center;padding:2px 0;letter-spacing:0.05em;text-transform:uppercase">
+                                    Reservado
+                                </div>
+                            @endif
                         </div>
 
                         {{-- Contenido del hilo --}}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-baseline justify-between gap-2">
-                                <p class="font-semibold text-gray-900 dark:text-white text-sm truncate">
-                                    {{ $thread->product->nombre }}
+                                <p class="font-semibold text-sm truncate
+                                    {{ $isDeleted ? 'text-gray-400 dark:text-gray-500 italic' : ($isSold ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-900 dark:text-white') }}">
+                                    @if($isDeleted)
+                                        Producto eliminado
+                                    @else
+                                        {{ $product->nombre }}
+                                    @endif
                                 </p>
                                 <span class="text-xs text-gray-400 dark:text-gray-500 shrink-0">
                                     {{ $thread->created_at->diffForHumans() }}
@@ -96,10 +117,12 @@
                             <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-indigo-400 shrink-0"></div>
                         @endif
 
-                        <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 transition shrink-0"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
+                        @if(! $isDeleted)
+                            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 transition shrink-0"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        @endif
                     </div>
                 @endforeach
             </div>
