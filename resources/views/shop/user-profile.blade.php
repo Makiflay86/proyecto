@@ -28,6 +28,24 @@
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $products->count() }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">Productos en venta</p>
             </div>
+
+            @php
+                $avg   = $user->averageRating();
+                $total = $user->ratingsCount();
+            @endphp
+            <div class="text-center shrink-0 border-l border-gray-100 dark:border-gray-700 pl-5 ml-1">
+                <div class="flex items-center justify-center gap-1">
+                    <svg class="w-5 h-5 {{ $avg !== null ? 'text-gold-400' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span class="text-2xl font-bold {{ $avg !== null ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500' }}">
+                        {{ $avg !== null ? number_format($avg, 1) : '—' }}
+                    </span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ $total > 0 ? $total . ' ' . ($total === 1 ? 'valoración' : 'valoraciones') : 'Sin valoraciones' }}
+                </p>
+            </div>
             @auth
                 @if(auth()->id() === $user->id)
                     <a href="{{ route('profile.store') }}"

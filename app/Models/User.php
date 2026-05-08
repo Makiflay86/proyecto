@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -66,6 +67,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function ratingsReceived(): HasMany
+    {
+        return $this->hasMany(Rating::class, 'rated_user_id');
+    }
+
+    public function averageRating(): ?float
+    {
+        $avg = $this->ratingsReceived()->avg('stars');
+        return $avg !== null ? round((float) $avg, 1) : null;
+    }
+
+    public function ratingsCount(): int
+    {
+        return $this->ratingsReceived()->count();
     }
 
     public function unreadThreadsCount(): int

@@ -106,6 +106,48 @@
         </div>
     </div>
 
+    {{-- Modal valoración --}}
+    @if($showRatingModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60"
+         x-data="{ hovered: 0, selected: 0 }">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-8 max-w-sm w-full">
+            <div class="flex justify-center mb-4">
+                <div class="bg-gold-100 dark:bg-gold-900/30 rounded-full p-4">
+                    <svg class="w-8 h-8 text-gold-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white text-center">¿Cómo fue el trato?</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400 text-center">Valora esta transacción del 1 al 5</p>
+
+            {{-- Estrellas --}}
+            <div class="flex justify-center gap-2 mt-6">
+                @for($i = 1; $i <= 5; $i++)
+                <button
+                    type="button"
+                    @mouseenter="hovered = {{ $i }}"
+                    @mouseleave="hovered = 0"
+                    @click="selected = {{ $i }}"
+                    wire:click="submitRating({{ $i }})"
+                    class="transition-transform hover:scale-110 focus:outline-none">
+                    <svg class="w-10 h-10 transition-colors"
+                         :class="(hovered >= {{ $i }} || selected >= {{ $i }}) ? 'text-gold-400' : 'text-gray-300 dark:text-gray-600'"
+                         fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                </button>
+                @endfor
+            </div>
+
+            <button wire:click="skipRating"
+                    class="mt-6 w-full text-center text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition">
+                Omitir valoración
+            </button>
+        </div>
+    </div>
+    @endif
+
     {{-- Área de mensajes con auto-scroll y polling cada 3s --}}
     <div wire:poll.3000ms="refreshMessages"
          x-data="{
