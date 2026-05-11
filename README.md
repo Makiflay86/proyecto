@@ -184,12 +184,14 @@ La lista diferencia visualmente el estado de cada producto:
    - Abre Docker Desktop → Settings → Resources → WSL Integration → activa tu distro de Ubuntu
    - Comprueba que el icono de Docker en la barra de tareas está **verde** antes de continuar
 
-3. **Git** — dentro de la terminal de Ubuntu (WSL2):
+> A partir de aquí, **todos los comandos se ejecutan en la terminal de Ubuntu/WSL2** (búscala en el buscador de Windows como "Ubuntu").
+
+3. **Git** — dentro de la terminal de Ubuntu:
    ```bash
    sudo apt update && sudo apt install git -y
    ```
 
-4. **Node.js** — dentro de la terminal de Ubuntu (WSL2):
+4. **Node.js** — dentro de la terminal de Ubuntu:
    ```bash
    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
    sudo apt install -y nodejs
@@ -200,7 +202,6 @@ La lista diferencia visualmente el estado de cada producto:
    git config --global core.autocrlf input
    ```
 
-> A partir de aquí, **todos los comandos se ejecutan en la terminal de Ubuntu/WSL2** (búscala en el menú inicio como "Ubuntu").
 
 ### macOS / Linux
 
@@ -252,21 +253,7 @@ APP_TIMEZONE=Europe/Madrid
 
 ---
 
-## 4. Levantar Docker
-
-```bash
-./vendor/bin/sail up -d
-```
-
-Para parar los contenedores:
-
-```bash
-./vendor/bin/sail down
-```
-
----
-
-## 5. Generar clave, migrar y enlazar storage
+## 4. Generar clave, migrar y enlazar storage
 
 ```bash
 ./vendor/bin/sail artisan key:generate
@@ -284,7 +271,7 @@ Si quieres poblar la base de datos con datos de prueba:
 
 ---
 
-## 6. Instalar dependencias de Node y compilar assets
+## 5. Instalar dependencias de Node y compilar assets
 
 ```bash
 npm install
@@ -298,6 +285,20 @@ npm run dev
 ```
 
 > El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión), `auth.js` (formularios de autenticación) y `admin-users.js` (formularios de creación/edición de usuarios en el panel).
+
+---
+
+## 6. Levantar Docker
+
+```bash
+./vendor/bin/sail up -d
+```
+
+Para parar los contenedores:
+
+```bash
+./vendor/bin/sail down
+```
 
 ---
 
