@@ -9,7 +9,7 @@ class UserProfileController extends Controller
 {
     public function show(User $user)
     {
-        $products = $user->products()->with('images')->latest()->get();
+        $products = $user->products()->with('images')->where('estado', '!=', 'vendido')->latest()->get();
 
         return view('shop.user-profile', compact('user', 'products'));
     }

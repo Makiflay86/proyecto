@@ -72,17 +72,13 @@
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 overflow-hidden hover:shadow-lg transition-all duration-300 group relative flex flex-col">
 
                             {{-- Badge estado --}}
-                            @if($product->isSold())
-                                <div class="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">
-                                    Vendido
-                                </div>
-                            @elseif($product->isReserved())
+                            @if($product->isReserved())
                                 <div class="absolute top-3 left-3 z-10 bg-amber-500 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow-sm">
                                     Reservado
                                 </div>
                             @endif
 
-                            <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600 {{ $product->isSold() || $product->isReserved() ? 'opacity-75' : '' }}">
+                            <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-600 {{ $product->isReserved() ? 'opacity-50' : '' }}">
                                 @if($product->images->isNotEmpty())
                                     <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                          alt="{{ $product->nombre }}"
@@ -100,9 +96,9 @@
                                 <h3 class="font-bold text-gray-900 dark:text-white truncate">{{ $product->nombre }}</h3>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{{ $product->descripcion }}</p>
                                 <div class="mt-3 flex-1 flex items-end justify-between">
-                                    <span class="font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ',', '.') }} €</span>
+                                    <span class="font-bold text-gray-800 dark:text-gray-200 px-3 py-2">{{ number_format($product->precio, 2, ',', '.') }} €</span>
                                     <a href="{{ route('store.show', $product) }}"
-                                       class="text-sm text-gold-600 dark:text-gold-400 hover:text-gold-800 dark:hover:text-gold-300 font-medium transition">
+                                       class="text-center text-sm font-medium text-gold-600 dark:text-gold-400 hover:text-gold-800 dark:hover:text-gold-300 bg-gold-50 dark:bg-gold-900/20 hover:bg-gold-100 dark:hover:bg-gold-900/40 px-3 py-2 rounded-lg transition">
                                         Ver →
                                     </a>
                                 </div>
