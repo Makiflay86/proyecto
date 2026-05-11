@@ -579,3 +579,7 @@ O si estás en modo desarrollo, asegúrate de tener `npm run dev` corriendo en o
 ```bash
 ./vendor/bin/sail artisan key:generate
 ```
+
+---
+
+### Creado por Francisco Aybar
