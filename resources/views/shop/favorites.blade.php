@@ -35,7 +35,7 @@
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($products as $product)
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative flex flex-col">
 
                         @if($product->isSold())
                             <div class="absolute top-2 left-2 z-10">
@@ -57,7 +57,7 @@
                             @endif
                         </div>
 
-                        <div class="p-5">
+                        <div class="p-5 flex flex-col flex-1">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">
                                     {{ $product->category?->root->name }}
@@ -68,10 +68,10 @@
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
                             <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
 
-                            <div class="mt-4 flex items-center justify-between">
+                            <div class="mt-auto pt-4 flex items-center justify-between">
                                 <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ',', '.') }} €</span>
                                 <a href="{{ route('store.show', $product) }}"
-                                   class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm">
+                                   class="text-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 px-3 py-2 rounded-lg transition">
                                     Ver detalles →
                                 </a>
                             </div>
