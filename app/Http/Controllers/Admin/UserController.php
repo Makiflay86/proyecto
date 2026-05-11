@@ -41,7 +41,13 @@ class UserController extends Controller
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'min:8', 'max:16', 'regex:/[^a-zA-Z0-9]/'],
+        ], [
+            'password.required'  => 'La contraseña es obligatoria.',
+            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.max'       => 'La contraseña no puede superar los 16 caracteres.',
+            'password.regex'     => 'La contraseña debe incluir al menos un símbolo especial (ej: !, @, #, $...).',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
         $user = User::create([
@@ -75,7 +81,12 @@ class UserController extends Controller
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'password' => ['nullable', 'confirmed', 'min:8', 'max:16', 'regex:/[^a-zA-Z0-9]/'],
+        ], [
+            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.max'       => 'La contraseña no puede superar los 16 caracteres.',
+            'password.regex'     => 'La contraseña debe incluir al menos un símbolo especial (ej: !, @, #, $...).',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
         $data = [
