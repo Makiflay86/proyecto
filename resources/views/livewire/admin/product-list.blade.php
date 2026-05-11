@@ -178,7 +178,7 @@
 
                     <div class="p-5">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs font-semibold uppercase tracking-wider text-gold-600 dark:text-gold-400 truncate">{{ $product->category?->root->name }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 truncate">{{ $product->category?->root->name }}</span>
                             @if($product->estado === 'activo')
                                 <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>
@@ -219,7 +219,10 @@
                                 Ejemplo: 1234.5 → "1.234,50€"
                             --}}
                             <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ",", ".") }}€</span>
-                            <a href="{{ route('products.show', $product->id) }}" class="text-gold-600 dark:text-gold-400 hover:text-gold-700 dark:hover:text-gold-300 font-medium text-sm" wire:navigate.hover>Ver detalles →</a>
+                            <a href="{{ route('products.show', $product->id) }}" 
+                               class="text-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 px-3 py-2 rounded-lg transition" wire:navigate.hover>
+                                Ver detalles →
+                            </a>
                         </div>
                     </div>
                 </div>
