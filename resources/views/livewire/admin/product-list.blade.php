@@ -211,6 +211,15 @@
                         --}}
                         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
 
+                        @if($product->user)
+                            <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                Por <a href="{{ route('admin.users.show', $product->user) }}"
+                                       class="font-medium text-gray-600 dark:text-gray-400 hover:text-gold-500 dark:hover:text-gold-400 transition">
+                                    {{ $product->user->name }}
+                                </a>
+                            </p>
+                        @endif
+
                         {{-- PRECIO + ENLACE AL DETALLE --}}
                         <div class="mt-4 flex items-center justify-between">
                             {{--
