@@ -165,7 +165,7 @@ La lista diferencia visualmente el estado de cada producto:
 
 ## Instrucciones de instalación con Docker
 
-> **Todos los comandos de esta guía se ejecutan desde la terminal de WSL2 (Windows) o terminal normal (macOS/Linux). Nunca desde CMD ni PowerShell.**
+> **Todos los comandos de esta guía se ejecutan desde la terminal de Ubuntu/WSL2 (Windows) o terminal normal (macOS/Linux). Nunca desde CMD ni PowerShell.**
 
 ---
 
@@ -514,7 +514,7 @@ La app genera un mensaje motivacional diario.
 - **En producción:** Se recomienda añadir un cron para que se ejecute independientemente de la entrada de usuarios:
 
 ```bash
-* * * * * cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
+cd /ruta-del-proyecto && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 Para ejecutarlo manualmente en cualquier momento:
