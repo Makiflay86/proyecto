@@ -253,7 +253,21 @@ APP_TIMEZONE=Europe/Madrid
 
 ---
 
-## 4. Generar clave, migrar y enlazar storage
+## 4. Levantar Docker
+
+```bash
+./vendor/bin/sail up -d
+```
+
+Para parar los contenedores:
+
+```bash
+./vendor/bin/sail down
+```
+
+---
+
+## 5. Generar clave, migrar y enlazar storage
 
 ```bash
 ./vendor/bin/sail artisan key:generate
@@ -271,7 +285,7 @@ Si quieres poblar la base de datos con datos de prueba:
 
 ---
 
-## 5. Instalar dependencias de Node y compilar assets
+## 6. Instalar dependencias de Node y compilar assets
 
 ```bash
 npm install
@@ -285,20 +299,6 @@ npm run dev
 ```
 
 > El proyecto tiene varios entry points de Vite: `app.js` (global), `dashboard.js` (panel de gestión), `auth.js` (formularios de autenticación) y `admin-users.js` (formularios de creación/edición de usuarios en el panel).
-
----
-
-## 6. Levantar Docker
-
-```bash
-./vendor/bin/sail up -d
-```
-
-Para parar los contenedores:
-
-```bash
-./vendor/bin/sail down
-```
 
 ---
 
