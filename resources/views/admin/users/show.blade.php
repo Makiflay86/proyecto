@@ -239,6 +239,70 @@
                 @endif
             </div>
 
+            {{-- Conversaciones del usuario --}}
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    Conversaciones
+                    <span class="text-sm font-normal text-gray-400">({{ $threads->count() }})</span>
+                </h3>
+
+                @if($threads->isEmpty())
+                    <p class="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Este usuario no tiene conversaciones.</p>
+                @else
+                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @foreach($threads as $thread)
+                            @php
+                                $isBuyer = $thread->thread_user_id === $user->id;
+                                $other   = $isBuyer ? $thread->product?->user : $thread->threadUser;
+                                $route   = ($thread->product && $thread->threadUser)
+                                    ? route('admin.users.conversation', [$thread->threadUser, $thread->product])
+                                    : null;
+                            @endphp
+                            <a href="{{ $route ?? '#' }}"
+                               @if(!$route) onclick="return false" @endif
+                               class="flex items-center gap-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-xl px-2 transition group">
+                                {{-- Imagen producto --}}
+                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 shrink-0">
+                                    @if($thread->product?->images->isNotEmpty())
+                                        <img src="{{ asset('storage/' . $thread->product->images->first()->path) }}"
+                                             class="w-full h-full object-cover">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-gray-300">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                {{-- Info --}}
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                        {{ $thread->product?->nombre ?? 'Producto eliminado' }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {{ $isBuyer ? 'Comprador' : 'Vendedor' }} · con {{ $other?->name ?? '—' }}
+                                        · <span class="italic">{{ $thread->body }}</span>
+                                    </p>
+                                </div>
+
+                                {{-- Fecha --}}
+                                <span class="text-xs text-gray-400 shrink-0">{{ $thread->created_at->diffForHumans() }}</span>
+
+                                <svg class="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
         </div>
     </div>
 </x-app-layout>

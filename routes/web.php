@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::post('/admin/users/{user}/avatar',          [UserController::class, 'updateAvatar'])->name('admin.users.avatar');
     Route::delete('/admin/users/{user}/avatar',        [UserController::class, 'deleteAvatar'])->name('admin.users.avatar.delete');
     Route::delete('/admin/users/{user}',              [UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('/admin/users/{user}/conversacion/{product}', [UserController::class, 'showConversation'])->name('admin.users.conversation');
 
     Route::get('/admin/categories',                    [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/admin/stats', \App\Livewire\Admin\Charts::class)->name('admin.stats');

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Message;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,7 +70,23 @@ class UserController extends Controller
     {
         $user->loadCount(['products', 'likedProducts']);
 
-        return view('admin.users.show', compact('user'));
+        $buyerIds = Message::selectRaw('MAX(id) as id')
+            ->where('thread_user_id', $user->id)
+            ->groupBy('product_id', 'thread_user_id')
+            ->pluck('id');
+
+        $sellerIds = Message::selectRaw('MAX(id) as id')
+            ->whereHas('product', fn ($q) => $q->where('user_id', $user->id))
+            ->where('thread_user_id', '!=', $user->id)
+            ->groupBy('product_id', 'thread_user_id')
+            ->pluck('id');
+
+        $threads = Message::with(['product.images', 'sender', 'threadUser'])
+            ->whereIn('id', $buyerIds->merge($sellerIds)->unique())
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('admin.users.show', compact('user', 'threads'));
     }
 
     public function edit(User $user)
@@ -127,6 +145,19 @@ class UserController extends Controller
         }
 
         return back()->with('success', 'Avatar eliminado correctamente.');
+    }
+
+    public function showConversation(User $user, Product $product)
+    {
+        $messages = Message::with('sender')
+            ->where('product_id', $product->id)
+            ->where('thread_user_id', $user->id)
+            ->orderBy('created_at')
+            ->get();
+
+        $product->load('images', 'user');
+
+        return view('admin.users.conversation', compact('user', 'product', 'messages'));
     }
 
     public function toggleAdmin(User $user)

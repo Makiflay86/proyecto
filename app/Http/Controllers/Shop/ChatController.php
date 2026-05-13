@@ -15,24 +15,18 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->is_admin) {
-            $lastIds = Message::selectRaw('MAX(id) as id')
-                ->groupBy('product_id', 'thread_user_id')
-                ->pluck('id');
-        } else {
-            $buyerIds = Message::selectRaw('MAX(id) as id')
-                ->where('thread_user_id', $user->id)
-                ->groupBy('product_id', 'thread_user_id')
-                ->pluck('id');
+        $buyerIds = Message::selectRaw('MAX(id) as id')
+            ->where('thread_user_id', $user->id)
+            ->groupBy('product_id', 'thread_user_id')
+            ->pluck('id');
 
-            $sellerIds = Message::selectRaw('MAX(id) as id')
-                ->whereHas('product', fn ($q) => $q->where('user_id', $user->id))
-                ->where('thread_user_id', '!=', $user->id)
-                ->groupBy('product_id', 'thread_user_id')
-                ->pluck('id');
+        $sellerIds = Message::selectRaw('MAX(id) as id')
+            ->whereHas('product', fn ($q) => $q->where('user_id', $user->id))
+            ->where('thread_user_id', '!=', $user->id)
+            ->groupBy('product_id', 'thread_user_id')
+            ->pluck('id');
 
-            $lastIds = $buyerIds->merge($sellerIds)->unique();
-        }
+        $lastIds = $buyerIds->merge($sellerIds)->unique();
 
         $threads = Message::with(['product.images', 'sender', 'threadUser'])
             ->whereIn('id', $lastIds)
