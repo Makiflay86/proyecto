@@ -18,6 +18,12 @@ class ProductList extends Component
     #[Url]
     public string $orden = '';
 
+    #[Url]
+    public string $precioMin = '';
+
+    #[Url]
+    public string $precioMax = '';
+
     public int $perPage = 12;
     public bool $hasMore = false;
 
@@ -54,11 +60,23 @@ class ProductList extends Component
         $this->perPage = 12;
     }
 
+    public function updatedPrecioMin(): void
+    {
+        $this->perPage = 12;
+    }
+
+    public function updatedPrecioMax(): void
+    {
+        $this->perPage = 12;
+    }
+
     public function clearAll(): void
     {
-        $this->path   = [];
-        $this->buscar = '';
-        $this->perPage = 12;
+        $this->path      = [];
+        $this->buscar    = '';
+        $this->precioMin = '';
+        $this->precioMax = '';
+        $this->perPage   = 12;
     }
 
     public function render()
@@ -96,6 +114,14 @@ class ProductList extends Component
                 $q->where('nombre', 'like', "%{$buscar}%")
                   ->orWhere('descripcion', 'like', "%{$buscar}%");
             });
+        }
+
+        if ($this->precioMin !== '') {
+            $query->where('precio', '>=', (float) $this->precioMin);
+        }
+
+        if ($this->precioMax !== '') {
+            $query->where('precio', '<=', (float) $this->precioMax);
         }
 
         if ($this->orden === 'precio_asc') {
