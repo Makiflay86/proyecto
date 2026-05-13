@@ -8,6 +8,45 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 
 ---
 
+## Índice
+
+- [Funcionalidades principales](#funcionalidades-principales)
+  - [Tienda pública](#tienda-pública)
+  - [Perfiles públicos de usuario](#perfiles-públicos-de-usuario)
+  - [Estados de un producto](#estados-de-un-producto)
+  - [Sistema de ventas y reservas](#sistema-de-ventas-y-reservas)
+  - [Sistema de likes (favoritos)](#sistema-de-likes-favoritos)
+  - [Chat entre usuarios](#chat-entre-usuarios-comprador--vendedor)
+  - [Lista de conversaciones ("Mis mensajes")](#lista-de-conversaciones-mis-mensajes)
+  - [Notificaciones de mensajes no leídos](#notificaciones-de-mensajes-no-leídos)
+  - [Sistema de valoraciones](#sistema-de-valoraciones)
+  - [Verificación de email](#verificación-de-email)
+  - [Publicar productos](#publicar-productos-todos-los-usuarios)
+  - [Perfil de usuario](#perfil-de-usuario)
+  - [Consentimiento de cookies y analítica](#consentimiento-de-cookies-y-analítica)
+  - [Navegación móvil (bottom navigation)](#navegación-móvil-bottom-navigation)
+  - [Dark mode](#dark-mode)
+  - [Footer legal](#footer-legal)
+  - [Panel de administración](#panel-de-administración)
+- [Instalación con Docker](#instrucciones-de-instalación-con-docker)
+  - [Requisitos previos](#requisitos-previos)
+  - [1. Clonar el repositorio](#1-clonar-el-repositorio)
+  - [2. Instalar dependencias de PHP](#2-instalar-dependencias-de-php)
+  - [3. Configurar el entorno](#3-configurar-el-entorno)
+  - [4. Levantar Docker](#4-levantar-docker)
+  - [5. Generar clave, migrar y enlazar storage](#5-generar-clave-migrar-y-enlazar-storage)
+  - [6. Instalar dependencias de Node y compilar assets](#6-instalar-dependencias-de-node-y-compilar-assets)
+- [Servicios disponibles](#servicios-disponibles)
+- [Roles y administración](#roles-y-administración)
+- [Rutas principales](#rutas-principales)
+- [Backup de la base de datos](#backup-de-la-base-de-datos)
+- [Tests](#tests)
+- [Comandos útiles](#comandos-útiles)
+- [Mensaje diario automático](#mensaje-diario-automático)
+- [Problemas frecuentes en Windows](#problemas-frecuentes-en-windows)
+
+---
+
 ## Funcionalidades principales
 
 ### Tienda pública
@@ -119,6 +158,15 @@ La lista diferencia visualmente el estado de cada producto:
 - GA4 recibe información del estado de sesión: `user_id` y `logged_in: true` para usuarios autenticados, `logged_in: false` para visitantes anónimos
 - El banner solo aparece en la tienda pública (`store.blade.php`), nunca en el panel de administración
 
+### Navegación móvil (bottom navigation)
+
+- Barra fija en la parte inferior de la pantalla, visible **solo en móvil** (`sm:hidden`) y únicamente para usuarios autenticados
+- Sustituye al menú desplegable de usuario del navbar en pantallas pequeñas
+- Cinco accesos directos: **Favoritos**, **Mensajes** (con badge de no leídos), **Publicar** (botón central destacado en dorado, elevado), **Mis productos** y **Mi perfil**
+- El ítem activo se resalta con color según la sección (rojo en favoritos, índigo en mensajes, dorado en publicar y productos)
+- Respeta el safe area de iOS (`env(safe-area-inset-bottom)`) para no quedar tapada por la barra de gestos del iPhone
+- El badge de mensajes no leídos se actualiza junto con el resto de indicadores de la app
+
 ### Dark mode
 
 - Funciona en todos los layouts: tienda, panel de administración y formularios de autenticación
@@ -155,11 +203,12 @@ La lista diferencia visualmente el estado de cada producto:
 - **Gestión de usuarios** (`/admin/users`): Sección dedicada con dos pestañas **sin cambio de URL** (Alpine.js):
   - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil o eliminar la cuenta (con modal de confirmación)
   - **Administradores** — cards con avatar, badge de rol y acciones (con modales Alpine) para degradar a cliente o eliminar. No se puede modificar la propia cuenta desde el panel
-  - **Perfil detallado** (`/admin/users/{id}`) — estadísticas del usuario: productos publicados, favoritos, último acceso, email verificado y **valoración media**. Acciones: editar datos, promover/degradar rol de administrador y eliminar cuenta, todas con modales de confirmación. La flecha "atrás" usa `history.back()` para respetar la pestaña activa
+  - **Perfil detallado** (`/admin/users/{id}`) — estadísticas del usuario: productos publicados, favoritos, último acceso, email verificado y **valoración media**. Acciones: editar datos, promover/degradar rol de administrador y eliminar cuenta, todas con modales de confirmación. Incluye un listado de todas las conversaciones del usuario con enlace a cada hilo. La flecha "atrás" navega siempre a la lista de usuarios
+  - **Visor de conversación** (`/admin/users/{user}/conversacion/{product}`) — vista de solo lectura del hilo de chat entre un comprador y un vendedor, dentro del layout del panel. Muestra separadores de fecha (Hoy/Ayer/fecha completa) y la hora integrada en cada burbuja. Incluye botón flotante para bajar al final de la conversación
   - **Crear usuario** — formulario dedicado para crear usuarios desde el panel con nombre, email, contraseña y opción de asignar rol de administrador
   - **Editar usuario** — formulario para modificar nombre, email y contraseña (dejar en blanco para no cambiarla); el rol de administrador también se puede cambiar desde aquí (excepto en la propia cuenta)
 - **Perfil del administrador** (`/admin/profile`): misma interfaz de edición que el lado cliente (avatar, nombre, email, contraseña, valoración) pero dentro del layout del panel con sidebar
-- **Chat:** Los hilos de chat de todos los usuarios son visibles para el administrador para fines de soporte o moderación
+- **Chat del administrador:** el administrador tiene su propio "Mis mensajes" como cualquier usuario — solo ve sus propias conversaciones como comprador o vendedor. Para supervisar las conversaciones de otro usuario, accede a su perfil detallado en el panel
 
 ---
 
@@ -278,10 +327,16 @@ Para parar los contenedores:
 Si quieres poblar la base de datos con datos de prueba:
 
 ```bash
-./vendor/bin/sail artisan db:seed
+./vendor/bin/sail artisan db:seed --class=ProductDemoSeeder
 ```
 
-> **Aviso:** `db:seed` añade categorías y productos de prueba. **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
+El seeder crea:
+- Jerarquía de categorías de hasta 4 niveles (Electrónica, Hogar, Moda, Deporte, Vehículos, Coleccionismo y sus subcategorías)
+- 5 usuarios de prueba y el administrador `francisco@gmail.com` (contraseña: `1234567890#`)
+- ~150 productos distribuidos entre los usuarios, con imágenes descargadas automáticamente de Flickr según la categoría
+- Likes cruzados entre usuarios y conversaciones de ejemplo
+
+> **Aviso:** **Nunca uses `migrate:fresh --seed`** en un entorno con datos reales porque borra toda la base de datos.
 
 ---
 
@@ -364,7 +419,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Dar like a productos                 | No        | Sí             | Sí            |
 | Mis favoritos                        | No        | Sí             | Sí            |
 | Contactar con el vendedor (chat)     | No        | Sí             | Sí            |
-| Mis mensajes + notificaciones        | No        | Sí             | Sí (todos)    |
+| Mis mensajes + notificaciones        | No        | Sí             | Sí            |
 | Publicar productos                   | No        | Sí             | Sí            |
 | Reservar / cancelar reserva          | No        | Sí (propio)    | Sí            |
 | Marcar producto como vendido         | No        | Sí (propio)    | Sí            |
@@ -412,6 +467,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | PUT    | `/admin/users/{user}`                    | Actualizar datos de un usuario                 |
 | PATCH  | `/admin/users/{user}/toggle-admin`       | Promover a admin o degradar a cliente          |
 | DELETE | `/admin/users/{user}`                    | Eliminar cuenta de usuario                     |
+| GET    | `/admin/users/{user}/conversacion/{product}` | Ver conversación de un usuario (solo admin) |
 
 ---
 
