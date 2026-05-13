@@ -62,7 +62,7 @@
 
             <div class="flex items-center gap-4 shrink-0">
                 <a href="{{ route('publish.create') }}"
-                   class="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 text-white font-semibold px-4 py-2.5 rounded-full text-sm transition shadow-sm">
+                   class="hidden sm:inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-600 text-white font-semibold px-4 py-2.5 rounded-full text-sm transition shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
@@ -172,6 +172,23 @@
                            class="text-sm text-green-600 dark:text-green-400">Actualizada.</p>
                     @endif
                 </div>
+            </form>
+        </div>
+
+        {{-- Cerrar sesión (solo móvil, en desktop está en el dropdown del navbar) --}}
+        <div class="sm:hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-1">Cerrar sesión</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-5">Saldrás de tu cuenta en este dispositivo.</p>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-red-50 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900 text-red-600 dark:text-red-400 font-semibold px-6 py-2.5 rounded-xl text-sm transition border border-red-200 dark:border-red-800">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Cerrar sesión
+                </button>
             </form>
         </div>
 

@@ -72,8 +72,8 @@
 
                             @auth
                                 @php $unreadNav = Auth::user()->unreadThreadsCount() @endphp
-                                {{-- Menú de usuario autenticado --}}
-                                <div class="relative" x-data="{ open: false }">
+                                {{-- Menú de usuario autenticado (oculto en móvil, sustituido por bottom nav) --}}
+                                <div class="relative hidden sm:block" x-data="{ open: false }">
                                     <button @click="open = !open"
                                             class="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold-500 dark:bg-gold-600 hover:bg-gold-600 dark:hover:bg-gold-500 transition text-sm font-medium text-white dark:text-white">
                                         <div class="relative w-6 h-6">
@@ -282,7 +282,7 @@
             @endauth
 
             {{-- Contenido --}}
-            <main>
+            <main class="pb-20 sm:pb-0">
                 {{ $slot }}
             </main>
 
@@ -382,6 +382,81 @@
 
         </div>
 
+        @auth
+        {{-- Mobile bottom navigation (solo en móvil) --}}
+        @php $unreadBottom = Auth::user()->unreadThreadsCount() @endphp
+        <nav class="sm:hidden fixed bottom-0 inset-x-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+             style="padding-bottom: env(safe-area-inset-bottom)">
+            <div class="flex items-center justify-around h-16">
+
+                {{-- Favoritos --}}
+                <a href="{{ route('store.favorites') }}"
+                   class="flex flex-col items-center gap-0.5 flex-1 py-2 transition
+                          {{ request()->routeIs('store.favorites') ? 'text-red-400' : 'text-gray-400 dark:text-gray-500 hover:text-red-400' }}">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"
+                         fill="{{ request()->routeIs('store.favorites') ? 'currentColor' : 'none' }}"
+                         stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                    <span class="text-[10px] font-medium">Favoritos</span>
+                </a>
+
+                {{-- Mensajes --}}
+                <a href="{{ route('chat.index') }}"
+                   class="flex flex-col items-center gap-0.5 flex-1 py-2 transition
+                          {{ request()->routeIs('chat.*') ? 'text-indigo-400' : 'text-gray-400 dark:text-gray-500 hover:text-indigo-400' }}">
+                    <div class="relative">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        <span id="unread-badge-bottom"
+                              class="{{ $unreadBottom > 0 ? '' : 'hidden' }} absolute -top-1.5 -right-1.5 min-w-[16px] h-4 bg-indigo-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
+                            {{ $unreadBottom > 9 ? '9+' : $unreadBottom }}
+                        </span>
+                    </div>
+                    <span class="text-[10px] font-medium">Mensajes</span>
+                </a>
+
+                {{-- Publicar (centro destacado) --}}
+                <a href="{{ route('publish.create') }}"
+                   class="flex flex-col items-center gap-0.5 flex-1 py-2 -mt-5 transition">
+                    <span class="flex items-center justify-center w-12 h-12 rounded-full shadow-lg transition
+                                 {{ request()->routeIs('publish.create') ? 'bg-gold-600' : 'bg-gold-500 hover:bg-gold-600' }}">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </span>
+                    <span class="text-[10px] font-medium text-gold-500 dark:text-gold-400">Publicar</span>
+                </a>
+
+                {{-- Mis productos --}}
+                <a href="{{ route('profile.my-products') }}"
+                   class="flex flex-col items-center gap-0.5 flex-1 py-2 transition
+                          {{ request()->routeIs('profile.my-products') ? 'text-gold-500 dark:text-gold-400' : 'text-gray-400 dark:text-gray-500 hover:text-gold-500 dark:hover:text-gold-400' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+                    </svg>
+                    <span class="text-[10px] font-medium">Productos</span>
+                </a>
+
+                {{-- Mi perfil --}}
+                <a href="{{ route('profile.store') }}"
+                   class="flex flex-col items-center gap-0.5 flex-1 py-2 transition
+                          {{ request()->routeIs('profile.store') ? 'text-gray-800 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200' }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span class="text-[10px] font-medium">Perfil</span>
+                </a>
+
+            </div>
+        </nav>
+        @endauth
+
         @livewireScripts
 
         @stack('scripts')
@@ -402,14 +477,17 @@
                     })
                     .then(function(data) {
                         if (!data) return;
-                        var dot   = document.getElementById('unread-dot');
-                        var badge = document.getElementById('unread-badge-count');
+                        var dot    = document.getElementById('unread-dot');
+                        var badge  = document.getElementById('unread-badge-count');
+                        var bottom = document.getElementById('unread-badge-bottom');
                         if (data.count > 0) {
-                            if (dot)   dot.classList.remove('hidden');
-                            if (badge) { badge.textContent = data.count > 99 ? '99+' : data.count; badge.classList.remove('hidden'); }
+                            if (dot)    dot.classList.remove('hidden');
+                            if (badge)  { badge.textContent = data.count > 99 ? '99+' : data.count; badge.classList.remove('hidden'); }
+                            if (bottom) { bottom.textContent = data.count > 9 ? '9+' : data.count; bottom.classList.remove('hidden'); }
                         } else {
-                            if (dot)   dot.classList.add('hidden');
-                            if (badge) badge.classList.add('hidden');
+                            if (dot)    dot.classList.add('hidden');
+                            if (badge)  badge.classList.add('hidden');
+                            if (bottom) bottom.classList.add('hidden');
                         }
                     });
                 }
