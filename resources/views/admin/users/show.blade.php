@@ -1,28 +1,30 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="#" onclick="history.back(); return false;"
-                   class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </a>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
+        <div class="flex items-center gap-3 min-w-0">
+            <a href="{{ route('admin.users.index') }}"
+               wire:navigate
+               class="shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </a>
+            <div class="min-w-0">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight truncate">
                     {{ $user->name }}
                 </h2>
-                @if ($user->is_admin)
-                    <span class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 text-xs font-semibold px-2.5 py-1 rounded-full">
-                        <i class="bi bi-shield-fill-check"></i> Admin
-                    </span>
-                @endif
-                @if ($user->isOnline())
-                    <span class="inline-flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 font-medium">
-                        <span class="w-2 h-2 rounded-full bg-green-500"></span> En línea
-                    </span>
-                @endif
+                <div class="flex items-center gap-2 flex-wrap mt-0.5">
+                    @if ($user->is_admin)
+                        <span class="inline-flex items-center gap-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                            <i class="bi bi-shield-fill-check"></i> Admin
+                        </span>
+                    @endif
+                    @if ($user->isOnline())
+                        <span class="inline-flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 font-medium">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span> En línea
+                        </span>
+                    @endif
+                </div>
             </div>
-            <div class="h-10"></div>
         </div>
     </x-slot>
 
@@ -84,7 +86,7 @@
                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Email verificado</p>
                 </div>
                 @php $avg = $user->averageRating(); $total = $user->ratingsCount(); @endphp
-                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 text-center">
+                <div class="col-span-2 sm:col-span-1 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-5 text-center">
                     <div class="flex items-center justify-center gap-1">
                         <svg class="w-5 h-5 {{ $avg !== null ? 'text-gold-400' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>

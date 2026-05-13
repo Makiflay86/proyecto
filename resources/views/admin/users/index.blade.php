@@ -1,13 +1,14 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight truncate">
                 Usuarios
             </h2>
             <a href="{{ route('admin.users.create') }}"
-               class="bg-gold-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-gold-700 transition duration-200"
+               class="shrink-0 bg-gold-600 text-white px-4 sm:px-6 py-2 rounded-full shadow-lg hover:bg-gold-700 transition duration-200 text-sm sm:text-base"
                wire:navigate.hover>
-                + Crear usuario
+                <span class="hidden sm:inline">+ Crear usuario</span>
+                <span class="sm:hidden">+ Crear</span>
             </a>
         </div>
     </x-slot>
