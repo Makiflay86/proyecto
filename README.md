@@ -50,11 +50,15 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 ## Funcionalidades principales
 
 ### Tienda pública
-- Catálogo de productos con filtrado por categoría en modo **drill-down** reactivo (Livewire): seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente
+- Catálogo de productos con **panel de filtros lateral** (drawer) accesible desde el botón "Filtros" con badge que muestra el número de filtros activos:
+  - **Ordenar por**: más recientes, precio menor a mayor, precio mayor a menor
+  - **Rango de precio**: inputs Mín/Máx con debounce — filtra en tiempo real sin recargar
+  - **Categoría**: filtrado en modo **drill-down** reactivo (seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente)
+  - Botón "Limpiar" que resetea todos los filtros y "Ver X resultados" que cierra el panel
+  - El drawer se adapta a móvil teniendo en cuenta el navbar inferior
 - Búsqueda por nombre/descripción desde el buscador del navbar: Alpine despacha un evento al window con debounce de 300 ms, el componente Livewire lo escucha y actualiza la propiedad directamente sin recargar la página
-- Ordenación por precio (asc/desc) o por más recientes, reactiva sin recargar la página
-- Paginación de 12 productos por página
 - Los productos en estado **activo** y **reservado** aparecen en la tienda; los vendidos o inactivos no
+- URLs amigables basadas en slug: `/producto/iphone-14-pro` en lugar de `/producto/1` — generadas automáticamente con `spatie/laravel-sluggable` (tildes y caracteres especiales normalizados)
 - Galería de imágenes con lightbox y navegación por teclado en el detalle del producto
 - Nombre del autor visible en cada tarjeta y en el detalle, **clickable** — lleva al perfil público del vendedor
 
@@ -194,11 +198,15 @@ La lista diferencia visualmente el estado de cada producto:
   - Últimos 5 productos publicados.
   - Auto-refresco inteligente (polling) para mantener los datos siempre actualizados.
 - **Gestión avanzada de productos** (`/admin/products`):
-  - Lista ordenada por fecha de publicación (más recientes primero) de forma predeterminada
-  - Búsqueda en tiempo real por nombre y descripción con `wire:model.live` (debounce de 300 ms)
-  - Filtro de ordenación por precio (menor/mayor) y fecha
+  - Buscador en tiempo real por nombre y descripción siempre visible (debounce 300 ms)
+  - **Panel de filtros lateral** (drawer) con badge de filtros activos:
+    - **Ordenar por**: más recientes, precio asc/desc
+    - **Estado**: Todos / Activo / Reservado / Vendido / Inactivo
+    - **Rango de precio**: Mín/Máx con debounce
+    - **Categoría**: drill-down por niveles igual que en la tienda
+    - Botones "Limpiar" y "Ver X resultados"
   - Contador total de productos visibles según los filtros aplicados
-  - Paginación integrada para una navegación fluida entre grandes catálogos
+  - Paginación infinita (infinite scroll) para navegar entre grandes catálogos
 - **Categorías** (`/admin/categories`): CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
 - **Gestión de usuarios** (`/admin/users`): Sección dedicada con dos pestañas **sin cambio de URL** (Alpine.js):
   - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil o eliminar la cuenta (con modal de confirmación)
@@ -414,7 +422,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Sección                              | Visitante | Usuario normal | Administrador |
 |--------------------------------------|:---------:|:--------------:|:-------------:|
 | Tienda pública                       | Sí        | Sí             | Sí            |
-| Búsqueda y filtros drill-down        | Sí        | Sí             | Sí            |
+| Búsqueda y filtros (precio, categoría)| Sí       | Sí             | Sí            |
 | Ver perfil público de un usuario     | Sí        | Sí             | Sí            |
 | Dar like a productos                 | No        | Sí             | Sí            |
 | Mis favoritos                        | No        | Sí             | Sí            |
@@ -438,7 +446,7 @@ O directamente en phpMyAdmin: pon `is_admin = 1` en el registro del usuario.
 | Método | Ruta                                     | Descripción                                    |
 |--------|------------------------------------------|------------------------------------------------|
 | GET    | `/`                                      | Catálogo de productos                          |
-| GET    | `/producto/{product}`                    | Detalle del producto                           |
+| GET    | `/producto/{slug}`                       | Detalle del producto (URL amigable por slug)   |
 | PATCH  | `/producto/{product}/reservar`           | Marcar producto como reservado (dueño)         |
 | PATCH  | `/producto/{product}/quitar-reserva`     | Cancelar reserva (dueño)                       |
 | PATCH  | `/producto/{product}/vendido`            | Marcar producto como vendido (dueño)           |
