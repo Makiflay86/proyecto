@@ -41,7 +41,7 @@ class DashboardContent extends Component
         $categoriesCount  = (int) $stats->categories;
 
         $recentProducts = Product::with('category.parent.parent.parent.parent')
-            ->select('id', 'nombre', 'category_id', 'precio', 'estado', 'created_at')
+            ->select('id', 'slug', 'nombre', 'category_id', 'precio', 'estado', 'created_at')
             ->latest()
             ->take(5)
             ->get();

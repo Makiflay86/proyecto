@@ -22,6 +22,15 @@ class ProductList extends Component
     #[Url]
     public string $buscar = '';
 
+    #[Url]
+    public string $estado = '';
+
+    #[Url]
+    public string $precioMin = '';
+
+    #[Url]
+    public string $precioMax = '';
+
     public int $perPage = 12;
     public bool $hasMore = false;
 
@@ -43,6 +52,31 @@ class ProductList extends Component
     public function updatedBuscar(): void
     {
         $this->perPage = 12;
+    }
+
+    public function updatedEstado(): void
+    {
+        $this->perPage = 12;
+    }
+
+    public function updatedPrecioMin(): void
+    {
+        $this->perPage = 12;
+    }
+
+    public function updatedPrecioMax(): void
+    {
+        $this->perPage = 12;
+    }
+
+    public function clearAll(): void
+    {
+        $this->path      = [];
+        $this->orden     = '';
+        $this->estado    = '';
+        $this->precioMin = '';
+        $this->precioMax = '';
+        $this->perPage   = 12;
     }
 
     public function selectLevel(int $depth, int $id): void
@@ -91,6 +125,18 @@ class ProductList extends Component
                 $q->where('nombre', 'like', "%{$this->buscar}%")
                   ->orWhere('descripcion', 'like', "%{$this->buscar}%");
             });
+        }
+
+        if ($this->estado !== '') {
+            $query->where('estado', $this->estado);
+        }
+
+        if ($this->precioMin !== '') {
+            $query->where('precio', '>=', (float) $this->precioMin);
+        }
+
+        if ($this->precioMax !== '') {
+            $query->where('precio', '<=', (float) $this->precioMax);
         }
 
         if ($this->orden === 'precio_asc') {
