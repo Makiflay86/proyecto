@@ -772,22 +772,23 @@ class ProductDemoSeeder extends Seeder
         ];
 
         // Asignamos cada conversación a un producto distinto con buyer ≠ seller
-        $usedPairs = [];
+        $usedProductIds = [];
         $convCount = 0;
         foreach ($conversations as $conv) {
-            // Buscar un producto con buyer distinto al seller
+            // Buscar un producto que no tenga ya una conversación
             foreach ($createdProducts as $product) {
+                if (in_array($product->id, $usedProductIds)) continue;
+
                 $seller = $product->user_id;
                 $buyer  = null;
                 foreach ($users as $u) {
-                    $pair = $product->id . '-' . $u->id;
-                    if ($u->id !== $seller && !in_array($pair, $usedPairs)) {
+                    if ($u->id !== $seller) {
                         $buyer = $u->id;
-                        $usedPairs[] = $pair;
                         break;
                     }
                 }
                 if (!$buyer) continue;
+                $usedProductIds[] = $product->id;
 
                 $now = now()->subMinutes(count($conv['messages']) * 5);
                 foreach ($conv['messages'] as $msg) {
