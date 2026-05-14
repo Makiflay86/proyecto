@@ -49,6 +49,15 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
   - [Solución de errores comunes](#solución-de-errores-comunes-en-cloud9)
   - [Proceso de instalación rápida](#proceso-de-instalación-rápida-en-cloud9)
   - [Configuración .env para AWS](#notas-importantes-de-configuración-para-aws)
+- [HTTPS y dominio en AWS](#https-y-dominio-en-aws)
+  - [1. Dominio gratuito con DuckDNS](#1-dominio-gratuito-con-duckdns)
+  - [2. Mover Sail al puerto 8000](#2-mover-sail-al-puerto-8000)
+  - [3. Instalar nginx](#3-instalar-nginx)
+  - [4. Certificado SSL con Let's Encrypt](#4-certificado-ssl-con-lets-encrypt)
+  - [5. Configurar nginx como proxy inverso HTTPS](#5-configurar-nginx-como-proxy-inverso-https)
+  - [6. Acceso a phpMyAdmin y Mailpit](#6-acceso-a-phpmyadmin-y-mailpit)
+  - [Renovación del certificado](#renovación-del-certificado)
+  - [Cuando cambia la IP (sesiones AWS Academy)](#cuando-cambia-la-ip-sesiones-aws-academy)
 
 ---
 
@@ -716,11 +725,232 @@ Si vas a usar el proyecto en AWS Cloud9, ten en cuenta realizar estos ajustes en
 
 ---
 
-### Creado por Francisco Aybar
-s rutas funcionen correctamente.
-- **Rendimiento:** Cambia `APP_DEBUG=false` para liberar recursos de la CPU.
-- **Drivers:** Se recomienda usar `SESSION_DRIVER=file` y `CACHE_STORE=file` para mayor velocidad en instancias con recursos limitados.
-- **Seguridad:** Recuerda abrir los puertos **80** (HTTP), **8080** (phpMyAdmin) y opcionalmente el **5173** (Vite) en el Security Group de tu instancia EC2.
+---
+
+## HTTPS y dominio en AWS
+
+Esta sección documenta cómo configurar un dominio con HTTPS en la instancia EC2 de AWS Academy, usando **DuckDNS** (dominio gratuito), **nginx** como proxy inverso y **Let's Encrypt** para el certificado SSL.
+
+> **Nota:** Las cuentas AWS Academy tienen restricciones que impiden usar Route 53 para registrar dominios ni CloudFront. Esta guía usa alternativas gratuitas que funcionan con cualquier cuenta.
+
+---
+
+### 1. Dominio gratuito con DuckDNS
+
+1. Ve a [duckdns.org](https://www.duckdns.org) e inicia sesión con Google o GitHub.
+2. En el campo de dominio escribe el nombre que quieras (ej: `venalia`) → **Add domain**.
+3. En el campo IP pon la IP pública de tu EC2 → **Update IP**.
+
+Tu dominio quedará disponible en `venalia.duckdns.org`.
+
+---
+
+### 2. Mover Sail al puerto 8000
+
+Por defecto Sail ocupa el puerto 80. Necesitamos liberarlo para nginx.
+
+Añade al `.env`:
+
+```env
+APP_PORT=8000
+APP_URL=https://venalia.duckdns.org
+ASSET_URL=https://venalia.duckdns.org
+```
+
+Reinicia Sail:
+
+```bash
+./vendor/bin/sail down && ./vendor/bin/sail up -d
+```
+
+Verifica que responde en el nuevo puerto:
+
+```bash
+curl -I http://localhost:8000
+```
+
+---
+
+### 3. Instalar nginx
+
+```bash
+sudo yum update -y
+sudo yum install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+```
+
+---
+
+### 4. Certificado SSL con Let's Encrypt
+
+Instala certbot:
+
+```bash
+sudo yum install -y certbot
+sudo pip3 install certbot-nginx
+```
+
+Antes de pedir el certificado, establece el TXT record en DuckDNS para la validación (necesario porque DuckDNS tiene problemas con la validación CAA de Let's Encrypt):
+
+```bash
+curl "https://www.duckdns.org/update?domains=venalia&token=TU_TOKEN_DUCKDNS&txt=VALOR_QUE_PIDA_CERTBOT"
+```
+
+Obtén el certificado (para el dominio `venalia.duckdns.org`):
+
+```bash
+sudo systemctl stop nginx
+sudo certbot certonly --standalone -d venalia.duckdns.org --non-interactive --agree-tos -m tu@email.com
+sudo systemctl start nginx
+```
+
+> Si falla con error CAA, actualiza el TXT record en DuckDNS con la API tal como se muestra arriba y vuelve a intentarlo. DuckDNS a veces necesita 1-2 intentos.
+
+El certificado se guarda en:
+- Certificado: `/etc/letsencrypt/live/venalia.duckdns.org/fullchain.pem`
+- Clave privada: `/etc/letsencrypt/live/venalia.duckdns.org/privkey.pem`
+
+---
+
+### 5. Configurar nginx como proxy inverso HTTPS
+
+Crea el archivo de configuración:
+
+```bash
+sudo tee /etc/nginx/conf.d/venalia.conf > /dev/null << 'EOF'
+server {
+    listen 80;
+    server_name venalia.duckdns.org;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name venalia.duckdns.org;
+
+    ssl_certificate /etc/letsencrypt/live/venalia.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/venalia.duckdns.org/privkey.pem;
+
+    location /mailpit {
+        proxy_pass http://localhost:8025;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /phpmyadmin/ {
+        proxy_pass http://localhost:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+```
+
+Aplica la configuración:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+Para que Laravel genere URLs HTTPS correctamente (está detrás de un proxy), añade en `bootstrap/app.php`:
+
+```php
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->trustProxies(at: '*');
+    // ...resto de middleware
+})
+```
+
+Limpia la caché:
+
+```bash
+./vendor/bin/sail artisan config:cache
+./vendor/bin/sail artisan view:clear
+```
+
+---
+
+### 6. Acceso a phpMyAdmin y Mailpit
+
+Con esta configuración, ambas herramientas son accesibles desde el dominio seguro:
+
+| Servicio    | URL en AWS                                  |
+|-------------|---------------------------------------------|
+| Aplicación  | `https://venalia.duckdns.org`               |
+| Mailpit     | `https://venalia.duckdns.org/mailpit`       |
+| phpMyAdmin  | `https://venalia.duckdns.org/phpmyadmin/`   |
+
+Para que phpMyAdmin genere los enlaces correctamente bajo el subpath, añade en `compose.yaml`:
+
+```yaml
+phpmyadmin:
+    environment:
+        PMA_ABSOLUTE_URI: 'https://venalia.duckdns.org/phpmyadmin/'
+```
+
+Para que Mailpit sirva su UI bajo `/mailpit`, añade en `compose.yaml`:
+
+```yaml
+mailpit:
+    environment:
+        MP_WEBROOT: '/mailpit'
+```
+
+Reinicia los servicios tras los cambios:
+
+```bash
+./vendor/bin/sail down && ./vendor/bin/sail up -d
+```
+
+---
+
+### Renovación del certificado
+
+Los certificados de Let's Encrypt expiran a los **90 días**. Para renovar:
+
+```bash
+sudo systemctl stop nginx
+sudo certbot renew
+sudo systemctl start nginx
+```
+
+---
+
+### Cuando cambia la IP (sesiones AWS Academy)
+
+Las sesiones de AWS Academy tienen un tiempo límite (~4 horas). Al expirar, el EC2 se para y al reiniciarlo la IP pública puede cambiar.
+
+**Cada vez que cambie la IP:**
+
+1. Comprueba la nueva IP:
+```bash
+curl ifconfig.me
+```
+
+2. Actualiza la IP en [duckdns.org](https://www.duckdns.org) con el nuevo valor.
+
+3. Levanta Sail y nginx:
+```bash
+cd ~/environment/venalia
+./vendor/bin/sail up -d
+sudo systemctl start nginx
+```
+
+> El certificado SSL no se ve afectado por el cambio de IP — es válido por dominio, no por IP.
 
 ---
 
