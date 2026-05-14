@@ -158,13 +158,13 @@
                                 </div>
                             @else
                                 <a href="{{ route('login') }}"
-                                   class="text-sm font-medium text-gray-700 dark:text-gray-100 hover:text-gold-600 dark:hover:text-gold-400 transition px-3 py-1.5">
+                                   class="inline-flex items-center text-sm font-semibold bg-gold-500 hover:bg-gold-600 dark:bg-gold-600 dark:hover:bg-gold-500 text-gray-900 dark:text-white px-4 py-1.5 rounded-full transition shadow-sm">
                                     Entrar
                                 </a>
-                                <a href="{{ route('register') }}"
+                                {{-- <a href="{{ route('register') }}"
                                    class="inline-flex items-center text-sm font-semibold bg-gold-500 hover:bg-gold-600 dark:bg-gold-600 dark:hover:bg-gold-500 text-gray-900 dark:text-white px-4 py-1.5 rounded-full transition shadow-sm">
                                     Registrarse
-                                </a>
+                                </a> --}}
                             @endauth
                         </div>
                     </div>
