@@ -50,6 +50,7 @@ services:
             retries: 3
             timeout: 5s
     phpmyadmin:
+        platform: linux/amd64
         image: 'phpmyadmin/phpmyadmin'
         ports:
             - '8080:80'
