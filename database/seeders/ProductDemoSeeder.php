@@ -779,14 +779,9 @@ class ProductDemoSeeder extends Seeder
             foreach ($createdProducts as $product) {
                 if (in_array($product->id, $usedProductIds)) continue;
 
-                $seller = $product->user_id;
-                $buyer  = null;
-                foreach ($users as $u) {
-                    if ($u->id !== $seller) {
-                        $buyer = $u->id;
-                        break;
-                    }
-                }
+                $seller     = $product->user_id;
+                $candidates = collect($users)->filter(fn($u) => $u->id !== $seller)->shuffle();
+                $buyer      = $candidates->first()?->id;
                 if (!$buyer) continue;
                 $usedProductIds[] = $product->id;
 

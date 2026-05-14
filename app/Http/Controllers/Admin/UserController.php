@@ -157,7 +157,9 @@ class UserController extends Controller
 
         $product->load('images', 'user');
 
-        return view('admin.users.conversation', compact('user', 'product', 'messages'));
+        $fromUser = request()->query('from') ? User::find(request()->query('from')) : $user;
+
+        return view('admin.users.conversation', compact('user', 'product', 'messages', 'fromUser'));
     }
 
     public function toggleAdmin(User $user)

@@ -261,7 +261,7 @@
                                 $isBuyer = $thread->thread_user_id === $user->id;
                                 $other   = $isBuyer ? $thread->product?->user : $thread->threadUser;
                                 $route   = ($thread->product && $thread->threadUser)
-                                    ? route('admin.users.conversation', [$thread->threadUser, $thread->product])
+                                    ? route('admin.users.conversation', [$thread->threadUser, $thread->product]) . '?from=' . $user->id
                                     : null;
                             @endphp
                             <a href="{{ $route ?? '#' }}"

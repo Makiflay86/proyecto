@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.users.show', $user) }}"
+            <a href="{{ route('admin.users.show', $fromUser) }}"
                wire:navigate
                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
