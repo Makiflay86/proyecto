@@ -172,7 +172,11 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group flex flex-col">
+                <div
+                    @if($loop->index === count($products) - 15)
+                        x-init="new IntersectionObserver(([e]) => e.isIntersecting && $wire.loadMore()).observe($el)"
+                    @endif
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group flex flex-col">
 
                     {{-- Badges centrados --}}
                     @if($product->isSold() || $product->isReserved())
@@ -231,21 +235,6 @@
         {{-- Spinner de carga --}}
         @if($hasMore)
             <div class="mt-8 flex flex-col items-center gap-4">
-                <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        @endif
-    @endif
-</div>
-        <div class="mt-8 flex flex-col items-center gap-4">
-                <div
-                    x-data
-                    x-init="
-                        new IntersectionObserver(([entry]) => {
-                            if (entry.isIntersecting) $wire.loadMore()
-                        }, { rootMargin: '400px' }).observe($el)
-                    "
-                    class="h-1 w-full"
-                ></div>
                 <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
         @endif
