@@ -189,6 +189,7 @@
                         @if($product->images->isNotEmpty())
                             <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                  alt="{{ $product->nombre }}"
+                                 loading="lazy"
                                  class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">Sin imagen</div>

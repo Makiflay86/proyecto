@@ -44,6 +44,11 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
 - [Comandos útiles](#comandos-útiles)
 - [Mensaje diario automático](#mensaje-diario-automático)
 - [Problemas frecuentes en Windows](#problemas-frecuentes-en-windows)
+- [Despliegue en AWS Cloud9](#despliegue-en-aws-cloud9)
+  - [Requisitos de la Instancia](#requisitos-de-la-instancia)
+  - [Solución de errores comunes](#solución-de-errores-comunes-en-cloud9)
+  - [Proceso de instalación rápida](#proceso-de-instalación-rápida-en-cloud9)
+  - [Configuración .env para AWS](#notas-importantes-de-configuración-para-aws)
 
 ---
 
@@ -684,19 +689,26 @@ sudo xfs_growfs -d /
 # 1. Instalar dependencias iniciales
 docker run --rm -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-reqs
 
-# 2. Configurar y levantar
+# 2. Configurar el entorno, levantar y preparar
 cp .env.example .env
 ./vendor/bin/sail up -d
-
-# 3. Inicializar app
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail artisan storage:link
 
-# 4. Frontend
+# 3. Frontend (Generar archivos estáticos)
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm run build
 ```
+
+### Notas importantes de configuración para AWS
+
+Si vas a usar el proyecto en AWS Cloud9, ten en cuenta realizar estos ajustes en tu archivo `.env` para asegurar el correcto funcionamiento y la mejor fluidez:
+
+- **URL y Red:** Configura `APP_URL=http://<tu-ip-publica>` y `VITE_HMR_HOST=<tu-ip-publica>` para que los assets y las rutas funcionen correctamente.
+- **Rendimiento:** Cambia `APP_DEBUG=false` para liberar recursos de la CPU.
+- **Drivers:** Se recomienda usar `SESSION_DRIVER=file` y `CACHE_STORE=file` para mayor velocidad en instancias con recursos limitados.
+- **Seguridad:** Recuerda abrir los puertos **80** (HTTP), **8080** (phpMyAdmin) y opcionalmente el **5173** (Vite) en el Security Group de tu instancia EC2.
 
 ---
 

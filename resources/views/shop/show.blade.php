@@ -33,6 +33,7 @@
                         @foreach($product->images as $i => $image)
                             <button type="button" @click="show({{ $i }})" class="shrink-0 group relative">
                                 <img src="{{ asset('storage/' . $image->path) }}"
+                                     loading="lazy"
                                      class="h-56 w-auto rounded-xl object-cover transition group-hover:brightness-90 cursor-zoom-in">
                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition rounded-xl">
                                     <svg class="w-7 h-7 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">

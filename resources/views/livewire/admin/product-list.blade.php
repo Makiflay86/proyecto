@@ -241,7 +241,9 @@
                     <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 {{ $product->isSold() || $product->isReserved() || $product->estado === 'inactivo' ? 'opacity-60 grayscale-[0.5]' : '' }}">
                         @if($product->images->isNotEmpty())
                             {{-- Mostramos la primera imagen de la colección --}}
-                            <img src="{{ asset('storage/' . $product->images->first()->path) }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $product->images->first()->path) }}" 
+                                 loading="lazy"
+                                 class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">Sin imagen</div>
                         @endif
