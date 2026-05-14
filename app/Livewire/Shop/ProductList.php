@@ -24,7 +24,7 @@ class ProductList extends Component
     #[Url]
     public string $precioMax = '';
 
-    public int $perPage = 12;
+    public int $perPage = 30;
     public bool $hasMore = false;
 
     public function mount(): void
@@ -34,40 +34,40 @@ class ProductList extends Component
 
     public function loadMore(): void
     {
-        $this->perPage += 12;
+        $this->perPage += 30;
     }
 
     public function selectLevel(int $depth, int $id): void
     {
         $this->path = array_slice($this->path, 0, $depth);
         $this->path[] = $id;
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function clearFrom(int $depth): void
     {
         $this->path = array_slice($this->path, 0, $depth);
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function updatedOrden(): void
     {
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function updatedBuscar(): void
     {
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function updatedPrecioMin(): void
     {
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function updatedPrecioMax(): void
     {
-        $this->perPage = 12;
+        $this->perPage = 30;
     }
 
     public function clearAll(): void
@@ -76,7 +76,7 @@ class ProductList extends Component
         $this->buscar    = '';
         $this->precioMin = '';
         $this->precioMax = '';
-        $this->perPage   = 12;
+        $this->perPage   = 30;
     }
 
     public function render()
