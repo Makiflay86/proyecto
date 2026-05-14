@@ -646,4 +646,58 @@ O si estás en modo desarrollo, asegúrate de tener `npm run dev` corriendo en o
 
 ---
 
+## Despliegue en AWS Cloud9
+
+Esta guía documenta los pasos necesarios para desplegar el proyecto en un entorno de **AWS Cloud9 (Amazon Linux 2023)**.
+
+### Requisitos de la Instancia
+- **Tipo de instancia:** Mínimo `t3.small` (2GB RAM).
+- **Disco:** Mínimo **20GB** (El valor por defecto de 10GB es insuficiente para Docker).
+
+### Solución de errores comunes en Cloud9
+
+#### 1. docker-compose: command not found
+Cloud9 usa `docker compose` (plugin), pero Sail busca el binario `docker-compose`.
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+#### 2. buildx version incompatible
+Si falla la construcción de la imagen de PHP 8.5:
+```bash
+mkdir -p ~/.docker/cli-plugins
+curl -L https://github.com/docker/buildx/releases/download/v0.17.1/buildx-v0.17.1.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx
+chmod +x ~/.docker/cli-plugins/docker-buildx
+```
+
+#### 3. no space left on device
+Si te quedas sin espacio tras ampliar el volumen en la consola de AWS:
+```bash
+sudo growpart /dev/xvda 1
+sudo xfs_growfs -d /
+```
+
+### Proceso de instalación rápida en Cloud9
+
+```bash
+# 1. Instalar dependencias iniciales
+docker run --rm -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php84-composer:latest composer install --ignore-platform-reqs
+
+# 2. Configurar y levantar
+cp .env.example .env
+./vendor/bin/sail up -d
+
+# 3. Inicializar app
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail artisan storage:link
+
+# 4. Frontend
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
+
+---
+
 ### Creado por Francisco Aybar
