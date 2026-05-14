@@ -305,7 +305,7 @@
                 x-on:open-legal.window="activeModal = $event.detail"
             >
 
-                <footer class="mt-16 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-8">
+                <footer class="mt-16 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-8 pb-28 sm:pb-8">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <img src="{{ asset('images/logo.svg') }}" alt="Venalia" class="h-8 w-auto mx-auto mb-3 opacity-60">
                         <p class="text-sm text-gray-400 dark:text-gray-500 mb-3">© {{ date('Y') }} Venalia — Compra y vende con confianza.</p>
