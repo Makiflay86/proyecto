@@ -61,6 +61,10 @@ Venalia es una aplicación web de compra-venta donde cualquier usuario registrad
   - **Categoría**: filtrado en modo **drill-down** reactivo (seleccionas una categoría raíz y aparecen sus subcategorías, luego las de estas, y así sucesivamente)
   - Botón "Limpiar" que resetea todos los filtros y "Ver X resultados" que cierra el panel
   - El drawer se adapta a móvil teniendo en cuenta el navbar inferior
+- **Carga infinita proactiva (Infinite Scroll)**:
+  - Carga inicial de **30 productos** (múltiplo de 3 para mantener la simetría de la grid).
+  - **Disparador por índice**: el sistema detecta mediante `IntersectionObserver` cuándo el usuario llega al producto número 15 (contando desde el final) y solicita automáticamente los siguientes 30.
+  - Este enfoque elimina los tiempos de espera visuales, ya que el contenido se descarga mientras el usuario aún está viendo el "colchón" de los últimos 15 productos cargados.
 - Búsqueda por nombre/descripción desde el buscador del navbar: Alpine despacha un evento al window con debounce de 300 ms, el componente Livewire lo escucha y actualiza la propiedad directamente sin recargar la página
 - Los productos en estado **activo** y **reservado** aparecen en la tienda; los vendidos o inactivos no
 - URLs amigables basadas en slug: `/producto/iphone-14-pro` en lugar de `/producto/1` — generadas automáticamente con `spatie/laravel-sluggable` (tildes y caracteres especiales normalizados)
