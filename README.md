@@ -211,7 +211,7 @@ La lista diferencia visualmente el estado de cada producto:
     - **Categoría**: drill-down por niveles igual que en la tienda
     - Botones "Limpiar" y "Ver X resultados"
   - Contador total de productos visibles según los filtros aplicados
-  - Paginación infinita (infinite scroll) para navegar entre grandes catálogos
+  - **Paginación infinita proactiva**: carga de 30 productos con disparador dinámico en el ítem 15 antes del final para asegurar una navegación fluida sin esperas.
 - **Categorías** (`/admin/categories`): CRUD completo con jerarquía padre-hijo y filtro drill-down reactivo
 - **Gestión de usuarios** (`/admin/users`): Sección dedicada con dos pestañas **sin cambio de URL** (Alpine.js):
   - **Clientes** — tabla paginada con nombre, email, fecha de registro, último acceso y estado online. Acciones para ver perfil o eliminar la cuenta (con modal de confirmación)
@@ -706,6 +706,14 @@ cp .env.example .env
 Si vas a usar el proyecto en AWS Cloud9, ten en cuenta realizar estos ajustes en tu archivo `.env` para asegurar el correcto funcionamiento y la mejor fluidez:
 
 - **URL y Red:** Configura `APP_URL=http://<tu-ip-publica>` y `VITE_HMR_HOST=<tu-ip-publica>` para que los assets y las rutas funcionen correctamente.
+- **Rendimiento:** Cambia `APP_DEBUG=false` para liberar recursos de la CPU.
+- **Drivers:** Se recomienda usar `SESSION_DRIVER=file` y `CACHE_STORE=file` para mayor velocidad en instancias con recursos limitados.
+- **Seguridad:** Recuerda abrir los puertos **80** (HTTP), **8080** (phpMyAdmin) y opcionalmente el **5173** (Vite) en el Security Group de tu instancia EC2.
+
+---
+
+### Creado por Francisco Aybar
+s rutas funcionen correctamente.
 - **Rendimiento:** Cambia `APP_DEBUG=false` para liberar recursos de la CPU.
 - **Drivers:** Se recomienda usar `SESSION_DRIVER=file` y `CACHE_STORE=file` para mayor velocidad en instancias con recursos limitados.
 - **Seguridad:** Recuerda abrir los puertos **80** (HTTP), **8080** (phpMyAdmin) y opcionalmente el **5173** (Vite) en el Security Group de tu instancia EC2.

@@ -311,9 +311,15 @@
             @endforeach
         </div>
 
-        {{-- Scroll infinito --}}
+        {{-- Spinner de carga --}}
         @if($hasMore)
             <div class="mt-8 flex flex-col items-center gap-4">
+                <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        @endif
+    @endif
+</div>
+        <div class="mt-8 flex flex-col items-center gap-4">
                 <div
                     x-data
                     x-init="
