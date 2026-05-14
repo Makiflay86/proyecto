@@ -179,12 +179,6 @@
 
     {{-- GRID DE PRODUCTOS --}}
     @if($products->isEmpty())
-        {{--
-            ESTADO VACÍO
-            Diferenciamos dos casos:
-            1. Hay filtro activo pero no hay productos → ofrecemos quitar el filtro
-            2. No hay filtro y no hay productos en absoluto → ofrecemos crear el primero
-        --}}
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-16 text-center transition-colors duration-300">
             <div class="flex justify-center mb-6">
                 <div class="bg-gold-100 dark:bg-gold-900/30 rounded-full p-6">
@@ -222,9 +216,13 @@
         {{-- GRID DE TARJETAS DE PRODUCTOS --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach($products as $product)
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group">
+                <div
+                    @if($loop->index === count($products) - 15)
+                        x-init="new IntersectionObserver(([e]) => e.isIntersecting && $wire.loadMore()).observe($el)"
+                    @endif
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl dark:hover:shadow-gold-900/30 transition-all duration-300 relative group">
 
-                    {{-- Badges centrados (Estilo tienda) --}}
+                    {{-- Badges centrados --}}
                     @if($product->isSold() || $product->isReserved() || $product->estado === 'inactivo')
                         <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                             @if($product->isSold())
@@ -240,8 +238,7 @@
                     {{-- IMAGEN DEL PRODUCTO --}}
                     <div class="h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 {{ $product->isSold() || $product->isReserved() || $product->estado === 'inactivo' ? 'opacity-60 grayscale-[0.5]' : '' }}">
                         @if($product->images->isNotEmpty())
-                            {{-- Mostramos la primera imagen de la colección --}}
-                            <img src="{{ asset('storage/' . $product->images->first()->path) }}" 
+                            <img src="{{ asset('storage/' . $product->images->first()->path) }}"
                                  loading="lazy"
                                  class="w-full h-full object-cover">
                         @else
@@ -275,13 +272,7 @@
                             @endif
                         </div>
 
-                        {{-- Nombre del producto --}}
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ $product->nombre }}</h3>
-
-                        {{--
-                            Descripción truncada a 2 líneas con line-clamp-2 (clase de Tailwind).
-                            Evita que las descripciones largas rompan el layout de la grid.
-                        --}}
                         <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm line-clamp-2">{{ $product->descripcion }}</p>
 
                         @if($product->user)
@@ -293,13 +284,7 @@
                             </p>
                         @endif
 
-                        {{-- PRECIO + ENLACE AL DETALLE --}}
                         <div class="mt-4 flex items-center justify-between">
-                            {{--
-                                number_format formatea el precio con 2 decimales,
-                                coma como separador decimal y punto como separador de miles.
-                                Ejemplo: 1234.5 → "1.234,50€"
-                            --}}
                             <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ number_format($product->precio, 2, ",", ".") }}€</span>
                             <a href="{{ route('products.show', $product->id) }}" 
                                class="text-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 px-3 py-2 rounded-lg transition" wire:navigate.hover>
@@ -314,21 +299,6 @@
         {{-- Spinner de carga --}}
         @if($hasMore)
             <div class="mt-8 flex flex-col items-center gap-4">
-                <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        @endif
-    @endif
-</div>
-        <div class="mt-8 flex flex-col items-center gap-4">
-                <div
-                    x-data
-                    x-init="
-                        new IntersectionObserver(([entry]) => {
-                            if (entry.isIntersecting) $wire.loadMore()
-                        }, { rootMargin: '400px' }).observe($el)
-                    "
-                    class="h-1 w-full"
-                ></div>
                 <div class="w-7 h-7 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
         @endif
